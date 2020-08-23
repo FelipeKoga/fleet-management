@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/nav_keyboard"
+        android:icon="@drawable/ic_baseline_keyboard"
+        app:showAsAction="ifRoom"
+        android:visible="true"
+        android:title="" />
+    <item
+        android:id="@+id/nav_speaker"
+        android:icon="@drawable/ic_round_mic"
+        app:showAsAction="ifRoom"
+        android:visible="false"
+        android:title="" />
+
+</menu>

@@ -1,0 +1,92 @@
+Resources:
+  SconnectWebsocketsRoute:
+    Type: 'AWS::ApiGatewayV2::Route'
+    Properties:
+      AuthorizationType: 'AWS_IAM'
+  CognitoUserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: tcc_user_pool
+      AdminCreateUserConfig:
+        AllowAdminCreateUserOnly: True
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 8
+      AutoVerifiedAttributes:
+        - email
+      Schema:
+        - AttributeDataType: String
+          Name: email
+          Required: false
+  CognitoUserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      ClientName: tcc_user_pool_client
+      UserPoolId: !Ref CognitoUserPool
+  CognitoIdentityPool:
+    Type: AWS::Cognito::IdentityPool
+    Properties:
+      IdentityPoolName: tcc_identity_pool
+      AllowUnauthenticatedIdentities: true
+      CognitoIdentityProviders:
+        - ClientId:
+            Ref: CognitoUserPoolClient
+          ProviderName:
+            Fn::GetAtt: [CognitoUserPool, ProviderName]
+  CognitoAuthRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Path: /
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: 'Allow'
+            Principal:
+              Federated: 'cognito-identity.amazonaws.com'
+            Action:
+              - 'sts:AssumeRoleWithWebIdentity'
+            Condition:
+              StringEquals:
+                'cognito-identity.amazonaws.com:aud': !Ref CognitoIdentityPool
+              'ForAnyValue:StringLike':
+                'cognito-identity.amazonaws.com:amr': authenticated
+      Policies:
+        - PolicyName: 'CognitoAuthorizedPolicy'
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: 'Allow'
+                Action:
+                  - 'mobileanalytics:PutEvents'
+                  - 'cognito-sync:*'
+                  - 'cognito-identity:*'
+                Resource: '*'
+  CognitoIdentityPoolRoleAttachment:
+    Type: AWS::Cognito::IdentityPoolRoleAttachment
+    Properties:
+      IdentityPoolId: !Ref CognitoIdentityPool
+      Roles:
+        authenticated: !GetAtt CognitoAuthRole.Arn
+      RoleMappings:
+        CognitoUserPool:
+          IdentityProvider:
+            !Join [
+              '',
+              [
+                'cognito-idp.',
+                !Sub '${self:provider.region}',
+                '.amazonaws.com/',
+                !Ref CognitoUserPool,
+                ':',
+                !Ref CognitoUserPoolClient,
+              ],
+            ]
+          AmbiguousRoleResolution: Deny
+          Type: Token
+Outputs:
+    UserPoolId:
+        Value: !Ref CognitoUserPool
+    UserPoolClientId:
+        Value: !Ref CognitoUserPoolClient
+    IdentityPoolId:
+        Value: !Ref CognitoIdentityPool

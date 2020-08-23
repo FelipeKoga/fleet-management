@@ -1,0 +1,12 @@
+{
+  "UserPoolClientId": "2tle8fpjvdrab07l8dtdi6o7h1",
+  "UserPoolId": "us-east-1_1t5Hxze7t",
+  "ConnectionDashhandlerLambdaFunctionQualifiedArn": "arn:aws:lambda:us-east-1:603366505042:function:tcc-dev-connection-handler:15",
+  "SendDashmessageLambdaFunctionQualifiedArn": "arn:aws:lambda:us-east-1:603366505042:function:tcc-dev-send-message:1",
+  "Region": "us-east-1",
+  "UserLambdaFunctionQualifiedArn": "arn:aws:lambda:us-east-1:603366505042:function:tcc-dev-user:31",
+  "IdentityPoolId": "us-east-1:73da1350-7766-4f17-b932-41fe4342d50f",
+  "ServiceEndpoint": "https://qv7ica8p35.execute-api.us-east-1.amazonaws.com/dev",
+  "ServiceEndpointWebsocket": "wss://3x7sch9ll8.execute-api.us-east-1.amazonaws.com/dev",
+  "ServerlessDeploymentBucketName": "tcc-dev-serverlessdeploymentbucket-1jrmif0g0q1yk"
+}

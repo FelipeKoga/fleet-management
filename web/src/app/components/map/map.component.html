@@ -1,0 +1,334 @@
+<div class="container">
+  <div class="content">
+    <div class="monitored-employees" style="position: relative;">
+      <div
+        style="
+          align-items: center;
+          display: flex;
+          color: black;
+          background-color: white;
+          font-weight: 400;
+          font-size: 22px;
+          padding: 24px;
+        "
+      >
+        <span style="width: 100%; text-align: center;">Monitoramento</span>
+      </div>
+      <div
+        style="
+          display: flex;
+          color: black;
+          background-color: white;
+          font-weight: 400;
+          font-size: 16px;
+          justify-content: space-around;
+          padding-left: 12px;
+          padding-bottom: 12px;
+        "
+      >
+        <div style="margin-bottom: 6px; display: flex; flex-direction: column;">
+          <span style="font-size: 28px; color: blue;">200</span
+          ><span style="color: grey; font-size: 14px;">funcionários</span>
+        </div>
+        <div style="margin-bottom: 6px; display: flex; flex-direction: column;">
+          <span style="font-size: 28px; color: blue;">20</span
+          ><span style="color: grey; font-size: 14px;">veículos ativos</span>
+        </div>
+      </div>
+      <div style="display: flex;">
+        <div
+          style="
+            display: flex;
+            width: 100%;
+            padding: 9px 12px 11px;
+            border-bottom-left-radius: 21px;
+            border-bottom-right-radius: 21px;
+            margin-bottom: 12px;
+            background-color: white;
+            box-shadow: 2px 2px 2px #ececec;
+          "
+        >
+          <input
+            style="outline: none; border: 0; width: 90%;"
+            placeholder="Pesquisa por funcionário"
+          />
+          <mat-icon
+            aria-hidden="false"
+            aria-label="Example home icon"
+            color="primary"
+            >search</mat-icon
+          >
+        </div>
+
+        <!-- <mat-form-field style="border: 0; outline: none;" style="width: 100%;">
+        <mat-icon matSuffix>search</mat-icon>
+        <input
+          matInput
+          autocomplete="off"
+          placeholder="Pesquisa por funcionário ou grupo"
+        />
+      </mat-form-field> -->
+      </div>
+      <!-- <mat-toolbar class="toolbar">
+        <span>Monitoramento </span>
+
+        <span class="example-spacer"></span>
+        <mat-form-field style="margin-right: 12px;">
+          <mat-label>Visualização</mat-label>
+          <mat-select>
+            <mat-option value="option">Ruas</mat-option>
+            <mat-option value="option">Cidade</mat-option>
+            <mat-option value="option">Estado</mat-option>
+            <mat-option value="option">País</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <button
+          mat-icon-button
+          color="primary"
+          aria-label="Example icon button with a menu icon"
+        >
+          <mat-icon>my_location</mat-icon>
+        </button>
+      </mat-toolbar> -->
+      <!-- <mat-form-field>
+        <mat-label>Visualização</mat-label>
+        <mat-select>
+          <mat-option value="option">Ruas</mat-option>
+          <mat-option value="option">Cidade</mat-option>
+          <mat-option value="option">Estado</mat-option>
+          <mat-option value="option">País</mat-option>
+        </mat-select>
+      </mat-form-field> -->
+
+      <div style="overflow-y: hidden; padding-left: 4px; padding-right: 4px;">
+        <mat-card *ngFor="let contact of contacts" class="card-employee">
+          <div style="display: flex; width: 100%; padding-bottom: 12px;">
+            <div mat-card-avatar class="photo">
+              <img class="userPhoto" [src]="contact.photo" />
+            </div>
+            <div style="flex-direction: column; width: 100%; margin-left: 4px;">
+              <div
+                style="font-weight: 500; font-size: 16px; margin-bottom: 4px;"
+              >
+                {{ contact.name }}
+              </div>
+              <div
+                style="
+                  display: flex;
+                  font-size: 14px;
+                  width: 100%;
+                  font-weight: 200;
+                  font-size: 14px;
+                  align-items: center;
+                "
+              >
+                <ng-container
+                  *ngIf="contact.update === 'Desabilitado'; else elseTemplate"
+                >
+                  <mat-icon
+                    style="
+                      text-align: center;
+                      margin-right: 6px;
+                      color: #666666;
+                    "
+                    >location_off</mat-icon
+                  >
+                  {{ contact.update }}
+                </ng-container>
+                <ng-template #elseTemplate>
+                  <mat-icon
+                    style="
+                      text-align: center;
+                      margin-right: 6px;
+                      color: #666666;
+                    "
+                    >update</mat-icon
+                  >
+                  {{ contact.update }}
+                </ng-template>
+              </div>
+            </div>
+          </div>
+        </mat-card>
+        <mat-card *ngFor="let contact of contacts" class="card-employee">
+          <mat-card-header style="position: relative;">
+            <div mat-card-avatar class="photo">
+              <img class="userPhoto" [src]="contact.photo" />
+            </div>
+
+            <!-- <div mat-card-avatar class="photo"></div> -->
+            <mat-card-title
+              style="
+                display: flex;
+                width: 100%;
+                align-items: center;
+                font-size: 14px;
+              "
+            >
+              {{ contact.name }}
+            </mat-card-title>
+            <mat-card-subtitle
+              style="
+                font-size: 12px;
+                align-items: center;
+                width: 100%;
+                display: flex;
+              "
+            >
+              <ng-container
+                *ngIf="contact.update === 'Desabilitado'; else elseTemplate"
+              >
+                <mat-icon style="font-size: 22px;">location_off</mat-icon>
+                {{ contact.update }}
+              </ng-container>
+              <ng-template #elseTemplate>
+                <mat-icon style="font-size: 22px;">update</mat-icon>
+                {{ contact.update }}
+              </ng-template>
+            </mat-card-subtitle>
+          </mat-card-header>
+        </mat-card>
+      </div>
+    </div>
+    <div class="map-container" style="position: relative;">
+      <agm-map
+        class="map"
+        [fullscreenControl]="true"
+        [latitude]="latitude"
+        [longitude]="longitude"
+        [styles]="mapStyle"
+        [maxZoom]="0"
+        [zoom]="8"
+        (mapClick)="mapClicked($event.coords.lat, $event.coords.lng)"
+        style="position: relative;"
+      >
+        <mat-icon
+          aria-hidden="false"
+          aria-label="Example home icon"
+          color="primary"
+          class="toggle-button controls button"
+          >search</mat-icon
+        >
+        <!-- <agm-direction
+          [origin]="origin"
+          [destination]="destination"
+        ></agm-direction> -->
+        <agm-marker
+          *ngFor="let marker of markers"
+          [latitude]="marker.lat"
+          [longitude]="marker.lng"
+          [markerDraggable]="false"
+          [scaleControl]="true"
+          contextmenu="#menu"
+          [iconUrl]="marker.icon"
+          (markerClick)="selectMarker($event, marker, infoWindow)"
+        >
+          <agm-info-window #infoWindow>
+            <div style="width: 350px;">
+              <h3>
+                <div mat-card-avatar class="photo">
+                  <img
+                    class="userPhoto"
+                    src="https://ui-avatars.com/api/?rounded=true&name=usuario+4&background=bf360c&color=fff"
+                  />
+                </div>
+              </h3>
+              <p><span style="font-weight: 500;">Nome:</span> Usuário 4</p>
+              <p>
+                <span style="font-weight: 500;">E-mail:</span>
+                usuario4@email.com
+              </p>
+              <p>
+                <span style="font-weight: 500;">Telefone:</span> 42999991093
+              </p>
+              <p>
+                <span style="font-weight: 500;"> Última localização:</span> Rua
+                barão do cerro azul, 385. Ponta Grossa
+              </p>
+              <p>
+                <span style="font-weight: 500;"
+                  >Intervalo de atualizações:</span
+                >
+                1 minuto
+              </p>
+              <div
+                style="display: flex; align-items: center;"
+                class="marker-window-actions"
+              >
+                <mat-form-field style="width: 100%;">
+                  <input matInput placeholder="Digite uma mensagem" />
+                </mat-form-field>
+                <button
+                  style="margin-left: 4px;"
+                  mat-icon-button
+                  color="primary"
+                  aria-label="Example icon button with a menu icon"
+                >
+                  <mat-icon>mic</mat-icon>
+                </button>
+              </div>
+              <!-- <div
+                style="
+                  display: grid;
+                  padding-top: 4px;
+                  padding-bottom: 4px;
+                  place-items: center;
+                "
+              >
+                <button
+                  mat-fab
+                  style="width: 60px; height: 60px;"
+                  color="primary"
+                  aria-label="Example icon button with a heart icon"
+                >
+                  <mat-icon>mic</mat-icon>
+                </button>
+              </div> -->
+            </div>
+          </agm-info-window>
+        </agm-marker>
+      </agm-map>
+
+      <button
+        style="
+          cursor: pointer;
+          position: absolute;
+          top: 0;
+          outline: none;
+          margin-top: 8px;
+          left: 0;
+          width: 40px;
+          height: 40px;
+          border: 0;
+          margin-bottom: 4px;
+          background-color: white;
+          box-shadow: rgba(0, 0, 0, 0.3) 0px 1px 4px -1px;
+          color: #666666;
+          margin-left: 12px;
+        "
+        aria-label="Example icon button with a home icon"
+      >
+        <mat-icon>settings</mat-icon>
+      </button>
+    </div>
+  </div>
+</div>
+
+<mat-menu #menu="matMenu">
+  <button style="background-color: #fafafa; color: #32cd32;" mat-menu-item>
+    <mat-icon>check_circle_outline</mat-icon>
+    <span>Online</span>
+  </button>
+  <button style="background-color: #fafafa;" mat-menu-item>
+    <mat-icon>person</mat-icon>
+    <span>Perfil</span>
+  </button>
+  <button style="background-color: #fafafa;" mat-menu-item>
+    <mat-icon>notifications_off</mat-icon>
+    <span>Desabilitar notificações</span>
+  </button>
+  <button style="background-color: #fafafa;" mat-menu-item>
+    <mat-icon>power_settings_new</mat-icon>
+    <span>Sair</span>
+  </button>
+</mat-menu>

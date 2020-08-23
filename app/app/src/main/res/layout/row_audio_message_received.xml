@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:gravity="end"
+        android:orientation="horizontal"
+        android:weightSum="2"
+        tools:ignore="PrivateResource">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="4dp"
+            android:background="@drawable/shape_message_received"
+            android:orientation="horizontal"
+            android:padding="8dp">
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <ImageView
+                    android:layout_gravity="center"
+                    android:id="@+id/imageViewUserPhoto"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginStart="4dp"
+                    android:scaleType="centerCrop"
+                    android:layout_marginEnd="4dp"
+                    android:background="@drawable/shape_rounded_mini_image"
+                    android:src="@drawable/ic_round_person" />
+                <TextView
+                    android:id="@+id/textView4"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="00:00"
+                    android:textAlignment="center"
+                    android:textSize="10sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <ImageButton
+                        android:id="@+id/ib_play"
+                        android:layout_width="40dp"
+                        android:scaleType="centerCrop"
+                        android:layout_height="40dp"
+                        android:layout_gravity="center"
+                        android:background="@android:color/transparent"
+                        android:visibility="visible"
+                        app:srcCompat="@drawable/ic_round_play_arrow_24" />
+
+                    <ProgressBar
+                        android:id="@+id/pb_download_audio"
+                        style="?android:attr/progressBarStyle"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:visibility="gone" />
+
+                    <SeekBar
+                        android:id="@+id/sb_audio"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:thumbTint="?colorPrimary" />
+                </LinearLayout>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                    <TextView
+                        android:id="@+id/textView5"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_marginEnd="0dp"
+                        android:text="12:30"
+                        android:textSize="10sp" />
+                </RelativeLayout>
+
+            </LinearLayout>
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="0dp" />
+    </LinearLayout>
+</layout>
+
+

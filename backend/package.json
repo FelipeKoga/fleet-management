@@ -1,0 +1,14 @@
+{
+  "name": "tcc-backend",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Felipe Kosloski Koga",
+  "license": "MIT",
+  "devDependencies": {
+    "aws-sdk": "^2.725.0",
+    "serverless-stack-output": "^0.2.3"
+  },
+  "dependencies": {
+    "aws-amplify-serverless-plugin": "^1.4.1"
+  }
+}

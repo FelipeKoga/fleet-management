@@ -1,0 +1,6 @@
+{
+  "action": "getUsers",
+  "data": {
+    "companyId": "1"
+  }
+}

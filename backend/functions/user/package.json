@@ -1,0 +1,10 @@
+{
+  "name": "user",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Felipe Koga",
+  "license": "MIT",
+  "dependencies": {
+    "uuid": "^8.3.0"
+  }
+}

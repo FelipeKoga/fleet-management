@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="?backgroundColor"
+        tools:context=".ui.chat.ChatFragment">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/tb_chat"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:background="?backgroundColor"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:gravity="end"
+            android:elevation="1dp"
+            app:navigationIcon="@drawable/ic_arrow_back_black">
+
+            <ImageView
+                android:id="@+id/iv_chat_photo"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:layout_marginEnd="12dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_launcher_background" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Usuário 5"
+                    android:textColor="?textColor"
+                    android:textSize="18sp" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="8dp"
+                        android:layout_height="8dp"
+                        android:background="@drawable/shape_online"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="4dp"
+                        android:text="Online"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+            </LinearLayout>
+        </androidx.appcompat.widget.Toolbar>
+
+        <LinearLayout
+            android:id="@+id/llMessage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:background="?cardBackgroundColor"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:id="@+id/linear_layout_chat_speaker"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <View
+                    android:id="@+id/divider2"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginBottom="14dp"
+                    android:background="?android:attr/listDivider" />
+
+                <ImageView
+                    android:id="@+id/animation_view"
+                    android:layout_width="220dp"
+                    android:layout_height="220dp"
+                    android:layout_marginBottom="12dp"
+                    android:background="@drawable/shape_rounded_mic"
+                    android:elevation="2dp"
+                    android:scaleType="centerCrop"
+                    android:tint="?colorPrimary"
+                    app:srcCompat="@drawable/ic_round_mic_none_200" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="2dp"
+                    android:text="Aperte para falar"
+                    android:textColor="?textHint"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/linear_layout_chat_keyboard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="4dp"
+                android:orientation="horizontal"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@drawable/shape_view"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <EditText
+                        android:id="@+id/edit_text_message"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginEnd="8dp"
+                        android:layout_weight="1"
+                        android:background="@android:color/transparent"
+                        android:hint="Digite uma mensagem"
+                        android:maxHeight="80dp"
+                        android:padding="12dp"
+                        android:scrollbarThumbVertical="?attr/textColor"
+                        android:scrollbars="vertical"
+                        android:textColor="?attr/textColor"
+                        android:visibility="visible"
+                        tools:ignore="NestedWeights" />
+
+                    <ImageButton
+                        android:id="@+id/image_button_attach"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:tint="?colorPrimary"
+                        android:backgroundTint="@android:color/transparent"
+                        android:src="@drawable/ic_round_attach_file"
+                        android:visibility="visible"
+                        app:borderWidth="0dp" />
+
+                    <ImageButton
+                        android:id="@+id/image_button_show_audio"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:backgroundTint="@android:color/transparent"
+                        android:src="@drawable/ic_round_camera"
+                        android:visibility="visible"
+                        android:tint="?colorPrimary"
+                        app:borderWidth="0dp" />
+
+                    <ImageButton
+                        android:id="@+id/image_button_send_message"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:backgroundTint="@android:color/transparent"
+                        android:src="@drawable/ic_round_send"
+                        android:visibility="gone"
+                        app:borderWidth="0dp" />
+
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_view_chat_messages"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@+id/llMessage"
+            android:layout_below="@+id/tb_chat"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginStart="0dp"
+            android:layout_marginTop="0dp"
+            android:layout_marginEnd="0dp"
+            android:layout_marginBottom="12dp"
+            android:background="?backgroundColor"
+            android:visibility="visible"
+            tools:listitem="@layout/row_message_received" />
+
+    </RelativeLayout>
+</layout>

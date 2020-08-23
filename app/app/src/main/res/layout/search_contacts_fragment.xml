@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <RelativeLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="?backgroundColor"
+        tools:context=".ui.contacts.SearchContactsFragment">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar_search_contacts"
+            android:layout_width="match_parent"
+            android:layout_height="?actionBarSize"
+            android:background="?backgroundColor"
+            android:elevation="2dp"
+            app:navigationIcon="@drawable/ic_arrow_back_black">
+
+            <EditText
+                android:id="@+id/edit_text_search_contact"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                android:hint="Pesquisar"
+                android:singleLine="true" />
+        </androidx.appcompat.widget.Toolbar>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/toolbar_search_contacts"
+            android:layout_marginTop="0dp"
+            android:orientation="vertical"
+            android:padding="12dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Histórico" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recycler_view_search_contacts"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="6dp"
+                tools:listitem="@layout/row_contact" />
+        </LinearLayout>
+    </RelativeLayout>
+</layout>

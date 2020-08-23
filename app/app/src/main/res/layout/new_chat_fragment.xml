@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="?backgroundColor"
+        tools:context=".ui.contacts.SearchContactsFragment">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar_search_contacts"
+            android:layout_width="match_parent"
+            android:layout_height="?actionBarSize"
+            android:background="?backgroundColor"
+            android:elevation="2dp"
+            app:navigationIcon="@drawable/ic_arrow_back_black">
+
+            <EditText
+                android:id="@+id/edit_text_search_contact"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                android:hint="Pesquisar"
+                android:singleLine="true" />
+        </androidx.appcompat.widget.Toolbar>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/toolbar_search_contacts"
+            android:layout_marginTop="0dp"
+            android:orientation="vertical"
+            android:padding="12dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Contatos" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recycler_view_search_contacts"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="6dp"
+                tools:listitem="@layout/row_contact" />
+        </LinearLayout>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/floatingButtonNewGroup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginEnd="12dp"
+            android:layout_marginBottom="12dp"
+            android:backgroundTint="?colorPrimary"
+            android:src="@drawable/ic_baseline_group_add"
+            app:tint="?backgroundColor" />
+    </RelativeLayout>
+</layout>

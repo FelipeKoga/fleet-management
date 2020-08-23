@@ -1,0 +1,61 @@
+Resources:
+  Connection:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: connectionId
+          AttributeType: S
+      BillingMode: PAY_PER_REQUEST
+      # GlobalSecondaryIndexes:
+      #     - IndexName: scheduleIdIndex
+      #       KeySchema:
+      #           - AttributeName: scheduleId
+      #             KeyType: HASH
+      #           - AttributeName: timestamp
+      #             KeyType: RANGE
+      #       Projection:
+      #           ProjectionType: ALL
+      KeySchema:
+        - AttributeName: connectionId
+          KeyType: HASH
+      TableName: connection
+  Chat:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: connectionId
+          AttributeType: S
+      BillingMode: PAY_PER_REQUEST
+      # GlobalSecondaryIndexes:
+      #     - IndexName: scheduleIdIndex
+      #       KeySchema:
+      #           - AttributeName: scheduleId
+      #             KeyType: HASH
+      #           - AttributeName: timestamp
+      #             KeyType: RANGE
+      #       Projection:
+      #           ProjectionType: ALL
+      KeySchema:
+        - AttributeName: connectionId
+          KeyType: HASH
+      TableName: chat
+  User:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+        - AttributeName: companyId
+          AttributeType: S
+      BillingMode: PAY_PER_REQUEST
+      GlobalSecondaryIndexes:
+        - IndexName: companyIdIndex
+          KeySchema:
+            - AttributeName: companyId
+              KeyType: HASH
+          Projection:
+            ProjectionType: ALL
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      TableName: user

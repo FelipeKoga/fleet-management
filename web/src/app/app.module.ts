@@ -1,0 +1,44 @@
+import { BrowserModule } from "@angular/platform-browser";
+import { NgModule } from "@angular/core";
+
+import { AppComponent } from "./app.component";
+import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
+import { MaterialModule } from "./material.module";
+import { NavigationComponent } from "./components/navigation/navigation.component";
+import { LayoutModule } from "@angular/cdk/layout";
+import { AppRoutingModule } from "./app-routing.module";
+import { MapComponent } from "./components/map/map.component";
+import { AgmCoreModule } from "@agm/core";
+import { AgmDirectionModule } from "agm-direction";
+import { ChatComponent } from "./components/chat/chat.component";
+import { HttpClientModule } from "@angular/common/http";
+import { EmployeesComponent } from "./components/employees/employees.component";
+import { MapBottomSheetComponent } from "./components/map/map-bottom-sheet/map-bottom-sheet.component";
+import { MatPaginatorIntl } from "@angular/material/paginator";
+import { getDutchPaginatorIntl } from "./utils/getPortuguesePaginatorIntl";
+
+@NgModule({
+  declarations: [
+    AppComponent,
+    NavigationComponent,
+    MapComponent,
+    ChatComponent,
+    EmployeesComponent,
+    MapBottomSheetComponent,
+  ],
+  imports: [
+    BrowserModule,
+    BrowserAnimationsModule,
+    MaterialModule,
+    LayoutModule,
+    AppRoutingModule,
+    HttpClientModule,
+    AgmCoreModule.forRoot({
+      apiKey: "***REMOVED***",
+    }),
+    AgmDirectionModule,
+  ],
+  providers: [{ provide: MatPaginatorIntl, useValue: getDutchPaginatorIntl() }],
+  bootstrap: [AppComponent],
+})
+export class AppModule {}

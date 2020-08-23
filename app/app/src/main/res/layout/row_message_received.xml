@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="start"
+        android:orientation="horizontal"
+        android:padding="8dp"
+        tools:ignore="PrivateResource">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="0dp"
+            android:layout_marginEnd="34dp"
+            android:background="@drawable/shape_message_received"
+            android:paddingTop="4dp"
+            android:paddingEnd="8dp"
+            android:paddingStart="8dp"
+            android:paddingBottom="8dp">
+
+            <TextView
+                android:id="@+id/text_view_message_recipient"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="12dp"
+                android:layout_weight="1"
+                android:layout_marginStart="4dp"
+                android:text="
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam a volutpat ipsum, non molestie ante. Ut tincidunt enim tempus, sagittis sem sit amet, ullamcorper nisi. Suspendisse eget dui non velit ullamcorper feugiat. Nulla facilisi. Phasellus fermentum nibh et dolor commodo placerat. Etiam at elit ac risus hendrerit viverra sit amet ut purus. Cras vitae nisl dignissim, sollicitudin tortor et, facilisis mauris. Ut rhoncus, nibh id dignissim ornare, eros quam vulputate leo, dignissim feugiat lorem lacus vitae urna."
+                android:textColor="?attr/textColor"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/text_view_message_recipient_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|end"
+                android:gravity="bottom|end"
+                android:text="17:40"
+                android:textColor="?attr/textHint"
+                android:textSize="10sp"
+                android:layout_marginEnd="4dp"
+                tools:ignore="SmallSp" />
+        </LinearLayout>
+    </RelativeLayout>
+</layout>

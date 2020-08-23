@@ -1,0 +1,197 @@
+<div class="chat-container">
+  <div class="chat-list-employees">
+    <div
+      style="
+        align-items: center;
+        display: flex;
+        color: black;
+        background-color: white;
+        font-weight: 400;
+        font-size: 20px;
+        padding: 24px;
+      "
+    >
+      <span style="width: 100%; text-align: center;">Mensagens</span>
+    </div>
+    <div style="display: flex;">
+      <div
+        style="
+          display: flex;
+          width: 100%;
+          padding: 9px 12px 11px;
+          border-bottom-left-radius: 21px;
+          border-bottom-right-radius: 21px;
+          margin-bottom: 12px;
+          background-color: white;
+          box-shadow: 2px 2px 2px #ececec;
+        "
+      >
+        <input
+          style="outline: none; border: 0; width: 90%;"
+          placeholder="Pesquisa por funcionário ou grupo"
+        />
+        <mat-icon
+          aria-hidden="false"
+          aria-label="Example home icon"
+          color="primary"
+          >search</mat-icon
+        >
+      </div>
+
+      <!-- <mat-form-field style="border: 0; outline: none;" style="width: 100%;">
+        <mat-icon matSuffix>search</mat-icon>
+        <input
+          matInput
+          autocomplete="off"
+          placeholder="Pesquisa por funcionário ou grupo"
+        />
+      </mat-form-field> -->
+    </div>
+    <div style="overflow-y: hidden;">
+      <!-- <div class="user-item" *ngFor="let contact of contacts">
+        <div mat-card-avatar class="photo">
+          <img class="userPhoto" [src]="contact.photo" />
+        </div>
+        <div
+          style="
+            width: 100%;
+            border-bottom: 1px solid #eeee;
+            font-size: 14px;
+            margin-left: 4px;
+            display: flex;
+            flex-direction: column;
+          "
+        >
+          <div style="font-weight: 500; width: 90%; margin-top: 12px;">
+            {{ contact.name }}
+          </div>
+          <div style="font-size: 12px; display: flex; color: grey;">
+            <div style="width: 100%;">Ultima mensagem</div>
+            <div style="font-size: 10px;">12:30</div>
+          </div>
+        </div>
+      </div> -->
+
+      <div style="overflow-y: hidden; padding-left: 4px; padding-right: 4px;">
+        <mat-card *ngFor="let contact of contacts" class="card-employee">
+          <div style="display: flex; width: 100%; padding-bottom: 12px;">
+            <div mat-card-avatar class="photo">
+              <img class="userPhoto" [src]="contact.photo" />
+            </div>
+            <div style="flex-direction: column; width: 100%; margin-left: 4px;">
+              <div style="font-weight: 500; font-size: 16px;">
+                {{ contact.name }}
+              </div>
+              <div
+                style="
+                  display: flex;
+
+                  width: 100%;
+                "
+              >
+                <div style="font-size: 12px; width: 100%;">Ultima mensagem</div>
+                <div style="font-size: 10px;">12:12</div>
+              </div>
+            </div>
+          </div>
+        </mat-card>
+      </div>
+    </div>
+  </div>
+  <div class="chat-content">
+    <div class="toolbar">
+      <img
+        class="img-profile"
+        src="https://instagram.fpgz1-1.fna.fbcdn.net/v/t51.2885-19/s150x150/106459975_719099685544296_4948485348446780484_n.jpg?_nc_ht=instagram.fpgz1-1.fna.fbcdn.net&_nc_ohc=9aPN9rZiR4QAX-6kRbO&oh=f604e9394ac4e051c9f730704677ae86&oe=5F4761A3
+        "
+      />
+      <div style="display: flex; flex-direction: column;">
+        <div style="display: flex;">
+          <span class="user-name" style="width: 100%;"
+            >Felipe Kosloski Koga</span
+          >
+          <div
+            class="user-name"
+            style="font-size: 16px; font-weight: 500;"
+          ></div>
+        </div>
+
+        <div
+          style="
+            display: flex;
+            height: 100%;
+            align-items: center;
+            margin-top: 4px;
+            padding-left: 24px;
+          "
+        >
+          <span class="online"></span>
+          <span class="status">
+            Online
+          </span>
+        </div>
+      </div>
+      <button
+        mat-mini-fab
+        (click)="openBottomSheetMap()"
+        color="primary"
+        aria-label="Example icon button with a menu icon"
+      >
+        <mat-icon>map</mat-icon>
+      </button>
+    </div>
+    <mat-divider></mat-divider>
+    <div #content class="content">
+      <div class="messages-list" #messageList>
+        <div *ngFor="let message of messages">
+          <div class="message-row sender" *ngIf="message.uuid === uuid">
+            <div class="message-text">
+              {{ message.message }}
+
+              <div class="message-timestamp">12:14</div>
+            </div>
+          </div>
+          <div class="message-row recipient" *ngIf="message.uuid !== uuid">
+            <div class="message-text">
+              {{ message.message }}
+
+              <div class="message-timestamp">12:14</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <mat-divider></mat-divider>
+      <div class="message-container">
+        <input
+          style="
+            outline: none;
+            border: 0;
+            height: 100%;
+            width: 90%;
+            padding: 18px;
+            font-size: 16px;
+            background: transparent;
+            word-break: break-all;
+          "
+          placeholder="Digite uma mensagem"
+        />
+        <!-- <mat-form-field
+          style="width: 90%; padding-right: 8px; padding-left: 8px;"
+        >
+          <mat-label>Digite uma mensagem...</mat-label>
+          <input
+            matInput
+            (keydown.enter)="sendMessage($event.target.value)"
+            autocomplete="off"
+          />
+        </mat-form-field> -->
+        <button mat-icon-button style="color: gray;">
+          <mat-icon>attach_file</mat-icon>
+        </button>
+        <button mat-icon-button style="color: gray;">
+          <mat-icon>mic</mat-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
