@@ -1,3 +1,35 @@
+# REST handlers
+user:
+  handler: functions/user/index.handler
+  package:
+    include:
+      - functions/user/*
+      - functions/user/*/**
+  events:
+    - http:
+        path: company/{companyId}/users
+        method: GET
+        cors: true
+    - http:
+        path: company/{companyId}/users/{userId}
+        method: GET
+        cors: true
+    - http:
+        path: company/{companyId}/users
+        method: POST
+        cors: true
+    - http:
+        path: company/{companyId}/users/{userId}
+        method: PUT
+        cors: true
+    - http:
+        path: company/{companyId}/users/{userId}
+        method: DELETE
+        cors: true
+  environment:
+    API_TCC: ${self:custom.apiUrl}
+
+# Web Socket handlers
 connection-handler:
   handler: functions/connection-handler/index.handler
   package:
@@ -13,6 +45,7 @@ connection-handler:
         routeResponseSelectionExpression: $default
   environment:
     API_TCC: ${self:custom.apiUrl}
+
 send-message:
   handler: functions/send-message/index.handler
   package:
@@ -23,36 +56,3 @@ send-message:
     - websocket:
         route: send-message
         routeResponseSelectionExpression: $default
-user:
-  handler: functions/user/index.handler
-  package:
-    include:
-      - functions/user/*
-      - functions/user/*/**
-  events:
-    - http:
-        path: user
-        method: GET
-        cors: true
-    - http:
-        path: user/{userId}
-        method: GET
-        cors: true
-    - websocket:
-        route: post-user
-        routeResponseSelectionExpression: $default
-    - websocket:
-        route: put-user
-        routeResponseSelectionExpression: $default
-    - websocket:
-        route: delete-user
-        routeResponseSelectionExpression: $default
-  environment:
-    API_URL: !Join
-      - ''
-      - - 'https://'
-        - !Ref ApiGatewayRestApi
-        - '.execute-api.'
-        - ${opt:region, self:provider.region}
-        - '.amazonaws.com/'
-        - ${opt:stage, self:provider.stage}
