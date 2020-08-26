@@ -1,5 +1,5 @@
 {
-  "action": "getUsers",
+  "httpMethod": "GET",
   "data": {
     "companyId": "1"
   }
