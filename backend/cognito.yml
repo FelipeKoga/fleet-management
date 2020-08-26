@@ -1,8 +1,8 @@
 Resources:
-  SconnectWebsocketsRoute:
-    Type: 'AWS::ApiGatewayV2::Route'
-    Properties:
-      AuthorizationType: 'AWS_IAM'
+  # SconnectWebsocketsRoute:
+  #   Type: 'AWS::ApiGatewayV2::Route'
+  #   Properties:
+  #     AuthorizationType: 'AWS_IAM'
   CognitoUserPool:
     Type: AWS::Cognito::UserPool
     Properties:
@@ -18,6 +18,12 @@ Resources:
         - AttributeDataType: String
           Name: email
           Required: false
+        - AttributeDataType: String
+          Mutable: True
+          Name: companyId
+          StringAttributeConstraints:
+            MinLength: 1
+            MaxLength: 256
   CognitoUserPoolClient:
     Type: AWS::Cognito::UserPoolClient
     Properties:
@@ -84,9 +90,9 @@ Resources:
           AmbiguousRoleResolution: Deny
           Type: Token
 Outputs:
-    UserPoolId:
-        Value: !Ref CognitoUserPool
-    UserPoolClientId:
-        Value: !Ref CognitoUserPoolClient
-    IdentityPoolId:
-        Value: !Ref CognitoIdentityPool
+  UserPoolId:
+    Value: !Ref CognitoUserPool
+  UserPoolClientId:
+    Value: !Ref CognitoUserPoolClient
+  IdentityPoolId:
+    Value: !Ref CognitoIdentityPool
