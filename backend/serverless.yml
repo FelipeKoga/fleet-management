@@ -1,9 +1,11 @@
-service: tcc
+app: tcc
+service: tcc-backend
 
 provider:
   name: aws
   runtime: nodejs12.x
   stage: dev
+  versionFunctions: false
   region: us-east-1
   websocketApiRouteSelectionExpression: $request.body.action
   iamRoleStatements:
@@ -23,11 +25,17 @@ provider:
       Action: dynamodb:Query
       Resource:
         - arn:aws:dynamodb:us-east-1:603366505042:table/user/index/*
+        - arn:aws:dynamodb:us-east-1:603366505042:table/connection/index/*
     - Effect: Allow
       Action: lambda:InvokeFunction
       Resource:
-        - arn:aws:lambda:us-east-1:603366505042:function:tcc-dev-connection-handler
-
+        - arn:aws:lambda:us-east-1:603366505042:function:tcc-backend-dev-user
+    - Effect: Allow
+      Action:
+        - cognito-idp:AdminCreateUser
+        - cognito-idp:AdminSetUserPassword
+        - cognito-idp:AdminDeleteUser
+      Resource: '*'
 plugins:
   - aws-amplify-serverless-plugin
   - serverless-stack-output
@@ -50,6 +58,12 @@ custom:
       - '.amazonaws.com/'
       - ${opt:stage, self:provider.stage}
       - '/'
+
+package:
+  individually: true
+  include:
+    - '!*'
+    - '!*/**'
 functions:
   - ${file(functions/serverless.yml)}
 
