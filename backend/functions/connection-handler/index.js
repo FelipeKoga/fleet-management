@@ -1,8 +1,6 @@
 const { deleteConnection, addConnection } = require('./resolver');
 
 exports.handler = async (event) => {
-  console.log(event);
-  console.log(process.env.API_TCC);
   if (event.requestContext.eventType === 'CONNECT') {
     await addConnection(
       event.requestContext.connectionId,
