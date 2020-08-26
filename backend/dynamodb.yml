@@ -5,16 +5,16 @@ Resources:
       AttributeDefinitions:
         - AttributeName: connectionId
           AttributeType: S
+        - AttributeName: companyId
+          AttributeType: S
       BillingMode: PAY_PER_REQUEST
-      # GlobalSecondaryIndexes:
-      #     - IndexName: scheduleIdIndex
-      #       KeySchema:
-      #           - AttributeName: scheduleId
-      #             KeyType: HASH
-      #           - AttributeName: timestamp
-      #             KeyType: RANGE
-      #       Projection:
-      #           ProjectionType: ALL
+      GlobalSecondaryIndexes:
+        - IndexName: companyIdIndex
+          KeySchema:
+            - AttributeName: companyId
+              KeyType: HASH
+          Projection:
+            ProjectionType: ALL
       KeySchema:
         - AttributeName: connectionId
           KeyType: HASH
@@ -26,15 +26,6 @@ Resources:
         - AttributeName: connectionId
           AttributeType: S
       BillingMode: PAY_PER_REQUEST
-      # GlobalSecondaryIndexes:
-      #     - IndexName: scheduleIdIndex
-      #       KeySchema:
-      #           - AttributeName: scheduleId
-      #             KeyType: HASH
-      #           - AttributeName: timestamp
-      #             KeyType: RANGE
-      #       Projection:
-      #           ProjectionType: ALL
       KeySchema:
         - AttributeName: connectionId
           KeyType: HASH
