@@ -29,70 +29,32 @@ Resources:
     Properties:
       ClientName: tcc_user_pool_client
       UserPoolId: !Ref CognitoUserPool
-  CognitoIdentityPool:
-    Type: AWS::Cognito::IdentityPool
+      ExplicitAuthFlows:
+        - ALLOW_ADMIN_USER_PASSWORD_AUTH
+        - ALLOW_CUSTOM_AUTH
+        - ALLOW_USER_SRP_AUTH
+        - ALLOW_REFRESH_TOKEN_AUTH
+      GenerateSecret: false
+      PreventUserExistenceErrors: ENABLED
+      ReadAttributes:
+        - name
+        - email
+        - custom:companyId
+  ApiGatewayAuthorizer:
+    DependsOn:
+      # this is pre-defined by serverless
+      - ApiGatewayRestApi
+    Type: AWS::ApiGateway::Authorizer
     Properties:
-      IdentityPoolName: tcc_identity_pool
-      AllowUnauthenticatedIdentities: true
-      CognitoIdentityProviders:
-        - ClientId:
-            Ref: CognitoUserPoolClient
-          ProviderName:
-            Fn::GetAtt: [CognitoUserPool, ProviderName]
-  CognitoAuthRole:
-    Type: AWS::IAM::Role
-    Properties:
-      Path: /
-      AssumeRolePolicyDocument:
-        Version: '2012-10-17'
-        Statement:
-          - Effect: 'Allow'
-            Principal:
-              Federated: 'cognito-identity.amazonaws.com'
-            Action:
-              - 'sts:AssumeRoleWithWebIdentity'
-            Condition:
-              StringEquals:
-                'cognito-identity.amazonaws.com:aud': !Ref CognitoIdentityPool
-              'ForAnyValue:StringLike':
-                'cognito-identity.amazonaws.com:amr': authenticated
-      Policies:
-        - PolicyName: 'CognitoAuthorizedPolicy'
-          PolicyDocument:
-            Version: '2012-10-17'
-            Statement:
-              - Effect: 'Allow'
-                Action:
-                  - 'mobileanalytics:PutEvents'
-                  - 'cognito-sync:*'
-                  - 'cognito-identity:*'
-                Resource: '*'
-  CognitoIdentityPoolRoleAttachment:
-    Type: AWS::Cognito::IdentityPoolRoleAttachment
-    Properties:
-      IdentityPoolId: !Ref CognitoIdentityPool
-      Roles:
-        authenticated: !GetAtt CognitoAuthRole.Arn
-      RoleMappings:
-        CognitoUserPool:
-          IdentityProvider:
-            !Join [
-              '',
-              [
-                'cognito-idp.',
-                !Sub '${self:provider.region}',
-                '.amazonaws.com/',
-                !Ref CognitoUserPool,
-                ':',
-                !Ref CognitoUserPoolClient,
-              ],
-            ]
-          AmbiguousRoleResolution: Deny
-          Type: Token
+      Name: cognito_auth
+      # apparently ApiGatewayRestApi is a global string
+      RestApiId: { 'Ref': 'ApiGatewayRestApi' }
+      IdentitySource: method.request.header.Authorization
+      Type: COGNITO_USER_POOLS
+      ProviderARNs:
+        - Fn::GetAtt: [CognitoUserPool, Arn]
 Outputs:
   UserPoolId:
     Value: !Ref CognitoUserPool
   UserPoolClientId:
     Value: !Ref CognitoUserPoolClient
-  IdentityPoolId:
-    Value: !Ref CognitoIdentityPool
