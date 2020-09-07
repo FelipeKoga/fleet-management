@@ -5,10 +5,8 @@
   "author": "Felipe Kosloski Koga",
   "license": "MIT",
   "devDependencies": {
+    "aws-amplify-serverless-plugin": "^1.4.1",
     "aws-sdk": "^2.725.0",
     "serverless-stack-output": "^0.2.3"
-  },
-  "dependencies": {
-    "aws-amplify-serverless-plugin": "^1.4.1"
   }
 }
