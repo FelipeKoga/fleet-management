@@ -2,5 +2,8 @@
   "requestContext": {
     "eventType": "CONNECT",
     "connectionId": "1234567"
+  },
+  "queryStringParameters": {
+    "username": "kosloski.fkoga@gmail.com"
   }
 }

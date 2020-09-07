@@ -4,7 +4,7 @@ exports.handler = async (event) => {
   if (event.requestContext.eventType === 'CONNECT') {
     await addConnection(
       event.requestContext.connectionId,
-      event.queryStringParameters.userId
+      event.queryStringParameters.username
     );
   } else if (event.requestContext.eventType === 'DISCONNECT') {
     await deleteConnection(event.requestContext.connectionId);
@@ -12,6 +12,6 @@ exports.handler = async (event) => {
 
   return {
     statusCode: 200,
-    body: JSON.stringify(event.requestContext.eventType),
+    body: JSON.stringify('Connection handler'),
   };
 };
