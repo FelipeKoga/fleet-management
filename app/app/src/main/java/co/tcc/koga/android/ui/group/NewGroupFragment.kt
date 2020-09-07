@@ -8,7 +8,6 @@ import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import co.drivefy.android.adapter.SelectContactAdapter
-import co.tcc.koga.android.data.Database
 import co.tcc.koga.android.databinding.NewGroupFragmentBinding
 
 
@@ -23,10 +22,10 @@ class NewGroupFragment : Fragment() {
         binding = NewGroupFragmentBinding.inflate(inflater)
         binding.apply {
             recyclerViewContactsNewGroup.layoutManager = LinearLayoutManager(container?.context)
-            recyclerViewContactsNewGroup.adapter = SelectContactAdapter(
-                Database.getContactsOnly(),
-                requireContext()
-            ) { }
+//            recyclerViewContactsNewGroup.adapter = SelectContactAdapter(
+//                Database.getContactsOnly(),
+//                requireContext()
+//            ) { }
 
             toolbarNewGroup.setNavigationOnClickListener {
                 findNavController().popBackStack()

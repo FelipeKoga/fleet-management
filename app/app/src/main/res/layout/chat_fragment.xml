@@ -12,7 +12,7 @@
         tools:context=".ui.chat.ChatFragment">
 
         <androidx.appcompat.widget.Toolbar
-            android:id="@+id/tb_chat"
+            android:id="@+id/toolbar_chat"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
@@ -25,11 +25,12 @@
 
             <ImageView
                 android:id="@+id/iv_chat_photo"
-                android:layout_width="42dp"
-                android:layout_height="42dp"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
                 android:layout_marginEnd="12dp"
-                android:scaleType="fitCenter"
-                android:src="@drawable/ic_launcher_background" />
+                android:scaleType="centerCrop"
+                android:background="@drawable/shape_rounded_image"
+                android:src="@drawable/ic_round_person" />
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -37,9 +38,10 @@
                 android:orientation="vertical">
 
                 <TextView
+                    android:id="@+id/text_view_chat_user"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Usuário 5"
+                    android:text=""
                     android:textColor="?textColor"
                     android:textSize="18sp" />
 
@@ -76,6 +78,7 @@
             android:orientation="horizontal">
 
             <LinearLayout
+                android:visibility="gone"
                 android:id="@+id/linear_layout_chat_speaker"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -97,7 +100,7 @@
                     android:background="@drawable/shape_rounded_mic"
                     android:elevation="2dp"
                     android:scaleType="centerCrop"
-                    android:tint="?colorPrimary"
+                    app:tint="?colorPrimary"
                     app:srcCompat="@drawable/ic_round_mic_none_200" />
 
                 <TextView
@@ -117,7 +120,7 @@
                 android:layout_marginEnd="8dp"
                 android:layout_marginBottom="4dp"
                 android:orientation="horizontal"
-                android:visibility="gone">
+                android:visibility="visible">
 
                 <LinearLayout
                     android:layout_width="0dp"
@@ -144,27 +147,34 @@
                         android:visibility="visible"
                         tools:ignore="NestedWeights" />
 
-                    <ImageButton
-                        android:id="@+id/image_button_attach"
+                    <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:tint="?colorPrimary"
-                        android:backgroundTint="@android:color/transparent"
-                        android:src="@drawable/ic_round_attach_file"
-                        android:visibility="visible"
-                        app:borderWidth="0dp" />
+                        android:id="@+id/linear_layout_keyboard_action"
+                        android:orientation="horizontal">
+                        <ImageButton
+                            android:id="@+id/image_button_attach"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:tint="?colorPrimary"
+                            android:backgroundTint="@android:color/transparent"
+                            android:src="@drawable/ic_round_attach_file"
+                            android:visibility="visible"
+                            app:borderWidth="0dp" />
 
-                    <ImageButton
-                        android:id="@+id/image_button_show_audio"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:backgroundTint="@android:color/transparent"
-                        android:src="@drawable/ic_round_camera"
-                        android:visibility="visible"
-                        android:tint="?colorPrimary"
-                        app:borderWidth="0dp" />
+                        <ImageButton
+                            android:id="@+id/image_button_show_audio"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:backgroundTint="@android:color/transparent"
+                            android:src="@drawable/ic_round_camera"
+                            android:visibility="visible"
+                            android:tint="?colorPrimary"
+                            app:borderWidth="0dp" />
+                    </LinearLayout>
+
 
                     <ImageButton
                         android:id="@+id/image_button_send_message"
@@ -173,6 +183,7 @@
                         android:layout_gravity="center"
                         android:backgroundTint="@android:color/transparent"
                         android:src="@drawable/ic_round_send"
+                        android:tint="?colorPrimary"
                         android:visibility="gone"
                         app:borderWidth="0dp" />
 
@@ -186,7 +197,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_above="@+id/llMessage"
-            android:layout_below="@+id/tb_chat"
+            android:layout_below="@+id/toolbar_chat"
             android:layout_alignParentStart="true"
             android:layout_alignParentEnd="true"
             android:layout_marginStart="0dp"
@@ -194,8 +205,20 @@
             android:layout_marginEnd="0dp"
             android:layout_marginBottom="12dp"
             android:background="?backgroundColor"
-            android:visibility="visible"
-            tools:listitem="@layout/row_message_received" />
+            android:visibility="visible" />
+
+        <ProgressBar
+            android:id="@+id/progress_bar_loading_messages"
+            style="?android:attr/progressBarStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/llMessage"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginStart="0dp"
+            android:layout_marginEnd="0dp"
+            android:layout_marginBottom="12dp" />
+
 
     </RelativeLayout>
 </layout>

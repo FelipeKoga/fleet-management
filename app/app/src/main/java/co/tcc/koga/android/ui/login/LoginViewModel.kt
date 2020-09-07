@@ -4,14 +4,16 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import co.tcc.koga.android.data.AWSClient
-import co.tcc.koga.android.data.network.contactsService
-import co.tcc.koga.android.domain.Contact
+import co.tcc.koga.android.data.network.Client
+import co.tcc.koga.android.data.network.websocket.Socket
+import co.tcc.koga.android.data.repository.ClientRepository
 import com.amazonaws.mobile.auth.core.internal.util.ThreadUtils.runOnUiThread
 import kotlinx.coroutines.launch
 import java.lang.Exception
+import javax.inject.Inject
 
-class LoginViewModel : ViewModel() {
+class LoginViewModel @Inject constructor(private val repository: ClientRepository) :
+    ViewModel() {
     private val _signInStatus = MutableLiveData<Boolean>()
     val loadingSignIn = MutableLiveData<Boolean>()
     val signInStatus: LiveData<Boolean> get() = _signInStatus
@@ -20,10 +22,10 @@ class LoginViewModel : ViewModel() {
         println(username)
         println(password)
         loadingSignIn.value = true
-        AWSClient.getInstance().signIn(username, password, fun() {
+        Client.getInstance().signIn(username, password, fun() {
             runOnUiThread {
-                loadingSignIn.value = false
-                _signInStatus.value = true
+
+                getCurrentUser()
             }
         }, fun(e: Exception?) {
             println(e)
@@ -34,16 +36,10 @@ class LoginViewModel : ViewModel() {
         })
     }
 
-    private val _contacts = MutableLiveData<Contact>()
-
-    fun getContacts() {
-        viewModelScope.launch {
-            try {
-                val series = contactsService.getContacts()
-                println(series)
-            } catch (e: Exception) {
-                println(e)
-            }
-        }
+    private fun getCurrentUser() = viewModelScope.launch {
+        repository.getCurrentUserFromRemote()
+        loadingSignIn.value = false
+        _signInStatus.value = true
     }
+
 }

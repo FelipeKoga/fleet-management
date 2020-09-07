@@ -1,6 +1,7 @@
 
 package co.tcc.koga.android.ui.settings
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -8,14 +9,25 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import co.tcc.koga.android.MainActivity
 import co.tcc.koga.android.databinding.SettingsFragmentBinding
-import co.tcc.koga.android.ui.login.LoginActivity
+import co.tcc.koga.android.ui.chats.ChatsViewModel
+import javax.inject.Inject
 
 class SettingsFragment : Fragment() {
 
-    private val viewModel: SettingsViewModel by viewModels()
     private lateinit var binding: SettingsFragmentBinding
+
+    @Inject
+    lateinit var viewModelFactory: ViewModelProvider.Factory
+    private val viewModel by viewModels<SettingsViewModel> { viewModelFactory }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        (requireActivity() as MainActivity).mainComponent.inject(this)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -29,9 +41,6 @@ class SettingsFragment : Fragment() {
 
             linearLayoutLogout.setOnClickListener {
                 viewModel.signOut()
-                val intent = Intent(requireContext(), LoginActivity::class.java)
-                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
-                startActivity(intent)
             }
         }
         return binding.root

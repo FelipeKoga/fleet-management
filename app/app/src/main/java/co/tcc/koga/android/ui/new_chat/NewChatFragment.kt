@@ -1,6 +1,5 @@
 package co.tcc.koga.android.ui.new_chat
 
-import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -8,10 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import co.tcc.koga.android.R
-import co.tcc.koga.android.data.Database
 import co.tcc.koga.android.databinding.NewChatFragmentBinding
-import co.tcc.koga.android.ui.contacts.ContactsAdapter
 
 class NewChatFragment : Fragment() {
     private lateinit var binding: NewChatFragmentBinding
@@ -23,11 +19,11 @@ class NewChatFragment : Fragment() {
         binding = NewChatFragmentBinding.inflate(inflater)
         binding.apply {
             recyclerViewSearchContacts.layoutManager = LinearLayoutManager(container?.context)
-            recyclerViewSearchContacts.adapter = ContactsAdapter(
-                Database.getContactsOnly(),
-                requireContext()
-            ) { contact ->
-            }
+//            recyclerViewSearchContacts.adapter = ContactsAdapter(
+//                Database.getContactsOnly(),
+//                requireContext()
+//            ) { contact ->
+//            }
 
             toolbarSearchContacts.setNavigationOnClickListener {
                 findNavController().popBackStack()

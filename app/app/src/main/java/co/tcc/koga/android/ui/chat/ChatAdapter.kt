@@ -4,17 +4,19 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import co.tcc.koga.android.R
+import co.tcc.koga.android.data.database.entity.MessageEntity
+import co.tcc.koga.android.data.network.Client
 import co.tcc.koga.android.databinding.RowAudioMessageReceivedBinding
 import co.tcc.koga.android.databinding.RowAudioMessageSentBinding
 import co.tcc.koga.android.databinding.RowMessageReceivedBinding
 import co.tcc.koga.android.databinding.RowMessageSentBinding
-import co.tcc.koga.android.domain.Contact
-import co.tcc.koga.android.domain.Message
-import com.bumptech.glide.Glide
-import com.bumptech.glide.request.RequestOptions
+import co.tcc.koga.android.utils.getDateByTimestamp
+import co.tcc.koga.android.utils.getHourByTimestamp
+
 
 class ChatAdapter(
-    private var messages: List<Message>
+    var messages: List<MessageEntity>,
+    var userId: String = ""
 ) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
@@ -25,62 +27,64 @@ class ChatAdapter(
 
     class SenderViewHolder(private val binding: RowMessageSentBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(item: Message) {
+        fun bind(item: MessageEntity) {
             with(binding) {
                 textViewMessageSent.text = item.message
-                textViewMessageSentDate.text = item.date
+                textViewMessageSentDate.text = getHourByTimestamp(item.createdAt)
+                if (item.id.isNullOrEmpty()) {
+                    imageViewMessageStatus.setImageResource(R.drawable.ic_baseline_timer);
+                } else {
+                    imageViewMessageStatus.setImageResource(R.drawable.ic_baseline_check);
+                }
             }
         }
     }
 
     class SenderAudioViewHolder(private val binding: RowAudioMessageSentBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(item: Message) {
+        fun bind(item: MessageEntity) {
             with(binding) {
                 println("BINDING")
-                println(item.sender)
-                Glide
-                    .with(binding.root)
-                    .load(item.sender.photo)
-                    .centerCrop()
-                    .apply(RequestOptions.circleCropTransform())
-                    .error(R.drawable.ic_round_person)
-                    .placeholder(R.drawable.ic_round_person)
-                    .into(imageViewUserPhoto)
+//                Glide
+//                    .with(binding.root)
+//                    .load(item.sender.photo)
+//                    .centerCrop()
+//                    .apply(RequestOptions.circleCropTransform())
+//                    .error(R.drawable.ic_round_person)
+//                    .placeholder(R.drawable.ic_round_person)
+//                    .into(imageViewUserPhoto)
             }
         }
     }
 
     class RecipientViewHolder(private val binding: RowMessageReceivedBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(item: Message) {
+        fun bind(item: MessageEntity) {
             with(binding) {
                 textViewMessageRecipient.text = item.message
-                textViewMessageRecipientDate.text = item.date
+                textViewMessageRecipientHour.text = getHourByTimestamp(item.createdAt)
             }
         }
     }
 
     class RecipientAudioViewHolder(private val binding: RowAudioMessageReceivedBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(item: Message) {
+        fun bind(item: MessageEntity) {
             with(binding) {
-                Glide
-                    .with(binding.root)
-                    .load(item.recipient.photo)
-                    .centerCrop()
-                    .apply(RequestOptions.circleCropTransform())
-                    .error(R.drawable.ic_round_person)
-                    .placeholder(R.drawable.ic_round_person)
-                    .into(imageViewUserPhoto)
+//                Glide
+//                    .with(binding.root)
+//                    .load(item.recipient.photo)
+//                    .centerCrop()
+//                    .apply(RequestOptions.circleCropTransform())
+//                    .error(R.drawable.ic_round_person)
+//                    .placeholder(R.drawable.ic_round_person)
+//                    .into(imageViewUserPhoto)
             }
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        println(viewType)
         if (viewType == viewSenderAudioItem) {
-            println("SENDER AUDIO VIEW ITEM")
             return SenderAudioViewHolder(RowAudioMessageSentBinding.inflate(LayoutInflater.from(parent.context)))
         }
         if (viewType == viewSenderItem) {
@@ -92,7 +96,6 @@ class ChatAdapter(
         }
 
         if (viewType == viewRecipientAudioItem) {
-            println("RETURN")
             return  RecipientAudioViewHolder(RowAudioMessageReceivedBinding.inflate(LayoutInflater.from(parent.context)))
         }
 
@@ -105,11 +108,10 @@ class ChatAdapter(
 
     override fun getItemViewType(position: Int): Int {
         val message = messages[position]
-        if (message.received) {
-            println(message.hasAudio)
-            return if (message.hasAudio) viewRecipientAudioItem else viewRecipientItem
+        if (message.senderId == userId) {
+            return viewSenderItem
         }
-        return if (message.hasAudio) viewSenderAudioItem else viewSenderItem
+        return viewRecipientItem
     }
 
 
