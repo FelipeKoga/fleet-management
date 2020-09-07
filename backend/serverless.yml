@@ -20,12 +20,16 @@ provider:
       Resource:
         - arn:aws:dynamodb:us-east-1:603366505042:table/connection
         - arn:aws:dynamodb:us-east-1:603366505042:table/user
+        - arn:aws:dynamodb:us-east-1:603366505042:table/user-chats
         - arn:aws:dynamodb:us-east-1:603366505042:table/chat
+        - arn:aws:dynamodb:us-east-1:603366505042:table/message
     - Effect: Allow
       Action: dynamodb:Query
       Resource:
         - arn:aws:dynamodb:us-east-1:603366505042:table/user/index/*
+        - arn:aws:dynamodb:us-east-1:603366505042:table/chat/index/*
         - arn:aws:dynamodb:us-east-1:603366505042:table/connection/index/*
+        - arn:aws:dynamodb:us-east-1:603366505042:table/message/index/*
     - Effect: Allow
       Action: lambda:InvokeFunction
       Resource:
@@ -36,9 +40,9 @@ provider:
         - cognito-idp:AdminSetUserPassword
         - cognito-idp:AdminDeleteUser
       Resource: '*'
+
 plugins:
   - aws-amplify-serverless-plugin
-  - serverless-stack-output
 custom:
   amplify:
     - filename: ../app/app/src/main/res/raw/awsconfiguration.json
@@ -47,8 +51,10 @@ custom:
     - filename: ../web/src/aws-exports.js
       type: javascript
       appClient: CognitoUserPoolClient
-  output:
-    file: ../web/src/stack.json
+  userTable: !Ref User
+  chatTable: !Ref Chat
+  companyTable: !Ref Company
+
   apiUrl: !Join
     - ''
     - - 'https://'
@@ -58,7 +64,15 @@ custom:
       - '.amazonaws.com/'
       - ${opt:stage, self:provider.stage}
       - '/'
-
+  webSocketUrl: !Join
+    - ''
+    - - 'https://'
+      - !Ref WebsocketsApi
+      - '.execute-api.'
+      - ${opt:region, self:provider.region}
+      - '.amazonaws.com/'
+      - ${opt:stage, self:provider.stage}
+      - '/'
 package:
   individually: true
   include:
@@ -70,4 +84,5 @@ functions:
 resources:
   - ${file(dynamodb.yml)}
   - ${file(cognito.yml)}
+  - ${file(cognito-identity-pool.yml)}
   - ${file(outputs.yml)}
