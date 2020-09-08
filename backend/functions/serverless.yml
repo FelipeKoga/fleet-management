@@ -37,7 +37,8 @@ chat:
     WS_URL: ${self:custom.webSocketUrl}
     USER_TABLE: ${self:custom.userTable}
     CHAT_TABLE: ${self:custom.chatTable}
-
+    APP: ${self:service}
+    STAGE: ${self:custom.stage}
 company:
   handler: functions/company/index.handler
   package:
@@ -121,6 +122,8 @@ connection-handler:
     API_URL: ${self:custom.apiUrl}
     WS_URL: ${self:custom.webSocketUrl}
     USER_TABLE: ${self:custom.userTable}
+    APP: ${self:service}
+    STAGE: ${self:custom.stage}
     KEYS_URL:
       !Join [
         '',
@@ -132,3 +135,14 @@ connection-handler:
           '/.well-known/jwks.json',
         ],
       ]
+
+post-message:
+  handler: functions/post-message/index.handler
+  package:
+    include:
+      - functions/post-message/*
+      - functions/post-message/*/**
+  environment:
+    API_URL: ${self:custom.apiUrl}
+    WS_URL: ${self:custom.webSocketUrl}
+    USER_TABLE: ${self:custom.userTable}
