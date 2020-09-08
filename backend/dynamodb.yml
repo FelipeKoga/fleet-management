@@ -31,8 +31,6 @@ Resources:
           AttributeType: S
         - AttributeName: companyId
           AttributeType: S
-        - AttributeName: connectionId
-          AttributeType: S
       BillingMode: PAY_PER_REQUEST
       GlobalSecondaryIndexes:
         - IndexName: companyIdIndex
@@ -41,9 +39,9 @@ Resources:
               KeyType: HASH
           Projection:
             ProjectionType: ALL
-        - IndexName: connectionIdIndex
+        - IndexName: sortKeyIndex
           KeySchema:
-            - AttributeName: connectionId
+            - AttributeName: sortKey
               KeyType: HASH
           Projection:
             ProjectionType: ALL
