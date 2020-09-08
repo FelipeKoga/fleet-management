@@ -1,0 +1,10 @@
+{
+  "requestContext": {
+    "routeKey": "open-chat"
+  },
+  "body": {
+    "data": {
+      "chatId": "1"
+    }
+  }
+}

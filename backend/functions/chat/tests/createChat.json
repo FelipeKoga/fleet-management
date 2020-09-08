@@ -1,0 +1,22 @@
+{
+  "httpMethod": "POST",
+  "pathParameters": {
+    "companyId": "1",
+    "username": "kosloski.fkoga@gmail.com"
+  },
+  "arguments": {
+    "groupName": "",
+    "isPrivate": true,
+    "avatar": "",
+    "admin": "",
+    "createdAt": "",
+    "members": [
+      {
+        "username": "kosloski.fkoga@gmail.com"
+      },
+      {
+        "username": "koga@koga.com"
+      }
+    ]
+  }
+}
