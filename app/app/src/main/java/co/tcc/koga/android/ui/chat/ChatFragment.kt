@@ -14,11 +14,17 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import co.tcc.koga.android.MainActivity
 import co.tcc.koga.android.R
+import co.tcc.koga.android.data.Resource
+import co.tcc.koga.android.data.network.Client
+import co.tcc.koga.android.databinding.GroupDetailsFragmentBinding
+import co.tcc.koga.android.ui.adapter.ChatAdapter
+import co.tcc.koga.android.ui.adapter.UserAdapter
 import co.tcc.koga.android.utils.hide
 import co.tcc.koga.android.utils.hideKeyboard
 import co.tcc.koga.android.utils.show
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.chat_fragment.*
 import javax.inject.Inject
 
@@ -37,11 +43,10 @@ class ChatFragment : Fragment(R.layout.chat_fragment) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        adapter = ChatAdapter(listOf())
         setupToolbar()
         setupViews()
+        setupRecyclerView()
         setupObservers()
-        viewModel.getMessages(args.chat.id)
     }
 
     override fun onDestroy() {
@@ -75,45 +80,45 @@ class ChatFragment : Fragment(R.layout.chat_fragment) {
     }
 
     private fun setupObservers() {
-        viewModel.messages.observe(viewLifecycleOwner) { messages ->
-            adapter.messages = messages
-            adapter.notifyDataSetChanged()
-            recycler_view_chat_messages.scrollToPosition(adapter.messages.size - 1)
-        }
+        viewModel.messages.observe(viewLifecycleOwner, {
+            if (!it.isNullOrEmpty()) {
+                adapter.messages = it
+                adapter.notifyDataSetChanged()
+                if (adapter.messages.size > 2) {
+                    recycler_view_chat_messages.scrollToPosition(adapter.messages.size - 1)
+                }
+            }
+        })
+        viewModel.getMessages(args.chat.chatId).observe(viewLifecycleOwner, {
+            println(it)
+            if (it.status === Resource.Status.LOADING && adapter.messages.isEmpty()) {
+                progress_bar_loading_messages.show()
+            } else {
+                progress_bar_loading_messages.hide()
+            }
+        })
 
-        viewModel.loadingMessages.observe(viewLifecycleOwner) { isLoading ->
-            if (isLoading) progress_bar_loading_messages.show()
-            else progress_bar_loading_messages.hide()
-        }
-
-        viewModel.currentUser.observe(viewLifecycleOwner) { user ->
-            adapter = ChatAdapter(listOf(), user.id)
-            setupRecyclerView()
-        }
-
-        viewModel.receiveNewMessage().observe(viewLifecycleOwner) { message ->
-            viewModel.handleNewMessage(message, false)
+        viewModel.messageReceived().observe(viewLifecycleOwner) { message ->
+            viewModel.handleNewMessage(args.chat.chatId, message, false)
         }
 
         viewModel.messageSent().observe(viewLifecycleOwner) { message ->
-            viewModel.handleNewMessage(message, true)
+            viewModel.handleNewMessage(args.chat.chatId, message, true)
         }
     }
 
     private fun setupRecyclerView() {
-        recycler_view_chat_messages.layoutManager = LinearLayoutManager(context)
+        adapter = ChatAdapter(listOf(), Client.getInstance().username(), args.chat.members)
+        val linearLayoutManager = LinearLayoutManager(context)
+        linearLayoutManager.stackFromEnd = true
+        recycler_view_chat_messages.layoutManager = linearLayoutManager
         recycler_view_chat_messages.adapter = adapter
-        recycler_view_chat_messages.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
-            if (!adapter.messages.isNullOrEmpty()) {
-                recycler_view_chat_messages.smoothScrollToPosition(
-                    adapter.messages.size
-                )
-            }
-        }
     }
 
     private fun setupToolbar() {
-        text_view_chat_user.text = args.chat.user?.name
+        text_view_chat_title.text =
+            if (args.chat.isPrivate) args.chat.user?.fullName else args.chat.groupName
+        loadChatAvatar(image_view_chat_avatar)
         toolbar_chat.apply {
             inflateMenu(R.menu.chat_menu)
             setOnMenuItemClickListener { item ->
@@ -124,23 +129,22 @@ class ChatFragment : Fragment(R.layout.chat_fragment) {
                 findNavController().popBackStack()
             }
             setOnClickListener {
-//                val contactDetailsBinding = ContactDetailsFragmentBinding.inflate(inflater)
-//                loadContactPhoto(contactDetailsBinding.imageViewContactDetailsPhoto)
-//                MaterialAlertDialogBuilder(context as Context)
-//                    .setView(contactDetailsBinding.root)
-//                    .show()
+                openChatDetails()
             }
         }
     }
 
-    private fun loadContactPhoto(imageView: ImageView) {
+    private fun loadChatAvatar(imageView: ImageView) {
         Glide
             .with(requireContext())
-            .load("https://www.osprofanos.com/wp-content/uploads/2013/03/cat37.jpg")
-            .centerCrop()
+            .load(
+                if (args.chat.isPrivate) args.chat.user?.avatar
+                else args.chat.avatar
+            )
+            .centerInside()
             .apply(RequestOptions.circleCropTransform())
-            .error(R.drawable.ic_outline_person)
-            .placeholder(R.drawable.ic_round_person)
+            .error(if (args.chat.isPrivate) R.drawable.ic_round_person else R.drawable.ic_round_group)
+            .placeholder(if (args.chat.isPrivate) R.drawable.ic_round_person else R.drawable.ic_round_group)
             .into(imageView)
     }
 
@@ -156,10 +160,8 @@ class ChatFragment : Fragment(R.layout.chat_fragment) {
             recycler_view_chat_messages.scrollToPosition(adapter.messages.size - 1)
             if (it != null) {
                 if (it.isNotEmpty()) {
-                    linear_layout_keyboard_action.hide()
                     image_button_send_message.show()
                 } else {
-                    linear_layout_keyboard_action.show()
                     image_button_send_message.hide()
                 }
             }
@@ -171,10 +173,27 @@ class ChatFragment : Fragment(R.layout.chat_fragment) {
                 edit_text_message.text.clear()
                 viewModel.sendMessage(
                     message,
-                    args.chat.user?.id as String,
-                    args.chat.id
+                    args.chat.chatId
                 )
             }
         }
     }
+
+    private fun openChatDetails() {
+        if (args.chat.isPrivate) {
+
+        } else {
+            val contactDetailsView =
+                GroupDetailsFragmentBinding.inflate(LayoutInflater.from(requireContext()))
+            contactDetailsView.recyclerViewGroupMembers.layoutManager = LinearLayoutManager(context)
+            contactDetailsView.recyclerViewGroupMembers.adapter =
+                UserAdapter(requireContext(), args.chat.members!!, fun(_) {})
+            MaterialAlertDialogBuilder(context as Context)
+                .setView(contactDetailsView.root)
+                .show()
+        }
+
+
+    }
 }
+

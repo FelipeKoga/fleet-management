@@ -30,34 +30,63 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_above="@+id/progress_bar_create_chat"
             android:layout_below="@+id/toolbar_search_contacts"
             android:layout_marginTop="0dp"
+            android:layout_marginBottom="0dp"
             android:orientation="vertical"
             android:padding="12dp">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Contatos" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_gravity="center"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:gravity="start"
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="Contatos" />
+
+                <ProgressBar
+                    android:id="@+id/progress_bar_users"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_gravity="center" />
+            </LinearLayout>
+
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recycler_view_search_contacts"
+                android:id="@+id/recycler_view_users"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginTop="6dp"
-                tools:listitem="@layout/row_contact" />
+                android:visibility="visible"
+                tools:listitem="@layout/row_user" />
         </LinearLayout>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/floatingButtonNewGroup"
+            android:id="@+id/floating_button_new_group"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_alignParentBottom="true"
+            app:backgroundTint="?backgroundColor"
+            android:background="?backgroundColor"
+            android:layout_marginBottom="24dp"
             android:layout_marginEnd="12dp"
-            android:layout_marginBottom="12dp"
-            android:backgroundTint="?colorPrimary"
             android:src="@drawable/ic_baseline_group_add"
-            app:tint="?backgroundColor" />
+            app:tint="?colorPrimary" />
+        <ProgressBar
+            android:id="@+id/progress_bar_create_chat"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_gravity="center"
+            android:layout_marginStart="0dp"
+            android:layout_marginEnd="0dp"
+            android:layout_marginBottom="0dp"
+            android:visibility="gone" />
     </RelativeLayout>
 </layout>

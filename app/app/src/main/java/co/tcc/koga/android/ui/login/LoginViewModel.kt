@@ -5,7 +5,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import co.tcc.koga.android.data.network.Client
-import co.tcc.koga.android.data.network.websocket.Socket
 import co.tcc.koga.android.data.repository.ClientRepository
 import com.amazonaws.mobile.auth.core.internal.util.ThreadUtils.runOnUiThread
 import kotlinx.coroutines.launch
@@ -24,7 +23,6 @@ class LoginViewModel @Inject constructor(private val repository: ClientRepositor
         loadingSignIn.value = true
         Client.getInstance().signIn(username, password, fun() {
             runOnUiThread {
-
                 getCurrentUser()
             }
         }, fun(e: Exception?) {
@@ -37,7 +35,8 @@ class LoginViewModel @Inject constructor(private val repository: ClientRepositor
     }
 
     private fun getCurrentUser() = viewModelScope.launch {
-        repository.getCurrentUserFromRemote()
+        repository.getCurrentUser()
+        repository.initWebSocket()
         loadingSignIn.value = false
         _signInStatus.value = true
     }

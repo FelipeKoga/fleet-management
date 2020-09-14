@@ -1,9 +1,10 @@
 const { CognitoIdentityServiceProvider } = require('aws-sdk');
 
 const service = new CognitoIdentityServiceProvider();
-const POOL_ID = 'us-east-1_KVttzPJIM';
+const POOL_ID = 'us-east-1_qtIxjoqVD';
 
 const createCognitoUser = async ({ name, email, password }, companyId) => {
+  console.log(email);
   const params = {
     UserPoolId: POOL_ID,
     Username: email,
@@ -28,6 +29,7 @@ const createCognitoUser = async ({ name, email, password }, companyId) => {
       },
     ],
   };
+
   await service.adminCreateUser(params).promise();
   const setUserPasswordResponse = await service
     .adminSetUserPassword({
@@ -41,11 +43,11 @@ const createCognitoUser = async ({ name, email, password }, companyId) => {
   return false;
 };
 
-const deleteCognitoUser = async (email) => {
+const deleteCognitoUser = async (username) => {
   return await service
     .adminDeleteUser({
       UserPoolId: POOL_ID,
-      Username: email,
+      Username: username,
     })
     .promise();
 };

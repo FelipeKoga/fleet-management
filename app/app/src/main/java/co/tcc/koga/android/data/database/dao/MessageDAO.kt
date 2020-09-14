@@ -2,6 +2,7 @@ package co.tcc.koga.android.data.database.dao
 
 import androidx.room.*
 import co.tcc.koga.android.data.database.entity.MessageEntity
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface MessageDAO {
@@ -9,15 +10,15 @@ interface MessageDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(message: MessageEntity): Long
 
-    @Query("UPDATE message SET id = :id where chatId = :chatId AND createdAt = :createdAt")
-    suspend fun replaceMessage(id: String, chatId: String, createdAt: String)
+    @Query("UPDATE message SET messageId = :messageId where chatId = :chatId AND createdAt = :createdAt")
+    suspend fun replaceMessage(messageId: String, chatId: String, createdAt: String)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAll(messages: List<MessageEntity>)
+    fun insertAll(messages: List<MessageEntity>)
 
     @Query("DELETE FROM message where chatId = :chatId")
     suspend fun deleteAll(chatId: String)
 
     @Query("SELECT * FROM message WHERE chatId = :chatId")
-    suspend fun getAll(chatId: String): List<MessageEntity>
+    fun getAll(chatId: String): Flow<List<MessageEntity>>
 }

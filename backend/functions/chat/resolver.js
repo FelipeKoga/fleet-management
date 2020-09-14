@@ -1,5 +1,6 @@
 const { v4 } = require('uuid');
-const { ApiGatewayManagementApi, Lambda } = require('aws-sdk');
+const { ApiGatewayManagementApi } = require('aws-sdk');
+const moment = require('moment-timezone');
 
 const { query, put } = require('./db');
 
@@ -8,13 +9,11 @@ const apigwManagementApi = new ApiGatewayManagementApi({
   endpoint: process.env.WS_URL,
 });
 
-const checkIfExists = async (members, isPrivate) => {
+const checkIfExists = async (member_username, username, isPrivate) => {
   if (!isPrivate) return false;
 
-  if (members.length !== 2) throw new Error('Error.');
-
-  const chatsMemberA = await getUserChats(members[0].username);
-  const chatsMemberB = await getUserChats(members[1].username);
+  const chatsMemberA = await getUserChats(member_username);
+  const chatsMemberB = await getUserChats(username);
 
   let chatId = null;
 
@@ -34,16 +33,20 @@ const checkIfExists = async (members, isPrivate) => {
 };
 
 const createChat = async (
-  { members, avatar, groupName, admin, isPrivate },
+  { members, member_username, avatar, groupName, admin, isPrivate },
   username
 ) => {
-  const existsChatId = await checkIfExists(members, isPrivate);
+  console.log(member_username);
+  const existsChatId = await checkIfExists(
+    member_username,
+    username,
+    isPrivate
+  );
+  console.log(existsChatId);
   if (existsChatId)
     return {
-      chat: {
-        ...(await getChat(existsChatId, username)),
-        ...(await getMessages(existsChatId, 1)),
-      },
+      ...(await getChat(existsChatId, username)),
+      ...(await getMessages(existsChatId, 1)),
     };
 
   const chatId = v4();
@@ -59,18 +62,38 @@ const createChat = async (
     },
   });
 
-  const promises = members.map(async (member) => {
+  await put({
+    TableName: process.env.CHAT_TABLE,
+    Item: {
+      chatId,
+      sortKey: `MEMBER#${username}`,
+      isPrivate,
+    },
+  });
+
+  if (member_username) {
     await put({
       TableName: process.env.CHAT_TABLE,
       Item: {
         chatId,
-        sortKey: `MEMBER#${member.username}`,
+        sortKey: `MEMBER#${member_username}`,
         isPrivate,
       },
     });
-  });
+  } else if (members.length) {
+    const promises = members.map(async (member) => {
+      await put({
+        TableName: process.env.CHAT_TABLE,
+        Item: {
+          chatId,
+          sortKey: `MEMBER#${member.username}`,
+          isPrivate,
+        },
+      });
+    });
 
-  await Promise.all(promises);
+    await Promise.all(promises);
+  }
 
   return await getChat(chatId, username);
 };
@@ -99,11 +122,9 @@ const getAllChats = async (username) => {
   const userChats = await getUserChats(username);
   const chats = [];
   const promises = userChats.map(async ({ chatId }) => {
-    const lastMessage = await getMessages(chatId, 1);
-    if (!lastMessage) return;
     const chat = await getChat(chatId, username);
 
-    chats.push({ ...chat, lastMessage });
+    chats.push(chat);
   });
 
   await Promise.all(promises);
@@ -135,6 +156,16 @@ const getChat = async (chatId, username) => {
   });
 
   const members = await Promise.all(promises);
+
+  if (chat.isPrivate) {
+    return {
+      chatId: chat.chatId,
+      isPrivate: chat.isPrivate,
+      user: members[0],
+      members: [],
+    };
+  }
+
   return {
     ...chat,
     members: members.filter((member) => !!member),
@@ -169,53 +200,34 @@ const getChatMembers = async (chatId) => {
   return response.Items;
 };
 
-const getMessages = async (chatId, limit) => {
+const getMessages = async (chatId) => {
   const response = await query({
     TableName: process.env.CHAT_TABLE,
     KeyConditionExpression: 'chatId = :chatId and begins_with(sortKey, :sk)',
-    ScanForwardIndex: true,
     ExpressionAttributeValues: {
       ':chatId': chatId,
       ':sk': 'MESSAGE#',
     },
-    ProjectionExpression: 'chatId, body, username, createdAt',
+    ProjectionExpression:
+      'chatId, body, sender, createdAt, sortKey, messageId, sent',
     ScanForwardIndex: false,
-    Limit: limit ? limit : null,
   });
-
-  if (limit) return response.Items[0];
 
   return response.Items;
 };
 
-const invokePostMessage = async (action, data) => {
-  const lambda = new Lambda();
-
-  console.log('INVOKE');
-  await lambda
-    .invoke({
-      FunctionName: `${process.env.APP}-${process.env.STAGE}-post-message`,
-      Payload: JSON.stringify({
-        method: 'user',
-        data: {
-          action,
-          data,
-        },
-      }),
-      InvocationType: 'RequestResponse',
-    })
-    .promise()
-    .catch((e) => console.log(e));
-};
-
-const sendMessage = async ({ chatId, username, body, createdAt }) => {
+const sendMessage = async ({ messageId, chatId, sender, body, createdAt }) => {
   const msg = {
     chatId,
-    username,
+    sender,
     body,
     createdAt,
+    messageId,
     sortKey: `MESSAGE#${createdAt}`,
+    sent: true,
   };
+
+  console.log(msg);
 
   await put({
     TableName: process.env.CHAT_TABLE,
@@ -224,9 +236,7 @@ const sendMessage = async ({ chatId, username, body, createdAt }) => {
 
   const chatMembers = await getChatMembers(chatId);
 
-  console.log(chatMembers);
   const promises = chatMembers.map(async (member) => {
-    console.log(member);
     const username = getUsername(member.sortKey);
     const response = await query({
       TableName: process.env.USER_TABLE,
@@ -237,22 +247,21 @@ const sendMessage = async ({ chatId, username, body, createdAt }) => {
       },
     });
 
-    console.log(response);
     const promises = response.Items.map(async (item) => {
-      if (item.username === username) {
+      if (item.username === sender) {
         await send({
           ConnectionId: item.connectionId,
           Data: JSON.stringify({
-            action: 'message-sent',
-            body: msg,
+            action: 'message_sent',
+            data: msg,
           }),
         });
       } else {
         await send({
           ConnectionId: item.connectionId,
           Data: JSON.stringify({
-            action: 'message-receive',
-            body: msg,
+            action: 'message_receive',
+            data: msg,
           }),
         });
       }
@@ -264,10 +273,6 @@ const sendMessage = async ({ chatId, username, body, createdAt }) => {
 };
 
 const send = async (params) => {
-  const apigwManagementApi = new ApiGatewayManagementApi({
-    apiVersion: '2018-11-29',
-    endpoint: process.env.WS_URL,
-  });
   await apigwManagementApi
     .postToConnection(params)
     .promise()

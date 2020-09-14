@@ -1,12 +1,9 @@
 {
-  "UserPoolClientId": "2tle8fpjvdrab07l8dtdi6o7h1",
-  "UserPoolId": "us-east-1_1t5Hxze7t",
-  "ConnectionDashhandlerLambdaFunctionQualifiedArn": "arn:aws:lambda:us-east-1:603366505042:function:tcc-dev-connection-handler:16",
-  "SendDashmessageLambdaFunctionQualifiedArn": "arn:aws:lambda:us-east-1:603366505042:function:tcc-dev-send-message:2",
+  "UserPoolClientId": "7v9bv1er5ckgmn0quptepbdjms",
+  "UserPoolId": "us-east-1_KVttzPJIM",
   "Region": "us-east-1",
-  "UserLambdaFunctionQualifiedArn": "arn:aws:lambda:us-east-1:603366505042:function:tcc-dev-user:32",
-  "IdentityPoolId": "us-east-1:73da1350-7766-4f17-b932-41fe4342d50f",
-  "ServiceEndpoint": "https://qv7ica8p35.execute-api.us-east-1.amazonaws.com/dev",
-  "ServiceEndpointWebsocket": "wss://3x7sch9ll8.execute-api.us-east-1.amazonaws.com/dev",
-  "ServerlessDeploymentBucketName": "tcc-dev-serverlessdeploymentbucket-1jrmif0g0q1yk"
+  "IdentityPoolId": "us-east-1:7bfeb24d-6a9e-4ab6-8783-7fb40af5705a",
+  "ServiceEndpoint": "https://1kcmfehg7j.execute-api.us-east-1.amazonaws.com/dev",
+  "ServiceEndpointWebsocket": "wss://a2xzjwkbb8.execute-api.us-east-1.amazonaws.com/dev",
+  "ServerlessDeploymentBucketName": "tcc-backend-dev-serverlessdeploymentbucket-1hrcoalyqzhet"
 }

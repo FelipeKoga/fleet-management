@@ -3,8 +3,9 @@ package co.tcc.koga.android.ui.di
 import co.tcc.koga.android.MainActivity
 import co.tcc.koga.android.ui.chat.ChatFragment
 import co.tcc.koga.android.ui.chats.ChatsFragment
+import co.tcc.koga.android.ui.new_group.NewGroupFragment
 import co.tcc.koga.android.ui.login.LoginFragment
-import co.tcc.koga.android.ui.login.LoginViewModel
+import co.tcc.koga.android.ui.new_chat.NewChatFragment
 import co.tcc.koga.android.ui.settings.SettingsFragment
 import co.tcc.koga.android.ui.splash_screen.SplashScreenFragment
 import dagger.Subcomponent
@@ -23,5 +24,7 @@ interface MainComponent {
     fun inject(fragment: ChatsFragment)
     fun inject(fragment: ChatFragment)
     fun inject(fragment: SettingsFragment)
+    fun inject(fragment: NewChatFragment)
+    fun inject(fragment: NewGroupFragment)
     fun inject(fragment: SplashScreenFragment)
 }

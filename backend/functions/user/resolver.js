@@ -1,90 +1,112 @@
 const { DynamoDB } = require('aws-sdk');
-const { v4 } = require('uuid');
 const sendToAllConnected = require('./post-message');
 const { createCognitoUser, deleteCognitoUser } = require('./cognito');
-
 const docClient = new DynamoDB.DocumentClient();
 const USER_TABLE = 'user';
 
 const list = async (companyId) => {
   const params = {
-    TableName: USER_TABLE,
+    TableName: process.env.USER_TABLE,
     IndexName: 'companyIdIndex',
     KeyConditionExpression: 'companyId = :cId',
     ExpressionAttributeValues: {
       ':cId': companyId,
     },
+    ProjectionExpression:
+      'username, fullName, email, avatar, companyId, settings, phone',
   };
   const response = await docClient.query(params).promise();
-
   return response.Items;
 };
 
-const getById = async (companyId, userId) => {
+const getUser = async (username) => {
   const params = {
-    TableName: USER_TABLE,
-    KeyConditionExpression: 'id = :userId',
+    TableName: process.env.USER_TABLE,
+    KeyConditionExpression: 'username = :u and begins_with(sortKey, :sk)',
     ExpressionAttributeValues: {
-      ':userId': userId,
+      ':u': username,
+      ':sk': `METADATA`,
     },
+    ProjectionExpression:
+      'username, fullName, email, avatar, companyId, settings, phone',
   };
+
   const response = await docClient.query(params).promise();
-  if (response.Items[0].companyId === companyId) {
+  if (response.Items.length) {
     return response.Items[0];
   }
   throw new Error('User not found');
 };
 
 const create = async (data, companyId) => {
+  await createCognitoUser(data, companyId);
   const newUser = {
-    id: v4(),
-    companyId,
+    username: data.email,
+    sortKey: `METADATA`,
     ...data,
   };
+  delete newUser.password;
+
   const params = {
     TableName: USER_TABLE,
     Item: newUser,
   };
   await docClient.put(params).promise();
-  const user = await getById(companyId, newUser.id);
-  await createCognitoUser(data, companyId);
+  const user = await getUser(newUser.username, companyId);
   await sendToAllConnected(user, 'post-user');
   return user;
 };
 
-const update = async (data, userId, companyId) => {
+const update = async (
+  { customName, fullName, email, phone, settings },
+  username,
+  companyId
+) => {
   const params = {
-    TableName: USER_TABLE,
+    TableName: process.env.USER_TABLE,
     Key: {
-      id: userId,
+      username,
+      sortKey: `METADATA`,
     },
-    UpdateExpression: 'set #n = :n, #e = :e',
-    ExpressionAttributeNames: {
-      '#n': 'name',
-      '#e': 'email',
-    },
+    UpdateExpression:
+      'set customName = :cn, fullName = :n, phone = :p, email = :e, settings = :s',
     ExpressionAttributeValues: {
-      ':n': data.name,
-      ':e': data.email,
+      ':cn': customName,
+      ':n': fullName,
+      ':p': phone,
+      ':e': email,
+      ':s': settings,
     },
   };
   await docClient.update(params).promise();
-  const user = await getById(companyId, userId);
+  const user = await getUser(username, companyId);
   await sendToAllConnected(user, 'update-user');
   return user;
 };
 
-const remove = async (userId, companyId) => {
+const remove = async (username, companyId) => {
   try {
-    const user = await getById(companyId, userId);
-    const params = {
-      TableName: USER_TABLE,
+    await deleteCognitoUser(username);
+    const user = await getUser(username, companyId);
+    let params = {
+      TableName: process.env.USER_TABLE,
       Key: {
-        id: user.id,
+        username,
       },
     };
-    await docClient.delete(params).promise();
-    await deleteCognitoUser(user.email);
+
+    await Promise.all([
+      docClient
+        .delete({ ...params, Key: { ...params.Key, sortKey: 'METADATA' } })
+        .promise(),
+      docClient
+        .delete({ ...params, Key: { ...params.Key, sortKey: 'CONNECTION' } })
+        .promise(),
+      docClient
+        .delete({ ...params, Key: { ...params.Key, sortKey: 'LOCATION' } })
+        .promise(),
+    ]);
+
     await sendToAllConnected(user, 'delete-user');
     return user;
   } catch (e) {
@@ -93,7 +115,7 @@ const remove = async (userId, companyId) => {
 };
 module.exports = {
   list,
-  getById,
+  getUser,
   create,
   update,
   remove,

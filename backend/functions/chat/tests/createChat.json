@@ -5,11 +5,11 @@
     "username": "kosloski.fkoga@gmail.com"
   },
   "arguments": {
-    "groupName": "",
-    "isPrivate": true,
+    "groupName": "Grupo 1",
+    "isPrivate": false,
     "avatar": "",
-    "admin": "",
-    "createdAt": "",
+    "admin": "kosloski.fkoga@gmail.com",
+    "createdAt": "1599590939",
     "members": [
       {
         "username": "kosloski.fkoga@gmail.com"

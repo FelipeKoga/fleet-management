@@ -1,41 +1,23 @@
 package co.tcc.koga.android.data.repository
 
-import android.os.Message
 import androidx.lifecycle.LiveData
+import co.tcc.koga.android.data.Resource
 import co.tcc.koga.android.data.database.entity.MessageEntity
+import kotlinx.coroutines.flow.Flow
 
 interface MessageRepository {
 
-    suspend fun insert(
-        id: String,
-        message: String,
-        senderId: String,
-        recipientId: String,
+    fun getMessages(
         chatId: String
-    ): MessageEntity
-
-    suspend fun insert(message: MessageEntity)
-
-    suspend fun replaceMessage(message: MessageEntity)
-
-    suspend fun insertAll(messages: List<MessageEntity>, chatId: String)
-
-    suspend fun getMessages(chatId: String): List<MessageEntity>
-
-    suspend fun getMessagesFromNetwork(
-        companyId: String,
-        userId: String,
-        chatId: String
-    ): List<MessageEntity>
+    ): Flow<Resource<List<MessageEntity>>>
 
     suspend fun sendMessage(
-        text: String,
-        senderId: String,
-        recipientId: String,
-        chatId: String
+        message: MessageEntity
     ): MessageEntity
 
-    fun receiveMessage(): LiveData<MessageEntity>
+    fun messageReceived(): LiveData<MessageEntity>
 
     fun messageSent(): LiveData<MessageEntity>
+
+    suspend fun insertMessage(message: MessageEntity)
 }

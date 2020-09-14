@@ -1,0 +1,7 @@
+{
+  "httpMethod": "GET",
+  "pathParameters": {
+    "companyId": "1",
+    "username": "kosloski.fkoga@gmail.com"
+  }
+}

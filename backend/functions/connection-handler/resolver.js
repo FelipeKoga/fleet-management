@@ -10,9 +10,7 @@ const getTimestamp = () => {
 };
 
 const addConnection = async (connectionId, username) => {
-  console.log(username);
   const response = await getUser(username);
-  console.log(response);
   if (response.Count) {
     const user = response.Items[0];
     const params = {

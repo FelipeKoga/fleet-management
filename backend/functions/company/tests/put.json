@@ -1,0 +1,10 @@
+{
+  "field": "putUser",
+  "arguments": {
+    "companyId": "1",
+    "fullName": "Kosloski Koga",
+    "email": "felipe.koga@gmail.com",
+    "avatar": "",
+    "settings": {}
+  }
+}

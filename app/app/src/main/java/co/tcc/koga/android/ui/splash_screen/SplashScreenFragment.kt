@@ -10,6 +10,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import co.tcc.koga.android.MainActivity
 import co.tcc.koga.android.R
+import co.tcc.koga.android.data.Resource
 import javax.inject.Inject
 
 class SplashScreenFragment : Fragment(R.layout.splash_screen_fragment) {
@@ -24,32 +25,45 @@ class SplashScreenFragment : Fragment(R.layout.splash_screen_fragment) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        println("SETUP OBSERVERS")
         viewModel.initApp()
         setupObservers()
     }
 
     private fun setupObservers() {
         viewModel.appStatus.observe(viewLifecycleOwner, { status ->
-            println(status)
             if (!status) {
-                Toast.makeText(requireContext(), "Erro ao inicilizar o app.", Toast.LENGTH_LONG)
-                    .show()
+                showErrorToast()
             }
         })
 
         viewModel.isLogged.observe(viewLifecycleOwner, { isLogged ->
-            println(isLogged)
             if (isLogged) {
-                findNavController().navigate(
-                    R.id.action_splashScreenFragment_to_chatsFragment,
-                )
+                initUserLogged()
+
             } else {
                 findNavController().navigate(
                     R.id.action_splashScreenFragment_to_loginFragment,
                 )
             }
         })
+    }
+
+    private fun initUserLogged() {
+        viewModel.initCurrentUser().observe(viewLifecycleOwner, {
+            if (it.status == Resource.Status.SUCCESS) {
+                findNavController().navigate(
+                    R.id.action_splashScreenFragment_to_chatsFragment,
+                )
+            }
+            else if (it.status == Resource.Status.ERROR) {
+                showErrorToast()
+            }
+        })
+    }
+
+    private fun showErrorToast() {
+        Toast.makeText(requireContext(), "Erro ao inicilizar o app.", Toast.LENGTH_LONG)
+            .show()
     }
 
 }

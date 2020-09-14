@@ -4,8 +4,12 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import co.tcc.koga.android.data.Resource
 import co.tcc.koga.android.data.repository.ClientRepository
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.map
+import androidx.lifecycle.asLiveData
+import co.tcc.koga.android.data.database.entity.UserEntity
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import javax.inject.Inject
 
 class SplashScreenViewModel @Inject constructor(private val repository: ClientRepository) :
@@ -21,7 +25,7 @@ class SplashScreenViewModel @Inject constructor(private val repository: ClientRe
     fun initApp() {
         repository.initApp(
             fun() {
-                initCurrentUser()
+                _isLogged.value = true
             },
 
             fun() {
@@ -33,17 +37,25 @@ class SplashScreenViewModel @Inject constructor(private val repository: ClientRe
             })
     }
 
-    private fun initCurrentUser() = viewModelScope.launch {
-        try {
-            var user = repository.getCurrentUserFromLocal()
-            if (user === null) {
-                user = repository.getCurrentUserFromRemote()
+    fun initCurrentUser(): LiveData<Resource<UserEntity>> =
+        repository.getCurrentUser().map {
+            println(it.status)
+            when (it.status) {
+                Resource.Status.LOADING -> {
+                    Resource.loading(null)
+                }
+                Resource.Status.SUCCESS -> {
+                    repository.initWebSocket()
+                    Resource.success(it.data)
+                }
+                Resource.Status.ERROR -> {
+                    _appStatus.value = false
+                    Resource.error(it.message!!, null)
+                }
+                Resource.Status.LOCAL -> {
+                    Resource.localData(it.data)
+                }
             }
-            repository.initWebSocket(user.id)
-            _isLogged.value = true
-        } catch (e: Exception) {
-            println(e)
-        }
-    }
+        }.asLiveData(viewModelScope.coroutineContext)
 
 }

@@ -6,28 +6,35 @@
         android:layout_width="match_parent"
         android:background="?backgroundColor"
         android:layout_height="match_parent"
-        tools:context=".ui.group.NewGroupFragment">
+        tools:context=".ui.new_group.NewGroupFragment">
 
         <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbarNewGroup"
+            android:id="@+id/toolbar_new_group"
             android:layout_width="match_parent"
             android:layout_height="?actionBarSize"
-            app:title="Novo grupo"
+            android:background="?backgroundColor"
             android:elevation="2dp"
-            app:navigationIcon="@drawable/ic_arrow_back_black"
-        />
+            app:navigationIcon="@drawable/ic_arrow_back_black">
+
+            <EditText
+                android:id="@+id/edit_text_search_contact"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                android:hint="Pesquisar"
+                android:singleLine="true" />
+        </androidx.appcompat.widget.Toolbar>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@+id/toolbarNewGroup"
+            android:layout_below="@+id/toolbar_new_group"
             android:layout_marginTop="0dp"
             android:layout_marginBottom="0dp"
             android:orientation="vertical"
             android:padding="12dp">
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/outlinedTextField"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -37,37 +44,46 @@
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:layout_width="match_parent"
+                    android:id="@+id/text_field_group_name"
                     android:layout_height="wrap_content" />
 
             </com.google.android.material.textfield.TextInputLayout>
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/outlinedTextField2"
-                app:endIconMode="custom"
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:visibility="gone"
                 android:layout_marginTop="12dp"
-                app:endIconDrawable="@drawable/ic_round_search_black"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                android:layout_width="match_parent"
+                android:orientation="horizontal"
+                android:id="@+id/recycler_view_selected_users"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:hint="Pesquise o nome do contato">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-
-            </com.google.android.material.textfield.TextInputLayout>
+                tools:listitem="@layout/row_selected_user" />
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="12dp"
                 android:text="Contatos"
                 android:textSize="14sp" />
             <androidx.recyclerview.widget.RecyclerView
                 android:layout_marginTop="12dp"
-                android:id="@+id/recyclerViewContactsNewGroup"
+                android:id="@+id/recycler_view_users_new_group"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                tools:listitem="@layout/row_contact" />
+                tools:listitem="@layout/row_user" />
         </LinearLayout>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/floating_button_create_group"
+            android:visibility="gone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_baseline_check"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginEnd="12dp"
+            android:layout_marginBottom="24dp"
+            app:backgroundTint="?colorPrimary"
+            android:background="?colorPrimary"
+            app:tint="?backgroundColor"/>
 
     </RelativeLayout>
 </layout>

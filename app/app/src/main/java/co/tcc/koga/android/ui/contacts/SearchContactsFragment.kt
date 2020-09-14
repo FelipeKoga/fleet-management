@@ -9,7 +9,6 @@ import androidx.core.os.bundleOf
 import androidx.navigation.fragment.findNavController
 import co.tcc.koga.android.R
 import co.tcc.koga.android.databinding.SearchContactsFragmentBinding
-import co.tcc.koga.android.domain.Contact
 
 class SearchContactsFragment : Fragment() {
     private lateinit var binding: SearchContactsFragmentBinding
@@ -35,11 +34,4 @@ class SearchContactsFragment : Fragment() {
         return binding.root
     }
 
-    private fun redirectToChat(contact: Contact) {
-        findNavController().navigate(
-            R.id.action_searchContactsFragment_to_chatFragment,
-            bundleOf("contact" to contact)
-        )
-
-    }
 }

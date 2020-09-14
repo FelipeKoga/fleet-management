@@ -5,8 +5,8 @@ import android.content.Context
 import androidx.room.Room
 import co.tcc.koga.android.data.database.AppDatabase
 import co.tcc.koga.android.data.database.dao.ChatDAO
-import co.tcc.koga.android.data.database.dao.ContactDAO
 import co.tcc.koga.android.data.database.dao.MessageDAO
+import co.tcc.koga.android.data.database.dao.UserDAO
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
@@ -26,13 +26,13 @@ class DatabaseModule {
 
     @Singleton
     @Provides
-    fun provideChatDao(database: AppDatabase): ChatDAO = database.chatDAO
+    fun providesChatDao(database: AppDatabase): ChatDAO = database.chatDAO
 
     @Singleton
     @Provides
-    fun provideMessageDao(database: AppDatabase): MessageDAO = database.messageDAO
+    fun providesMessageDao(database: AppDatabase): MessageDAO = database.messageDAO
 
     @Singleton
     @Provides
-    fun provideContactDao(database: AppDatabase): ContactDAO = database.contactDAO
+    fun providesUserDao(database: AppDatabase): UserDAO = database.userDao
 }

@@ -2,7 +2,6 @@ package co.tcc.koga.android
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import co.tcc.koga.android.data.network.websocket.Socket
 import co.tcc.koga.android.ui.di.MainComponent
 
 class MainActivity : AppCompatActivity() {

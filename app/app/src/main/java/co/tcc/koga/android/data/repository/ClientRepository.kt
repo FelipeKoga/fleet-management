@@ -1,6 +1,9 @@
 package co.tcc.koga.android.data.repository
 
-import co.tcc.koga.android.data.database.entity.ContactEntity
+
+import co.tcc.koga.android.data.Resource
+import co.tcc.koga.android.data.database.entity.UserEntity
+import kotlinx.coroutines.flow.Flow
 
 
 interface ClientRepository {
@@ -11,11 +14,9 @@ interface ClientRepository {
         onError: () -> Unit
     )
 
-    suspend fun getCurrentUserFromLocal(): ContactEntity?
-
-    suspend fun getCurrentUserFromRemote(): ContactEntity
+    fun getCurrentUser(): Flow<Resource<UserEntity>>
 
     suspend fun signOut()
 
-    fun initWebSocket(userId: String)
+    fun initWebSocket()
 }

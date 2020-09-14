@@ -1,86 +1,87 @@
 package co.tcc.koga.android.ui.chat
 
 import androidx.lifecycle.*
-import co.tcc.koga.android.data.database.entity.ContactEntity
+import co.tcc.koga.android.data.Resource
 import co.tcc.koga.android.data.database.entity.MessageEntity
-import co.tcc.koga.android.data.network.websocket.Socket
+import co.tcc.koga.android.data.network.Client
 import co.tcc.koga.android.data.repository.ClientRepository
 import co.tcc.koga.android.data.repository.MessageRepository
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import java.lang.Exception
 import javax.inject.Inject
 
 class ChatViewModel @Inject constructor(
     private val repository: MessageRepository,
-    private val clientRepository: ClientRepository
 ) : ViewModel() {
     private val _messages = MutableLiveData<List<MessageEntity>>()
-    private val _currentUser = MutableLiveData<ContactEntity>()
-    private val _loadingMessages = MutableLiveData(true)
     val messages: LiveData<List<MessageEntity>>
         get() = _messages
-    val loadingMessages: LiveData<Boolean> get() = _loadingMessages
-    val currentUser: LiveData<ContactEntity> get() = _currentUser
 
-    fun receiveNewMessage(): LiveData<MessageEntity> {
-        return repository.receiveMessage()
+    fun messageReceived(): LiveData<MessageEntity> {
+        return repository.messageReceived()
     }
 
     fun messageSent(): LiveData<MessageEntity> {
         return repository.messageSent()
     }
 
-    fun getMessages(chatId: String) = viewModelScope.launch {
-        try {
-            val currentUser = clientRepository.getCurrentUserFromLocal()
-            _currentUser.postValue(currentUser)
-            var msgs = repository.getMessages(chatId)
-            _messages.postValue(msgs)
-            if (msgs.isNotEmpty()) _loadingMessages.value = false
-            msgs = repository.getMessagesFromNetwork(
-                currentUser!!.id,
-                currentUser.companyId,
-                chatId
-            )
-            _messages.postValue(msgs)
-            _loadingMessages.value = false
-        } catch (e: Exception) {
-            println(e)
+    fun getMessages(chatId: String) = repository.getMessages(chatId).map {
+        when (it.status) {
+            Resource.Status.LOADING -> {
+                Resource.loading(null)
+            }
+            Resource.Status.SUCCESS -> {
+                _messages.value = it.data
+                Resource.success(it.data)
+            }
+            Resource.Status.ERROR -> {
+                Resource.error(it.message!!, null)
+            }
+            Resource.Status.LOCAL -> {
+                _messages.value = it.data
+                Resource.localData(it.data)
+            }
         }
-    }
+    }.asLiveData(viewModelScope.coroutineContext)
 
-    fun sendMessage(text: String, recipientId: String, chatId: String) = viewModelScope.launch {
+    fun sendMessage(text: String, chatId: String) = viewModelScope.launch {
         try {
             val msgs = _messages.value?.toMutableList()
-            msgs?.add(repository.sendMessage(text, _currentUser.value!!.id, recipientId, chatId))
+            val message = MessageEntity(chatId, text, Client.getInstance().username())
+            msgs?.add(message)
             _messages.postValue(msgs)
+            repository.sendMessage(message)
         } catch (e: Exception) {
             println(e)
         }
     }
 
-    fun handleNewMessage(message: MessageEntity, sent: Boolean) = viewModelScope.launch {
-        try {
-            val msgs = messages.value?.toMutableList()
-            if (msgs !== null) {
-                if (sent) {
-                    repository.replaceMessage(message)
-                    _messages.postValue(msgs.map {
-                        if (it.id.isEmpty() && it.createdAt == message.createdAt) {
-                            message
-                        } else {
-                            it
-                        }
-                    })
-                } else {
-                    msgs.add(message)
-                    repository.insert(message)
-                    _messages.postValue(msgs)
+    fun handleNewMessage(chatId: String, message: MessageEntity, sent: Boolean) =
+        viewModelScope.launch {
+            try {
+                if (chatId != message.chatId) return@launch
+                val msgs = messages.value?.toMutableList()
+                if (msgs !== null) {
+                    val findMsg = msgs.find { it.messageId == message.messageId }
+                    if (sent && findMsg != null) {
+                        _messages.postValue(msgs.map {
+                            if (it.messageId == message.messageId) {
+                                message
+                            } else {
+                                it
+                            }
+                        })
+
+                    } else {
+                        msgs.add(message)
+                        _messages.postValue(msgs)
+                    }
+                    repository.insertMessage(message)
                 }
+            } catch (e: Exception) {
+                println(e)
             }
-        } catch (e: Exception) {
-            println(e)
         }
-    }
 
 }

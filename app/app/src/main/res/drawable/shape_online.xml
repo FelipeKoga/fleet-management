@@ -5,8 +5,8 @@
     android:thicknessRatio="1.9"
     android:useLevel="false" >
 
-<!--    <stroke-->
-<!--        android:color="?backgroundColor"-->
-<!--        android:width="2dp" />-->
+    <stroke
+        android:color="?backgroundColor"
+        android:width="1dp" />
     <solid android:color="@color/online" />
 </shape>

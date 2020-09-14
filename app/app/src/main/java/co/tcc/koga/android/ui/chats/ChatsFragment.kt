@@ -6,16 +6,16 @@ import android.view.*
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import co.tcc.koga.android.MainActivity
 import co.tcc.koga.android.R
-import co.tcc.koga.android.data.database.AppDatabase
+import co.tcc.koga.android.data.Resource
 import co.tcc.koga.android.data.database.entity.ChatEntity
-import co.tcc.koga.android.data.repository.ChatsRepository
-import co.tcc.koga.android.ui.login.LoginViewModel
+import co.tcc.koga.android.ui.adapter.ChatsAdapter
+import co.tcc.koga.android.utils.hide
+import co.tcc.koga.android.utils.show
 import kotlinx.android.synthetic.main.chats_fragment.*
 import javax.inject.Inject
 
@@ -43,11 +43,6 @@ class ChatsFragment : Fragment(R.layout.chats_fragment) {
         super.onCreateOptionsMenu(menu, inflater)
     }
 
-    override fun onResume() {
-        super.onResume()
-        viewModel.getCurrentUser()
-    }
-
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.item_search -> {
@@ -61,16 +56,26 @@ class ChatsFragment : Fragment(R.layout.chats_fragment) {
     }
 
     private fun setupObservers() {
-        viewModel.apply {
-            chats.observe(viewLifecycleOwner, { chats ->
-                adapter.chats = chats
-                adapter.notifyDataSetChanged()
+            viewModel.chats.observe(viewLifecycleOwner, {
+                when (it.status) {
+                    Resource.Status.LOADING -> {
+                        if (!it.data.isNullOrEmpty()) progress_bar_chats.hide()
+
+                    }
+                    Resource.Status.SUCCESS, Resource.Status.LOCAL -> {
+                        if (!it.data.isNullOrEmpty()) {
+                            recycler_view_chats.show()
+                            progress_bar_chats.hide()
+                            adapter.chats = it.data
+                            adapter.notifyDataSetChanged()
+
+                        }
+                    }
+                    Resource.Status.ERROR -> {
+                    }
+                }
             })
 
-            currentUser.observe(viewLifecycleOwner, { user ->
-                if (user?.id !== null) viewModel.getChats()
-            })
-        }
     }
 
     private fun redirectToChat(chat: ChatEntity) {
@@ -93,13 +98,13 @@ class ChatsFragment : Fragment(R.layout.chats_fragment) {
 
         }
         floatingButtonNewChat.setOnClickListener {
-            findNavController().navigate(R.id.action_chatsFragment_to_newGroupFragment)
+            findNavController().navigate(R.id.action_chatsFragment_to_newChatFragment)
         }
 
     }
 
     private fun setupRecyclerView() {
-        adapter = ChatsAdapter(listOf()) { chat ->
+        adapter = ChatsAdapter(requireContext(), listOf()) { chat ->
             redirectToChat(chat)
         }
         recycler_view_chats.layoutManager = LinearLayoutManager(requireContext())

@@ -1,6 +1,7 @@
 {
-  "field": "deleteUser",
-  "arguments": {
-    "id": "696d3772-152c-4279-b670-46cf1797c057"
+  "httpMethod": "DELETE",
+  "pathParameters": {
+    "companyId": "1",
+    "username": "koga@koga.com"
   }
 }

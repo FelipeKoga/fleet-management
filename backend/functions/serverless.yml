@@ -7,7 +7,7 @@ chat:
       - functions/chat/*/**
   events:
     - http:
-        path: company/{companyId}/users/{userId}/chats
+        path: company/{companyId}/users/{username}/chats
         method: GET
         cors: true
         authorizer:
@@ -15,7 +15,15 @@ chat:
           authorizerId:
             Ref: ApiGatewayAuthorizer
     - http:
-        path: company/{companyId}/users/{userId}/chats/{chatId}
+        path: company/{companyId}/users/{username}/chats
+        method: POST
+        cors: true
+        authorizer:
+          type: COGNITO_USER_POOLS
+          authorizerId:
+            Ref: ApiGatewayAuthorizer
+    - http:
+        path: company/{companyId}/users/{username}/chats/{chatId}
         method: GET
         cors: true
         authorizer:
@@ -23,7 +31,7 @@ chat:
           authorizerId:
             Ref: ApiGatewayAuthorizer
     - http:
-        path: company/{companyId}/users/{userId}/chats/{chatId}/messages
+        path: company/{companyId}/users/{username}/chats/{chatId}/messages
         method: GET
         cors: true
         authorizer:
@@ -53,7 +61,7 @@ user:
       - functions/user/*/**
   events:
     - http:
-        path: user
+        path: user/{username}
         method: GET
         cors: true
         authorizer:
@@ -69,7 +77,7 @@ user:
           authorizerId:
             Ref: ApiGatewayAuthorizer
     - http:
-        path: company/{companyId}/users/{userId}
+        path: company/{companyId}/users/{username}
         method: GET
         cors: true
         authorizer:
@@ -85,7 +93,7 @@ user:
           authorizerId:
             Ref: ApiGatewayAuthorizer
     - http:
-        path: company/{companyId}/users/{userId}
+        path: company/{companyId}/users/{username}
         method: PUT
         cors: true
         authorizer:
@@ -93,7 +101,7 @@ user:
           authorizerId:
             Ref: ApiGatewayAuthorizer
     - http:
-        path: company/{companyId}/users/{userId}
+        path: company/{companyId}/users/{username}
         method: DELETE
         cors: true
         authorizer:

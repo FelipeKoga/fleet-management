@@ -1,0 +1,12 @@
+{
+  "httpMethod": "POST",
+  "pathParameters": {
+    "companyId": "1"
+  },
+  "body": {
+    "companyId": "1",
+    "name": "Felipe",
+    "email": "koga@koga.com",
+    "password": "123@1234"
+  }
+}

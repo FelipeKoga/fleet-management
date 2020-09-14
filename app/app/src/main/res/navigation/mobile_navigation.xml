@@ -38,7 +38,7 @@
     </fragment>
     <fragment
         android:id="@+id/newGroupFragment"
-        android:name="co.tcc.koga.android.ui.group.NewGroupFragment"
+        android:name="co.tcc.koga.android.ui.new_group.NewGroupFragment"
         android:label="NewGroupFragment" >
         <action
             android:id="@+id/action_newGroupFragment_to_chatFragment"
@@ -58,8 +58,8 @@
             android:id="@+id/action_chatsFragment_to_profileFragment"
             app:destination="@id/profileFragment" />
         <action
-            android:id="@+id/action_chatsFragment_to_newGroupFragment"
-            app:destination="@id/newGroupFragment" />
+            android:id="@+id/action_chatsFragment_to_newChatFragment"
+            app:destination="@id/newChatFragment" />
     </fragment>
     <fragment
         android:id="@+id/splashScreenFragment"
@@ -86,5 +86,16 @@
             app:popUpTo="@id/loginFragment"
             android:id="@+id/action_loginFragment_to_chatsFragment"
             app:destination="@id/chatsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/newChatFragment"
+        android:name="co.tcc.koga.android.ui.new_chat.NewChatFragment"
+        android:label="NewChatFragment" >
+        <action
+            android:id="@+id/action_newChatFragment_to_chatFragment"
+            app:destination="@id/chatFragment" />
+        <action
+            android:id="@+id/action_newChatFragment_to_newGroupFragment"
+            app:destination="@id/newGroupFragment" />
     </fragment>
 </navigation>

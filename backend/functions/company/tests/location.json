@@ -1,0 +1,8 @@
+{
+  "field": "addLocation",
+  "arguments": {
+    "latitude": "123",
+    "longitude": "321",
+    "createdAt": "1599426326"
+  }
+}

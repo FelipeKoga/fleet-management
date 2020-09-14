@@ -1,6 +1,7 @@
 package co.tcc.koga.android.data.network
 
 import android.content.Context
+import co.tcc.koga.android.data.database.entity.UserEntity
 import com.amazonaws.mobile.client.AWSMobileClient
 import com.amazonaws.mobile.client.Callback
 import com.amazonaws.mobile.client.UserState
@@ -10,6 +11,8 @@ import java.lang.Exception
 
 class Client {
 
+    lateinit var currentUser: UserEntity
+
     fun initAWSClient(
         applicationContext: Context, onInitSuccess: (isSignIn: Boolean) -> Unit,
         onInitError: () -> Unit
@@ -17,6 +20,7 @@ class Client {
         AWSMobileClient.getInstance().initialize(applicationContext,
             object : Callback<UserStateDetails> {
                 override fun onResult(result: UserStateDetails?) {
+                    println(result?.userState)
                     when (result?.userState) {
                         UserState.SIGNED_OUT -> onInitSuccess(false)
                         UserState.SIGNED_IN -> onInitSuccess(true)
@@ -25,6 +29,7 @@ class Client {
                 }
 
                 override fun onError(e: Exception?) {
+                    println("ENTREI")
                     onInitError()
                 }
 

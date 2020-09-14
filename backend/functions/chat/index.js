@@ -5,27 +5,37 @@ const {
   createChat,
 } = require('./resolver');
 
+const response = (statusCode, data) => {
+  return {
+    statusCode: statusCode,
+    body: JSON.stringify(data),
+  };
+};
+
 exports.handler = async (event) => {
   if (event.httpMethod) {
     const { username, companyId, chatId } = event.pathParameters;
     if (event.httpMethod === 'GET') {
       if (chatId) {
-        return await getMessages(chatId);
+        return response(200, await getMessages(chatId));
       } else {
-        return await getAllChats(username, companyId);
+        return response(200, await getAllChats(username, companyId));
       }
     }
 
     if (event.httpMethod === 'POST') {
-      return await createChat(event.arguments, username);
+      console.log('CREATE CHAT');
+      console.log(event);
+      console.log(username);
+      return response(201, await createChat(JSON.parse(event.body), username));
     }
   }
 
   if (event.requestContext.routeKey === 'send-message') {
-    return await sendMessage(event.body.data);
+    console.log(event.body);
+    console.log(event.body);
+    const body = JSON.parse(event.body);
+    return response(200, await sendMessage(JSON.parse(body.data)));
   }
-  return {
-    statusCode: 400,
-    body: JSON.stringify('Error.'),
-  };
+  return response(500, 'Method not allowed');
 };
