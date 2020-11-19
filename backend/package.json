@@ -5,7 +5,7 @@
   "author": "Felipe Kosloski Koga",
   "license": "MIT",
   "scripts": {
-    "invoke": "dotenv-load serverless invoke local --function"
+    "test": "node scripts/test.js"
   },
   "devDependencies": {
     "aws-amplify-serverless-plugin": "^1.4.1",
