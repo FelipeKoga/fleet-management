@@ -59,6 +59,7 @@ user:
     include:
       - functions/user/*
       - functions/user/*/**
+      - '!functions/user/node_modules/aws-sdk/**'
   events:
     - http:
         path: user/{username}

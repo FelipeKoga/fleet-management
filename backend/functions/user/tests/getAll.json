@@ -1,6 +1,0 @@
-{
-  "httpMethod": "GET",
-  "pathParameters": {
-    "companyId": "1"
-  }
-}

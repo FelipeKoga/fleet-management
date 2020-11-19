@@ -54,9 +54,9 @@ custom:
     - filename: ../web/src/aws-exports.js
       type: javascript
       appClient: CognitoUserPoolClient
-  userTable: !Ref User
-  chatTable: !Ref Chat
-  companyTable: !Ref Company
+  userTable: !Ref UserTable
+  chatTable: !Ref ChatTable
+  companyTable: !Ref CompanyTable
 
   apiUrl: !Join
     - ''

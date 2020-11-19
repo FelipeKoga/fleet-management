@@ -1,38 +1,33 @@
-const { list, getUser, create, update, remove } = require('./resolver');
+const Resolvers = require('./resolvers');
 
-const responsePayload = (statusCode, data) => {
-  return {
-    statusCode,
-    body: JSON.stringify(data),
-  };
-};
+async function main(method, { username, companyId }, body) {
+    switch (method) {
+        case 'GET':
+            if (username) return Resolvers.get(username);
+            return Resolvers.list(companyId);
+        case 'POST':
+            return Resolvers.create(body, companyId);
+        case 'PUT':
+            return Resolvers.update(body, username, companyId);
+        case 'DELETE':
+            return Resolvers.remove(username, companyId);
+        default:
+            throw new Error('Method not allowed');
+    }
+}
 
-exports.handler = async (event) => {
-  const { body, pathParameters, httpMethod, resource } = event;
+exports.handler = async event => {
+    const { body, pathParameters, httpMethod } = event;
 
-  console.log(event);
-
-  if (!pathParameters) {
-    throw new Error('Missing path parameters');
-  }
-
-  const { companyId, username } = pathParameters;
-  if (!companyId && resource !== '/user/{username}')
-    throw new Error('Missing company ID');
-
-  switch (httpMethod) {
-    case 'GET':
-      if (username) {
-        return responsePayload(200, await getUser(username));
-      }
-      return responsePayload(200, await list(companyId));
-    case 'POST':
-      return responsePayload(200, await create(body, companyId));
-    case 'PUT':
-      return responsePayload(200, await update(body, username, companyId));
-    case 'DELETE':
-      return responsePayload(200, await remove(username, companyId));
-    default:
-      return responsePayload(400, 'Method not allowed');
-  }
+    try {
+        return {
+            statusCode: 200,
+            body: JSON.stringify(await main(httpMethod, pathParameters, body)),
+        };
+    } catch (error) {
+        return {
+            statusCode: 500,
+            body: JSON.stringify(error.message),
+        };
+    }
 };
