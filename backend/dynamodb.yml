@@ -1,64 +1,108 @@
 Resources:
-  Chat:
-    Type: AWS::DynamoDB::Table
-    Properties:
-      AttributeDefinitions:
-        - AttributeName: chatId
-          AttributeType: S
-        - AttributeName: sortKey
-          AttributeType: S
-      BillingMode: PAY_PER_REQUEST
-      KeySchema:
-        - AttributeName: chatId
-          KeyType: HASH
-        - AttributeName: sortKey
-          KeyType: RANGE
-      GlobalSecondaryIndexes:
-        - IndexName: sortKeyIndex
-          KeySchema:
-            - AttributeName: sortKey
-              KeyType: HASH
-          Projection:
-            ProjectionType: ALL
-      TableName: chat
-  User:
-    Type: AWS::DynamoDB::Table
-    Properties:
-      AttributeDefinitions:
-        - AttributeName: username
-          AttributeType: S
-        - AttributeName: sortKey
-          AttributeType: S
-        - AttributeName: companyId
-          AttributeType: S
-      BillingMode: PAY_PER_REQUEST
-      GlobalSecondaryIndexes:
-        - IndexName: companyIdIndex
-          KeySchema:
-            - AttributeName: companyId
-              KeyType: HASH
-          Projection:
-            ProjectionType: ALL
-        - IndexName: sortKeyIndex
-          KeySchema:
-            - AttributeName: sortKey
-              KeyType: HASH
-          Projection:
-            ProjectionType: ALL
-      KeySchema:
-        - AttributeName: username
-          KeyType: HASH
-        - AttributeName: sortKey
-          KeyType: RANGE
-      TableName: user
-  Company:
-    Type: AWS::DynamoDB::Table
-    Properties:
-      AttributeDefinitions:
-        - AttributeName: companyId
-          AttributeType: S
-      BillingMode: PAY_PER_REQUEST
-      KeySchema:
-        - AttributeName: companyId
-          KeyType: HASH
-      TableName: company
+    # ChatTable:
+    #     Type: AWS::DynamoDB::Table
+    #     Properties:
+    #         AttributeDefinitions:
+    #             - AttributeName: chatId
+    #               AttributeType: S
+    #             - AttributeName: sortKey
+    #               AttributeType: S
+    #         BillingMode: PAY_PER_REQUEST
+    #         KeySchema:
+    #             - AttributeName: chatId
+    #               KeyType: HASH
+    #             - AttributeName: sortKey
+    #               KeyType: RANGE
+    #         GlobalSecondaryIndexes:
+    #             - IndexName: sortKeyIndex
+    #               KeySchema:
+    #                   - AttributeName: sortKey
+    #                     KeyType: HASH
+    #               Projection:
+    #                   ProjectionType: ALL
+    #         TableName: ${self:app}-chat-${self:custom.stage}
+    UserTable:
+        Type: AWS::DynamoDB::Table
+        Properties:
+            AttributeDefinitions:
+                - AttributeName: username
+                  AttributeType: S
+                - AttributeName: companyId
+                  AttributeType: S
+            BillingMode: PAY_PER_REQUEST
+            GlobalSecondaryIndexes:
+                - IndexName: companyIdIndex
+                  KeySchema:
+                      - AttributeName: companyId
+                        KeyType: HASH
+                  Projection:
+                      ProjectionType: ALL
+            KeySchema:
+                - AttributeName: username
+                  KeyType: HASH
+            TableName: ${self:app}-user-${self:custom.stage}
+
+    ConnectionTable:
+        Type: AWS::DynamoDB::Table
+        Properties:
+            AttributeDefinitions:
+                - AttributeName: connectionId
+                  AttributeType: S
+                - AttributeName: username
+                  AttributeType: S
+                - AttributeName: companyId
+                  AttributeType: S
+            BillingMode: PAY_PER_REQUEST
+            GlobalSecondaryIndexes:
+                - IndexName: companyIdIndex
+                  KeySchema:
+                      - AttributeName: companyId
+                        KeyType: HASH
+                  Projection:
+                      ProjectionType: ALL
+                - IndexName: usernameIndex
+                  KeySchema:
+                      - AttributeName: username
+                        KeyType: HASH
+                  Projection:
+                      ProjectionType: ALL
+            KeySchema:
+                - AttributeName: connectionId
+                  KeyType: HASH
+            TableName: ${self:app}-connection-${self:custom.stage}
+    LocationTable:
+        Type: AWS::DynamoDB::Table
+        Properties:
+            AttributeDefinitions:
+                - AttributeName: locationId
+                  AttributeType: S
+                - AttributeName: username
+                  AttributeType: S
+                - AttributeName: timestamp
+                  AttributeType: S
+            BillingMode: PAY_PER_REQUEST
+            GlobalSecondaryIndexes:
+                - IndexName: usernameIndex
+                  KeySchema:
+                      - AttributeName: username
+                        KeyType: HASH
+                  Projection:
+                      ProjectionType: ALL
+            KeySchema:
+                - AttributeName: locationId
+                  KeyType: HASH
+                - AttributeName: timestamp
+                  KeyType: RANGE
+            TableName: ${self:app}-location-${self:custom.stage}
+    CompanyTable:
+        Type: AWS::DynamoDB::Table
+        Properties:
+            AttributeDefinitions:
+                - AttributeName: companyId
+                  AttributeType: S
+            BillingMode: PAY_PER_REQUEST
+
+            KeySchema:
+                - AttributeName: companyId
+                  KeyType: HASH
+            TableName: ${self:app}-company-${self:custom.stage}

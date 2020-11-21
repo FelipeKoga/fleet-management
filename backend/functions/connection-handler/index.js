@@ -1,17 +1,16 @@
-const { deleteConnection, addConnection } = require('./resolver');
+const { deleteConnection, addConnection } = require('./resolvers');
 
-exports.handler = async (event) => {
-  if (event.requestContext.eventType === 'CONNECT') {
-    await addConnection(
-      event.requestContext.connectionId,
-      event.queryStringParameters.username
-    );
-  } else if (event.requestContext.eventType === 'DISCONNECT') {
-    await deleteConnection(event.requestContext.connectionId);
-  }
+exports.handler = async ({ requestContext, queryStringParameters }) => {
+    const { eventType, connectionId } = requestContext;
 
-  return {
-    statusCode: 200,
-    body: JSON.stringify('Connection handler'),
-  };
+    if (eventType === 'CONNECT') {
+        await addConnection(connectionId, queryStringParameters.username);
+    } else if (eventType === 'DISCONNECT') {
+        await deleteConnection(connectionId);
+    }
+
+    return {
+        statusCode: 200,
+        body: JSON.stringify(''),
+    };
 };

@@ -2,90 +2,89 @@ app: tcc
 service: tcc-backend
 
 provider:
-  name: aws
-  runtime: nodejs12.x
-  stage: dev
-  versionFunctions: false
-  region: us-east-1
-  websocketApiRouteSelectionExpression: $request.body.action
-  iamRoleStatements:
-    - Effect: Allow
-      Action:
-        - dynamodb:Scan
-        - dynamodb:Query
-        - dynamodb:PutItem
-        - dynamodb:GetItem
-        - dynamodb:DeleteItem
-        - dynamodb:UpdateItem
-      Resource:
-        - arn:aws:dynamodb:us-east-1:603366505042:table/connection
-        - arn:aws:dynamodb:us-east-1:603366505042:table/user
-        - arn:aws:dynamodb:us-east-1:603366505042:table/user-chats
-        - arn:aws:dynamodb:us-east-1:603366505042:table/chat
-        - arn:aws:dynamodb:us-east-1:603366505042:table/message
-    - Effect: Allow
-      Action: dynamodb:Query
-      Resource:
-        - arn:aws:dynamodb:us-east-1:603366505042:table/user/index/*
-        - arn:aws:dynamodb:us-east-1:603366505042:table/chat/index/*
-        - arn:aws:dynamodb:us-east-1:603366505042:table/connection/index/*
-        - arn:aws:dynamodb:us-east-1:603366505042:table/message/index/*
-    - Effect: Allow
-      Action: lambda:InvokeFunction
-      Resource:
-        - arn:aws:lambda:us-east-1:603366505042:function:tcc-backend-dev-user
-        - arn:aws:lambda:us-east-1:603366505042:function:tcc-backend-dev-post-message
+    name: aws
+    runtime: nodejs12.x
+    stage: dev
+    versionFunctions: false
+    region: us-east-1
+    websocketApiRouteSelectionExpression: $request.body.action
+    iamRoleStatements:
+        - Effect: Allow
+          Action:
+              - dynamodb:Scan
+              - dynamodb:Query
+              - dynamodb:PutItem
+              - dynamodb:GetItem
+              - dynamodb:DeleteItem
+              - dynamodb:UpdateItem
+          Resource:
+              - arn:aws:dynamodb:us-east-1:603366505042:table/${self:app}-connection-${self:custom.stage}
+              - arn:aws:dynamodb:us-east-1:603366505042:table/${self:app}-user-${self:custom.stage}
+              - arn:aws:dynamodb:us-east-1:603366505042:table/${self:app}-chat-${self:custom.stage}
+              - arn:aws:dynamodb:us-east-1:603366505042:table/${self:app}-message-${self:custom.stage}
+        - Effect: Allow
+          Action: dynamodb:Query
+          Resource:
+              - arn:aws:dynamodb:us-east-1:603366505042:table/${self:app}-user-${self:custom.stage}/index/*
+              - arn:aws:dynamodb:us-east-1:603366505042:table/${self:app}-chat-${self:custom.stage}/index/*
+              - arn:aws:dynamodb:us-east-1:603366505042:table/${self:app}-connection-${self:custom.stage}/index/*
+              - arn:aws:dynamodb:us-east-1:603366505042:table/${self:app}-message-${self:custom.stage}/index/*
+        - Effect: Allow
+          Action: lambda:InvokeFunction
+          Resource:
+              - arn:aws:lambda:us-east-1:603366505042:function:tcc-backend-dev-user
+              - arn:aws:lambda:us-east-1:603366505042:function:tcc-backend-dev-ws-post-message
 
-    - Effect: Allow
-      Action:
-        - cognito-idp:AdminCreateUser
-        - cognito-idp:AdminSetUserPassword
-        - cognito-idp:AdminDeleteUser
-      Resource: '*'
+        - Effect: Allow
+          Action:
+              - cognito-idp:AdminCreateUser
+              - cognito-idp:AdminSetUserPassword
+              - cognito-idp:AdminDeleteUser
+          Resource: '*'
 
 plugins:
-  - aws-amplify-serverless-plugin
+    - aws-amplify-serverless-plugin
 custom:
-  stage: ${opt:stage, self:provider.stage}
-  amplify:
-    - filename: ../app/app/src/main/res/raw/awsconfiguration.json
-      type: native
-      appClient: CognitoUserPoolClient
-    - filename: ../web/src/aws-exports.js
-      type: javascript
-      appClient: CognitoUserPoolClient
-  userTable: !Ref UserTable
-  chatTable: !Ref ChatTable
-  companyTable: !Ref CompanyTable
+    stage: ${opt:stage, self:provider.stage}
+    amplify:
+        - filename: ../app/app/src/main/res/raw/awsconfiguration.json
+          type: native
+          appClient: CognitoUserPoolClient
+        - filename: ../web/src/aws-exports.js
+          type: javascript
+          appClient: CognitoUserPoolClient
+    userTable: !Ref UserTable
+    connectionTable: !Ref ConnectionTable
+    companyTable: !Ref CompanyTable
 
-  apiUrl: !Join
-    - ''
-    - - 'https://'
-      - !Ref ApiGatewayRestApi
-      - '.execute-api.'
-      - ${opt:region, self:provider.region}
-      - '.amazonaws.com/'
-      - ${opt:stage, self:provider.stage}
-      - '/'
-  webSocketUrl: !Join
-    - ''
-    - - 'https://'
-      - !Ref WebsocketsApi
-      - '.execute-api.'
-      - ${opt:region, self:provider.region}
-      - '.amazonaws.com/'
-      - ${opt:stage, self:provider.stage}
-      - '/'
+    apiUrl: !Join
+        - ''
+        - - 'https://'
+          - !Ref ApiGatewayRestApi
+          - '.execute-api.'
+          - ${opt:region, self:provider.region}
+          - '.amazonaws.com/'
+          - ${opt:stage, self:provider.stage}
+          - '/'
+    webSocketUrl: !Join
+        - ''
+        - - 'https://'
+          - !Ref WebsocketsApi
+          - '.execute-api.'
+          - ${opt:region, self:provider.region}
+          - '.amazonaws.com/'
+          - ${opt:stage, self:provider.stage}
+          - '/'
 package:
-  individually: true
-  include:
-    - '!*'
-    - '!*/**'
+    individually: true
+    include:
+        - '!*'
+        - '!*/**'
 functions:
-  - ${file(functions/serverless.yml)}
+    - ${file(functions/serverless.yml)}
 
 resources:
-  - ${file(dynamodb.yml)}
-  - ${file(cognito.yml)}
-  - ${file(cognito-identity-pool.yml)}
-  - ${file(outputs.yml)}
+    - ${file(dynamodb.yml)}
+    - ${file(cognito.yml)}
+    - ${file(cognito-identity-pool.yml)}
+    - ${file(outputs.yml)}

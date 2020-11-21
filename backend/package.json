@@ -1,25 +1,27 @@
 {
-  "name": "tcc-backend",
-  "version": "1.0.0",
-  "main": "index.js",
-  "author": "Felipe Kosloski Koga",
-  "license": "MIT",
-  "scripts": {
-    "test": "node scripts/test.js"
-  },
-  "devDependencies": {
-    "aws-amplify-serverless-plugin": "^1.4.1",
-    "aws-sdk": "^2.725.0",
-    "eslint": "^7.13.0",
-    "eslint-config-airbnb-base": "^14.2.1",
-    "eslint-config-prettier": "^6.15.0",
-    "eslint-plugin-import": "^2.22.1",
-    "eslint-plugin-prettier": "^3.1.4",
-    "prettier": "^2.1.2",
-    "serverless-stack-output": "^0.2.3"
-  },
-  "dependencies": {
-    "cross-env": "^7.0.2",
-    "dotenv-load": "^2.0.0"
-  }
+    "name": "tcc-backend",
+    "version": "1.0.0",
+    "main": "index.js",
+    "author": "Felipe Kosloski Koga",
+    "license": "MIT",
+    "scripts": {
+        "test": "node scripts/test.js",
+        "deploy": "dotenv-load serverless deploy function --function",
+        "sls": "dotenv-load serverless deploy"
+    },
+    "devDependencies": {
+        "aws-amplify-serverless-plugin": "^1.4.1",
+        "aws-sdk": "^2.725.0",
+        "eslint": "^7.13.0",
+        "eslint-config-airbnb-base": "^14.2.1",
+        "eslint-config-prettier": "^6.15.0",
+        "eslint-plugin-import": "^2.22.1",
+        "eslint-plugin-prettier": "^3.1.4",
+        "prettier": "^2.1.2",
+        "serverless-stack-output": "^0.2.3"
+    },
+    "dependencies": {
+        "cross-env": "^7.0.2",
+        "dotenv-load": "^2.0.0"
+    }
 }

@@ -8,8 +8,10 @@ serverless deploy function --function sendMessage
 
 # Test local
 
-serverless invoke local --function user --path functions/user/tests/get.json
+## USER
 
-serverless invoke local --function chat --path functions/chat/tests/chats.json -e CHAT_TABLE=chat -e USER_TABLE=user
-
-serverless invoke local --function connection-handler --path functions/connection-handler/tests/connect.json -e USER_TABLE=user
+yarn test user get "-e USER_TABLE=tcc-user-dev"
+yarn test user create "-e USER_TABLE=tcc-user-dev"
+yarn test user delete "-e USER_TABLE=user"
+yarn test user list "-e USER_TABLE=user"
+yarn test user update "-e USER_TABLE=user"

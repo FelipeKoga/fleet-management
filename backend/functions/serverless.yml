@@ -1,157 +1,162 @@
 # REST handlers
 chat:
-  handler: functions/chat/index.handler
-  package:
-    include:
-      - functions/chat/*
-      - functions/chat/*/**
-  events:
-    - http:
-        path: company/{companyId}/users/{username}/chats
-        method: GET
-        cors: true
-        authorizer:
-          type: COGNITO_USER_POOLS
-          authorizerId:
-            Ref: ApiGatewayAuthorizer
-    - http:
-        path: company/{companyId}/users/{username}/chats
-        method: POST
-        cors: true
-        authorizer:
-          type: COGNITO_USER_POOLS
-          authorizerId:
-            Ref: ApiGatewayAuthorizer
-    - http:
-        path: company/{companyId}/users/{username}/chats/{chatId}
-        method: GET
-        cors: true
-        authorizer:
-          type: COGNITO_USER_POOLS
-          authorizerId:
-            Ref: ApiGatewayAuthorizer
-    - http:
-        path: company/{companyId}/users/{username}/chats/{chatId}/messages
-        method: GET
-        cors: true
-        authorizer:
-          type: COGNITO_USER_POOLS
-          authorizerId:
-            Ref: ApiGatewayAuthorizer
-    - websocket:
-        route: send-message
-        routeResponseSelectionExpression: $default
-  environment:
-    WS_URL: ${self:custom.webSocketUrl}
-    USER_TABLE: ${self:custom.userTable}
-    CHAT_TABLE: ${self:custom.chatTable}
-    APP: ${self:service}
-    STAGE: ${self:custom.stage}
+    handler: functions/chat/index.handler
+    package:
+        include:
+            - functions/chat/*
+            - functions/chat/*/**
+    events:
+        - http:
+              path: company/{companyId}/users/{username}/chats
+              method: GET
+              cors: true
+              authorizer:
+                  type: COGNITO_USER_POOLS
+                  authorizerId:
+                      Ref: ApiGatewayAuthorizer
+        - http:
+              path: company/{companyId}/users/{username}/chats
+              method: POST
+              cors: true
+              authorizer:
+                  type: COGNITO_USER_POOLS
+                  authorizerId:
+                      Ref: ApiGatewayAuthorizer
+        - http:
+              path: company/{companyId}/users/{username}/chats/{chatId}
+              method: GET
+              cors: true
+              authorizer:
+                  type: COGNITO_USER_POOLS
+                  authorizerId:
+                      Ref: ApiGatewayAuthorizer
+        - http:
+              path: company/{companyId}/users/{username}/chats/{chatId}/messages
+              method: GET
+              cors: true
+              authorizer:
+                  type: COGNITO_USER_POOLS
+                  authorizerId:
+                      Ref: ApiGatewayAuthorizer
+        - websocket:
+              route: send-message
+              routeResponseSelectionExpression: $default
+        - websocket:
+              route: open-messages
+              routeResponseSelectionExpression: $default
+    environment:
+        WS_URL: ${self:custom.webSocketUrl}
+        # USER_TABLE: ${self:custom.userTable}
+        # CHAT_TABLE: ${self:custom.chatTable}
+        APP: ${self:service}
+        STAGE: ${self:custom.stage}
 company:
-  handler: functions/company/index.handler
-  package:
-    include:
-      - functions/company/*
-      - functions/company/*/**
+    handler: functions/company/index.handler
+    package:
+        include:
+            - functions/company/*
+            - functions/company/*/**
 user:
-  handler: functions/user/index.handler
-  package:
-    include:
-      - functions/user/*
-      - functions/user/*/**
-      - '!functions/user/node_modules/aws-sdk/**'
-  events:
-    - http:
-        path: user/{username}
-        method: GET
-        cors: true
-        authorizer:
-          type: COGNITO_USER_POOLS
-          authorizerId:
-            Ref: ApiGatewayAuthorizer
-    - http:
-        path: company/{companyId}/users
-        method: GET
-        cors: true
-        authorizer:
-          type: COGNITO_USER_POOLS
-          authorizerId:
-            Ref: ApiGatewayAuthorizer
-    - http:
-        path: company/{companyId}/users/{username}
-        method: GET
-        cors: true
-        authorizer:
-          type: COGNITO_USER_POOLS
-          authorizerId:
-            Ref: ApiGatewayAuthorizer
-    - http:
-        path: company/{companyId}/users
-        method: POST
-        cors: true
-        authorizer:
-          type: COGNITO_USER_POOLS
-          authorizerId:
-            Ref: ApiGatewayAuthorizer
-    - http:
-        path: company/{companyId}/users/{username}
-        method: PUT
-        cors: true
-        authorizer:
-          type: COGNITO_USER_POOLS
-          authorizerId:
-            Ref: ApiGatewayAuthorizer
-    - http:
-        path: company/{companyId}/users/{username}
-        method: DELETE
-        cors: true
-        authorizer:
-          type: COGNITO_USER_POOLS
-          authorizerId:
-            Ref: ApiGatewayAuthorizer
-  environment:
-    API_URL: ${self:custom.apiUrl}
-    WS_URL: ${self:custom.webSocketUrl}
-    USER_TABLE: ${self:custom.userTable}
+    handler: functions/user/index.handler
+    package:
+        include:
+            - functions/user/*
+            - functions/user/*/**
+            - '!functions/user/node_modules/aws-sdk/**'
+    events:
+        - http:
+              path: user/{username}
+              method: GET
+              cors: true
+              authorizer:
+                  type: COGNITO_USER_POOLS
+                  authorizerId:
+                      Ref: ApiGatewayAuthorizer
+        - http:
+              path: company/{companyId}/users
+              method: GET
+              cors: true
+              authorizer:
+                  type: COGNITO_USER_POOLS
+                  authorizerId:
+                      Ref: ApiGatewayAuthorizer
+        - http:
+              path: company/{companyId}/users/{username}
+              method: GET
+              cors: true
+              authorizer:
+                  type: COGNITO_USER_POOLS
+                  authorizerId:
+                      Ref: ApiGatewayAuthorizer
+        - http:
+              path: company/{companyId}/users
+              method: POST
+              cors: true
+              authorizer:
+                  type: COGNITO_USER_POOLS
+                  authorizerId:
+                      Ref: ApiGatewayAuthorizer
+        - http:
+              path: company/{companyId}/users/{username}
+              method: PUT
+              cors: true
+              authorizer:
+                  type: COGNITO_USER_POOLS
+                  authorizerId:
+                      Ref: ApiGatewayAuthorizer
+        - http:
+              path: company/{companyId}/users/{username}
+              method: DELETE
+              cors: true
+              authorizer:
+                  type: COGNITO_USER_POOLS
+                  authorizerId:
+                      Ref: ApiGatewayAuthorizer
+    environment:
+        API_URL: ${self:custom.apiUrl}
+        WS_URL: ${self:custom.webSocketUrl}
+        # USER_TABLE: ${self:custom.userTable}
 # Web Socket handlers
 connection-handler:
-  handler: functions/connection-handler/index.handler
-  package:
-    include:
-      - functions/connection-handler/*
-      - functions/connection-handler/*/**
-  events:
-    - websocket:
-        route: $connect
-        routeResponseSelectionExpression: $default
-    - websocket:
-        route: $disconnect
-        routeResponseSelectionExpression: $default
-  environment:
-    API_URL: ${self:custom.apiUrl}
-    WS_URL: ${self:custom.webSocketUrl}
-    USER_TABLE: ${self:custom.userTable}
-    APP: ${self:service}
-    STAGE: ${self:custom.stage}
-    KEYS_URL:
-      !Join [
-        '',
-        [
-          'https://cognito-idp.',
-          '${opt:region, self:provider.region}',
-          '.amazonaws.com/',
-          !Ref CognitoUserPool,
-          '/.well-known/jwks.json',
-        ],
-      ]
+    handler: functions/connection-handler/index.handler
+    package:
+        include:
+            - functions/connection-handler/*
+            - functions/connection-handler/*/**
+            - '!functions/connection-handler/node_modules/aws-sdk/**'
+    events:
+        - websocket:
+              route: $connect
+              routeResponseSelectionExpression: $default
+        - websocket:
+              route: $disconnect
+              routeResponseSelectionExpression: $default
+    environment:
+        WS_URL: ${self:custom.webSocketUrl}
+        USER_TABLE: ${self:custom.userTable}
+        CONNECTION_TABLE: ${self:custom.connectionTable}
+        APP: ${self:service}
+        STAGE: ${self:custom.stage}
+        # KEYS_URL:
+        #     !Join [
+        #         '',
+        #         [
+        #             'https://cognito-idp.',
+        #             '${opt:region, self:provider.region}',
+        #             '.amazonaws.com/',
+        #             !Ref CognitoUserPool,
+        #             '/.well-known/jwks.json',
+        #         ],
+        #     ]
 
-post-message:
-  handler: functions/post-message/index.handler
-  package:
-    include:
-      - functions/post-message/*
-      - functions/post-message/*/**
-  environment:
-    API_URL: ${self:custom.apiUrl}
-    WS_URL: ${self:custom.webSocketUrl}
-    USER_TABLE: ${self:custom.userTable}
+ws-post-message:
+    handler: functions/ws-post-message/index.handler
+    package:
+        include:
+            - functions/ws-post-message/*
+            - functions/ws-post-message/*/**
+              - '!functions/ws-post-message/node_modules/aws-sdk/**'
+
+    environment:
+        WS_URL: ${self:custom.webSocketUrl}
+        # USER_TABLE: ${self:custom.userTable}
