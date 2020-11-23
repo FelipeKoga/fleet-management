@@ -1,19 +1,15 @@
 const DynamoDB = require('aws-sdk/clients/dynamodb');
+const { removeUserIDs } = require('./connection');
 
 const docClient = new DynamoDB.DocumentClient();
-
-const UserTable = process.env.USER_TABLE;
-const ConnectionTable = process.env.CONNECTION_TABLE;
 
 async function get(username) {
     const { Items } = await docClient
         .query({
-            TableName: UserTable,
-            KeyConditionExpression:
-                'username = :u and begins_with(sortKey, :sk)',
+            TableName: process.env.USER_TABLE,
+            KeyConditionExpression: 'username = :u',
             ExpressionAttributeValues: {
                 ':u': username,
-                ':sk': `METADATA`,
             },
             ProjectionExpression:
                 'username, fullName, email, avatar, companyId, settings, phone',
@@ -29,7 +25,7 @@ async function get(username) {
 async function list(companyId) {
     const { Items } = await docClient
         .query({
-            TableName: UserTable,
+            TableName: process.env.USER_TABLE,
             IndexName: 'companyIdIndex',
             KeyConditionExpression: 'companyId = :cId',
             ExpressionAttributeValues: {
@@ -45,13 +41,12 @@ async function list(companyId) {
 async function create(data, companyId) {
     const { password, ...user } = {
         username: data.email,
-        sortKey: `METADATA`,
         ...data,
     };
 
     await docClient
         .put({
-            TableName: UserTable,
+            TableName: process.env.USER_TABLE,
             Item: {
                 ...user,
                 companyId,
@@ -62,10 +57,9 @@ async function create(data, companyId) {
 
 async function update({ customName, phone, email, settings }, username) {
     const params = {
-        TableName: UserTable,
+        TableName: process.env.USER_TABLE,
         Key: {
             username,
-            sortKey: `METADATA`,
         },
         UpdateExpression:
             'set customName = :cn, phone = :p, email = :e, settings = :s',
@@ -81,35 +75,15 @@ async function update({ customName, phone, email, settings }, username) {
 
 async function remove(username) {
     const params = {
-        TableName: UserTable,
+        TableName: process.env.USER_TABLE,
         Key: {
             username,
         },
     };
-    await docClient
-        .delete({
-            ...params,
-            Key: { ...params.Key, sortKey: 'METADATA' },
-        })
-        .promise();
-    await docClient
-        .delete({
-            ...params,
-            Key: { ...params.Key, sortKey: 'CONNECTION' },
-        })
-        .promise();
-    await docClient
-        .delete({
-            ...params,
-            Key: { ...params.Key, sortKey: 'LOCATION' },
-        })
-        .promise();
-}
-
-async function listConnectionIds(companyId) {
-    const params = {
-        TableName: ConnectionTable,
-    };
+    await docClient.delete(params).promise();
+    await removeUserIDs(username);
+    return true;
+    // await removeUserLocations(username);
 }
 
 module.exports = {

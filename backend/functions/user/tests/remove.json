@@ -1,7 +1,7 @@
 {
-  "httpMethod": "DELETE",
-  "pathParameters": {
-    "companyId": "1",
-    "username": "koga@koga.com"
-  }
+    "httpMethod": "DELETE",
+    "pathParameters": {
+        "companyId": "1",
+        "username": "kosloski.fkoga@gmail.com"
+    }
 }

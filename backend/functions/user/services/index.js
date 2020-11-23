@@ -1,9 +1,9 @@
 const Cognito = require('./cognito');
 const Database = require('./database');
-const WebSocket = require('./websocket');
+const Lambda = require('./lambda');
 
 module.exports = {
     Cognito,
     Database,
-    WebSocket,
+    Lambda,
 };

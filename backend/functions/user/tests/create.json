@@ -1,13 +1,13 @@
 {
-  "httpMethod": "POST",
-  "pathParameters": {
-    "companyId": "1"
-  },
-  "body": {
-    "name": "Felipe",
-    "email": "koga@koga.com",
-    "password": "123@1234",
-    "customName": "",
-    "settings": {}
-  }
+    "httpMethod": "POST",
+    "pathParameters": {
+        "companyId": "1"
+    },
+    "body": {
+        "name": "Felipe",
+        "email": "kosloski.fkoga@gmail.com",
+        "password": "123@1234",
+        "customName": "",
+        "settings": {}
+    }
 }

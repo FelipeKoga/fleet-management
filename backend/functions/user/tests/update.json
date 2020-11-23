@@ -1,14 +1,14 @@
 {
-  "httpMethod": "PUT",
-  "pathParameters": {
-    "companyId": "1",
-    "username": "koga@koga.com"
-  },
-  "body": {
-    "name": "Eduardo",
-    "email": "koga1@gmail.com",
-    "phone": "213123",
-    "customName": "Koga",
-    "settings": {}
-  }
+    "httpMethod": "PUT",
+    "pathParameters": {
+        "companyId": "1",
+        "username": "kosloski.fkoga@gmail.com"
+    },
+    "body": {
+        "name": "Eduardo",
+        "email": "koga1@gmail.com",
+        "phone": "213123",
+        "customName": "Koga",
+        "settings": {}
+    }
 }
