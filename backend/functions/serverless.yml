@@ -113,9 +113,9 @@ user:
                   authorizerId:
                       Ref: ApiGatewayAuthorizer
     environment:
-        API_URL: ${self:custom.apiUrl}
-        WS_URL: ${self:custom.webSocketUrl}
-        # USER_TABLE: ${self:custom.userTable}
+        USER_TABLE: ${self:custom.userTable}
+        CONNECTION_TABLE: ${self:custom.connectionTable}
+
 # Web Socket handlers
 connection-handler:
     handler: functions/connection-handler/index.handler
