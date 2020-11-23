@@ -18,7 +18,7 @@ async function get(username) {
 }
 
 async function list(companyId) {
-    return Database.user.userse.list(companyId);
+    return Database.user.list(companyId);
 }
 
 async function create(data, companyId) {
