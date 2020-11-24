@@ -9,7 +9,7 @@ async function getCompanyIDs(companyId) {
             IndexName: 'companyIdIndex',
             KeyConditionExpression: 'companyId = :cId',
             ExpressionAttributeValues: {
-                ':c': companyId,
+                ':cId': companyId,
             },
             ProjectionExpression: 'connectionId',
         })
