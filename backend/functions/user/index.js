@@ -8,7 +8,7 @@ async function main(method, { username, companyId }, body) {
         case 'POST':
             return Resolvers.create(body, companyId);
         case 'PUT':
-            return Resolvers.update(body, username, companyId);
+            return Resolvers.update(body, username);
         case 'DELETE':
             return Resolvers.remove(username, companyId);
         default:
@@ -22,7 +22,9 @@ exports.handler = async event => {
     try {
         return {
             statusCode: 200,
-            body: JSON.stringify(await main(httpMethod, pathParameters, body)),
+            body: JSON.stringify(
+                await main(httpMethod, pathParameters, JSON.parse(body)),
+            ),
         };
     } catch (error) {
         return {
