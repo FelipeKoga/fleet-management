@@ -38,6 +38,22 @@ chat:
                   type: COGNITO_USER_POOLS
                   authorizerId:
                       Ref: ApiGatewayAuthorizer
+        - http:
+            path: company/{companyId}/users/{username}/group
+            method: POST
+            cors: true
+            authorizer:
+                type: COGNITO_USER_POOLS
+                authorizerId:
+                    Ref: ApiGatewayAuthorizer
+        - http:
+            path: company/{companyId}/users/{username}/group/{groupId}
+            method: PUT
+            cors: true
+            authorizer:
+                type: COGNITO_USER_POOLS
+                authorizerId:
+                    Ref: ApiGatewayAuthorizer
         - websocket:
               route: send-message
               routeResponseSelectionExpression: $default
@@ -45,9 +61,11 @@ chat:
               route: open-messages
               routeResponseSelectionExpression: $default
     environment:
-        WS_URL: ${self:custom.webSocketUrl}
-        # USER_TABLE: ${self:custom.userTable}
-        # CHAT_TABLE: ${self:custom.chatTable}
+        USER_TABLE: ${self:custom.userTable}
+        CHAT_TABLE: ${self:custom.chatTable}
+        # USER_CHAT_TABLE: ${self:custom.userChatTable}
+        # MESSAGE_TABLE: ${self:custom.messageTable}
+
         APP: ${self:service}
         STAGE: ${self:custom.stage}
 company:
@@ -115,6 +133,8 @@ user:
     environment:
         USER_TABLE: ${self:custom.userTable}
         CONNECTION_TABLE: ${self:custom.connectionTable}
+        APP: ${self:service}
+        STAGE: ${self:custom.stage}
 
 # Web Socket handlers
 connection-handler:

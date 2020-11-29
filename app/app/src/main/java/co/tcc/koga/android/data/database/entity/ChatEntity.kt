@@ -16,5 +16,6 @@ data class ChatEntity(
     val isPrivate: Boolean,
     val members: List<UserEntity>?,
     val user: UserEntity?,
-    val newMessages: Long?
+    val newMessages: Long,
+    val lastMessage: MessageEntity? = null
 ) : Parcelable

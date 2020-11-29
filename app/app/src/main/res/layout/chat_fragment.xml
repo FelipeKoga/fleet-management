@@ -73,7 +73,7 @@
         </androidx.appcompat.widget.Toolbar>
 
         <LinearLayout
-            android:id="@+id/llMessage"
+            android:id="@+id/linear_layout_message"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
@@ -81,7 +81,7 @@
             android:orientation="horizontal">
 
             <LinearLayout
-                android:visibility="gone"
+                android:visibility="visible"
                 android:id="@+id/linear_layout_chat_speaker"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -178,7 +178,6 @@
 <!--                            app:borderWidth="0dp" />-->
 <!--                    </LinearLayout>-->
 
-
                     <ImageButton
                         android:id="@+id/image_button_send_message"
                         android:layout_width="wrap_content"
@@ -187,7 +186,7 @@
                         android:backgroundTint="@android:color/transparent"
                         android:src="@drawable/ic_round_send"
                         android:tint="?colorPrimary"
-                        android:visibility="gone"
+                        android:visibility="visible"
                         app:borderWidth="0dp" />
 
                 </LinearLayout>
@@ -199,7 +198,7 @@
             android:id="@+id/recycler_view_chat_messages"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_above="@+id/llMessage"
+            android:layout_above="@+id/linear_layout_message"
             android:layout_below="@+id/toolbar_chat"
             android:layout_alignParentStart="true"
             android:layout_alignParentEnd="true"
@@ -216,7 +215,7 @@
             style="?android:attr/progressBarStyle"
             android:layout_width="24dp"
             android:layout_height="24dp"
-            android:layout_above="@+id/llMessage"
+            android:layout_above="@+id/linear_layout_message"
             android:layout_alignParentStart="true"
             android:layout_alignParentEnd="true"
             android:layout_marginStart="0dp"

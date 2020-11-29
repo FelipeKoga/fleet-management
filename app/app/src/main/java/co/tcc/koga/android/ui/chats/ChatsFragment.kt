@@ -38,6 +38,16 @@ class ChatsFragment : Fragment(R.layout.chats_fragment) {
         setupObservers()
     }
 
+    override fun onResume() {
+        super.onResume()
+        viewModel.getAllChats().observe(viewLifecycleOwner, {
+            if (it.status === Resource.Status.LOADING) {
+                if (!it.data.isNullOrEmpty()) progress_bar_chats.hide()
+            }
+        })
+
+    }
+
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.contacts_menu, menu)
         super.onCreateOptionsMenu(menu, inflater)
@@ -56,25 +66,25 @@ class ChatsFragment : Fragment(R.layout.chats_fragment) {
     }
 
     private fun setupObservers() {
-            viewModel.chats.observe(viewLifecycleOwner, {
-                when (it.status) {
-                    Resource.Status.LOADING -> {
-                        if (!it.data.isNullOrEmpty()) progress_bar_chats.hide()
 
-                    }
-                    Resource.Status.SUCCESS, Resource.Status.LOCAL -> {
-                        if (!it.data.isNullOrEmpty()) {
-                            recycler_view_chats.show()
-                            progress_bar_chats.hide()
-                            adapter.chats = it.data
-                            adapter.notifyDataSetChanged()
 
-                        }
-                    }
-                    Resource.Status.ERROR -> {
-                    }
-                }
-            })
+        viewModel.chats.observe(viewLifecycleOwner, {
+            if (!it.isNullOrEmpty()) {
+                recycler_view_chats.show()
+                progress_bar_chats.hide()
+                adapter.chats = it
+                adapter.notifyDataSetChanged()
+
+            }
+        })
+
+        viewModel.messageReceived().observe(viewLifecycleOwner, {
+            viewModel.handleNewMessage(it, true)
+        })
+
+        viewModel.messageSent().observe(viewLifecycleOwner, {
+            viewModel.handleNewMessage(it, false)
+        })
 
     }
 

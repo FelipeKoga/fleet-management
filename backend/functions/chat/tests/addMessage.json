@@ -1,10 +1,12 @@
 {
-    "httpMethod": "GET",
-    "resource": "/company/{companyId}/users/{username}/chats/{chatId/messages",
+    "httpMethod": "POST",
+    "resource": "/company/{companyId}/users/{username}/chats/{chatId}/messages",
     "pathParameters": {
         "companyId": "1",
         "username": "kosloski@email.com",
         "chatId": "38c9f7e9-894f-4db8-b17f-a8e56d5bc799"
+    },
+    "body": {
+        "message": "Olá 2"
     }
-
 }

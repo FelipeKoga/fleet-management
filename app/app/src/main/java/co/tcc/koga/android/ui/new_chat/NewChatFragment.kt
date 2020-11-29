@@ -47,6 +47,7 @@ class NewChatFragment : Fragment() {
                 progress_bar_create_chat.show()
                 viewModel.createChat(user.username)
             })
+
             recyclerViewUsers.layoutManager = LinearLayoutManager(container?.context)
             recyclerViewUsers.adapter = adapter
 

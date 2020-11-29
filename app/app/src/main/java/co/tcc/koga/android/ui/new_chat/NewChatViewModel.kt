@@ -45,6 +45,8 @@ class NewChatViewModel @Inject constructor(
     ) = viewModelScope.launch {
         try {
             val newChat = chatsRepository.createChat(member_username)
+            println("New chat")
+            println(newChat)
             _chatCreated.postValue(newChat)
         } catch (e: Exception) {
             println(e)

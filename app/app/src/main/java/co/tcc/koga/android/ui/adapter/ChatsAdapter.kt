@@ -4,11 +4,15 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import co.tcc.koga.android.R
 import co.tcc.koga.android.data.database.entity.ChatEntity
+import co.tcc.koga.android.utils.getHourByTimestamp
+import co.tcc.koga.android.utils.hide
+import co.tcc.koga.android.utils.show
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import kotlinx.android.synthetic.main.row_chat.view.*
@@ -24,16 +28,39 @@ class ChatsAdapter(
         RecyclerView.ViewHolder(itemView) {
         private val view: View = itemView
         private val textViewName: TextView = itemView.text_view_name
+        private val textViewLastMessage: TextView = itemView.text_view_last_message
+        private val textViewLastMessageHour: TextView = itemView.text_view_last_message_hour
+        private val textViewNewMessages: TextView = itemView.text_view_new_messages
         private val imageViewAvatar: ImageView = itemView.image_view_avatar
         private val imageViewUserStatus: ImageView = itemView.image_view_user_status
 
-        fun bindView(chat: ChatEntity, context: Context, onContactClicked: (chat: ChatEntity) -> Unit) {
+        fun bindView(
+            chat: ChatEntity,
+            context: Context,
+            onContactClicked: (chat: ChatEntity) -> Unit
+        ) {
+            println("BIND VIEW ----------------------------")
+            println(chat)
             if (chat.isPrivate) {
                 textViewName.text = chat.user?.fullName
             } else {
                 imageViewUserStatus.visibility = View.GONE
                 textViewName.text = chat.groupName
             }
+
+            if (chat.lastMessage !== null) {
+                textViewLastMessage.text = chat.lastMessage.body
+                textViewLastMessageHour.text = getHourByTimestamp(chat.lastMessage.createdAt)
+            }
+
+
+            if (chat.newMessages > 0) {
+                textViewNewMessages.show()
+                textViewNewMessages.text = chat.newMessages.toString()
+            } else {
+                textViewNewMessages.hide()
+            }
+
             bindAvatar(chat, context)
             view.setOnClickListener { onContactClicked.invoke(chat) }
         }
@@ -66,6 +93,7 @@ class ChatsAdapter(
 
     override fun onBindViewHolder(holder: ChatsViewHolder, position: Int) {
         val chat = chats[position]
+        println(chat)
         holder.bindView(chat, context, onContactClicked)
     }
 

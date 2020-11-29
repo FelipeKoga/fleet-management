@@ -1,41 +1,50 @@
-const {
-  getAllChats,
-  sendMessage,
-  getMessages,
-  createChat,
-} = require('./resolver');
+const Resolver = require('./resolvers');
 
-const response = (statusCode, data) => {
-  return {
-    statusCode: statusCode,
-    body: JSON.stringify(data),
-  };
-};
+async function handlePostMethod(resource, body, { username, chatId }) {
+    const method = resource.split('/').pop();
+    if (method === 'group') return Resolver.createGroup(username, body);
 
-exports.handler = async (event) => {
-  if (event.httpMethod) {
-    const { username, companyId, chatId } = event.pathParameters;
-    if (event.httpMethod === 'GET') {
-      if (chatId) {
-        return response(200, await getMessages(chatId));
-      } else {
-        return response(200, await getAllChats(username, companyId));
-      }
+    if (method === 'messages')
+        return Resolver.addMessage(chatId, username, body);
+
+    const { withUsername } = body;
+    return Resolver.createChat(username, withUsername);
+}
+
+async function handleGetMethod(resource, { username, chatId }) {
+    const method = resource.split('/').pop();
+    if (method === 'chats') return Resolver.getAllChats(username);
+
+    if (method === 'messages') return Resolver.getMessages(chatId);
+
+    throw new Error();
+}
+
+async function main({ httpMethod, resource, pathParameters, body }) {
+    if (httpMethod) {
+        switch (httpMethod) {
+            case 'POST':
+                return handlePostMethod(resource, body, pathParameters);
+            case 'GET':
+                return handleGetMethod(resource, pathParameters);
+            default:
+                throw new Error('Method not allowed');
+        }
     }
 
-    if (event.httpMethod === 'POST') {
-      console.log('CREATE CHAT');
-      console.log(event);
-      console.log(username);
-      return response(201, await createChat(JSON.parse(event.body), username));
-    }
-  }
+    throw new Error('Method not defined');
+}
 
-  if (event.requestContext.routeKey === 'send-message') {
-    console.log(event.body);
-    console.log(event.body);
-    const body = JSON.parse(event.body);
-    return response(200, await sendMessage(JSON.parse(body.data)));
-  }
-  return response(500, 'Method not allowed');
+exports.handler = async event => {
+    try {
+        return {
+            statusCode: 200,
+            body: await main(event),
+        };
+    } catch (error) {
+        return {
+            statusCode: 500,
+            body: error.message,
+        };
+    }
 };

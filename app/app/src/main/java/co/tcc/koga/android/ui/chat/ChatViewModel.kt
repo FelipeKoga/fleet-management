@@ -4,6 +4,7 @@ import androidx.lifecycle.*
 import co.tcc.koga.android.data.Resource
 import co.tcc.koga.android.data.database.entity.MessageEntity
 import co.tcc.koga.android.data.network.Client
+import co.tcc.koga.android.data.repository.ChatsRepository
 import co.tcc.koga.android.data.repository.ClientRepository
 import co.tcc.koga.android.data.repository.MessageRepository
 import kotlinx.coroutines.flow.map
@@ -13,6 +14,7 @@ import javax.inject.Inject
 
 class ChatViewModel @Inject constructor(
     private val repository: MessageRepository,
+    private val chatsRepository: ChatsRepository
 ) : ViewModel() {
     private val _messages = MutableLiveData<List<MessageEntity>>()
     val messages: LiveData<List<MessageEntity>>
@@ -24,6 +26,10 @@ class ChatViewModel @Inject constructor(
 
     fun messageSent(): LiveData<MessageEntity> {
         return repository.messageSent()
+    }
+
+    fun openChat(chatId: String) = viewModelScope.launch {
+        chatsRepository.openChat(chatId)
     }
 
     fun getMessages(chatId: String) = repository.getMessages(chatId).map {

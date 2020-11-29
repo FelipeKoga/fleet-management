@@ -1,0 +1,15 @@
+{
+    "httpMethod": "POST",
+    "resource": "/company/{companyId}/users/{username}/group",
+    "pathParameters": {
+        "companyId": "1",
+        "username": "kosloski@email.com"
+    },
+    "body": {
+        "members": [
+            "koga@koga.com"
+        ],
+        
+        "groupName": "Teste"
+    }
+}

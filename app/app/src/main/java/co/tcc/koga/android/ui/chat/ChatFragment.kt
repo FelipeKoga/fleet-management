@@ -1,6 +1,7 @@
 package co.tcc.koga.android.ui.chat
 
 import android.content.Context
+import android.media.MediaRecorder
 import android.os.Bundle
 import android.view.*
 import android.widget.ImageView
@@ -26,11 +27,13 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.chat_fragment.*
+import java.io.IOException
 import javax.inject.Inject
 
 class ChatFragment : Fragment(R.layout.chat_fragment) {
     private lateinit var adapter: ChatAdapter
     private val args: ChatFragmentArgs by navArgs()
+    private var recorder: MediaRecorder? = null
 
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
@@ -43,9 +46,15 @@ class ChatFragment : Fragment(R.layout.chat_fragment) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        viewModel.openChat(args.chat.chatId)
         setupToolbar()
         setupViews()
         setupRecyclerView()
+        setupObservers()
+    }
+
+    override fun onResume() {
+        super.onResume()
         setupObservers()
     }
 
@@ -99,11 +108,29 @@ class ChatFragment : Fragment(R.layout.chat_fragment) {
         })
 
         viewModel.messageReceived().observe(viewLifecycleOwner) { message ->
+            viewModel.openChat(args.chat.chatId)
             viewModel.handleNewMessage(args.chat.chatId, message, false)
         }
 
         viewModel.messageSent().observe(viewLifecycleOwner) { message ->
             viewModel.handleNewMessage(args.chat.chatId, message, true)
+        }
+    }
+
+    private fun startRecording() {
+        recorder = MediaRecorder().apply {
+            setAudioSource(MediaRecorder.AudioSource.MIC)
+            setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP)
+            setOutputFile("audio ${Math.random()}")
+            setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB)
+
+            try {
+                prepare()
+            } catch (e: IOException) {
+                println("prepare() failed")
+            }
+
+            start()
         }
     }
 
@@ -166,7 +193,6 @@ class ChatFragment : Fragment(R.layout.chat_fragment) {
                 }
             }
         }
-
         image_button_send_message.setOnClickListener {
             val message = edit_text_message.text.toString()
             if (message.isNotEmpty()) {

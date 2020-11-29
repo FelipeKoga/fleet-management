@@ -56,6 +56,9 @@ custom:
     userTable: !Ref UserTable
     connectionTable: !Ref ConnectionTable
     companyTable: !Ref CompanyTable
+    chatTable: !Ref ChatTable
+    # userChatTable: !Ref UserChatTable
+    # messageTable: !Ref MessageTable
 
     apiUrl: !Join
         - ''
