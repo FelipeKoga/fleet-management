@@ -1,13 +1,13 @@
 {
-  "requestContext": {
-    "routeKey": "send-message"
-  },
-  "body": {
-    "data": {
-      "chatId": "d6fcfb3d-12f7-49b6-bfad-db5b7bd6510a",
-      "username": "koga@koga.com",
-      "body": "3",
-      "createdAt": "1599592937"
+    "requestContext": {
+        "routeKey": "send-message"
+    },
+    "body": {
+        "data": {
+            "chatId": "b11180b6-c5a4-4d93-b4d4-34402a14f45f",
+            "username": "koga@koga.com",
+            "body": "1",
+            "createdAt": "1599592937"
+        }
     }
-  }
 }

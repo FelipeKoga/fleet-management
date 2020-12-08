@@ -4,9 +4,9 @@
     "pathParameters": {
         "companyId": "1",
         "username": "kosloski@email.com",
-        "chatId": "38c9f7e9-894f-4db8-b17f-a8e56d5bc799"
+        "chatId": "60d384a5-8fed-4a1a-8b83-8335d5b07af7"
     },
     "body": {
-        "message": "Olá 2"
+        "message": "Olá 4"
     }
 }

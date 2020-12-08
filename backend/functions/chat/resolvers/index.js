@@ -1,54 +1,57 @@
+const _ = require('lodash');
 const Database = require('../services/database');
 
-async function getChatWithUser(chatId, username) {
+const zonedTime = date => {
+    const localeFormat = date.toLocaleString('en-US', {
+        timeZone: 'America/Sao_Paulo',
+    });
+    return new Date(localeFormat);
+};
+
+async function getChat(chatId, member) {
     const chat = await Database.getChat(chatId);
-    const user = await Database.getUser(username);
+    const chatMember = member ? await Database.getUser(member) : null;
     const lastMessage = await Database.getLastMessage(chatId);
     return {
         ...chat,
-        user,
-        lastMessage: lastMessage || {},
+        lastMessage,
+        user: chatMember,
     };
 }
 
-async function getUsersByChat(chatId) {
-    return Database.getChatUsers(chatId);
-}
-
 async function getAllChats(username) {
-    const chatIds = await Database.getUserChats(username);
-    const chats = [];
-    const promises = chatIds.map(async chatId => {
-        const allUsers = await getUsersByChat(chatId);
-        const users = allUsers.map(u => u.username !== username);
-        chats.push(await getChatWithUser(chatId, username));
-    });
+    const userChats = await Database.getUserChats(username);
+    const chats = await Promise.all(
+        userChats.map(async ({ chatId }) => {
+            return Database.getChat(chatId);
+        }),
+    );
 
-    return Promise.all(promises);
+    return Promise.all(
+        chats.map(async ({ chatId, isPrivate }) => {
+            if (isPrivate) {
+                const users = await Database.getChatUsers(chatId);
+                const member = users.filter(
+                    user => user.username !== username,
+                )[0];
+                return getChat(chatId, member);
+            }
+
+            return getChat(chatId);
+        }),
+    );
 }
 
-async function privateChatAlreadyExists(username, withUsername) {
-    const userChatIds = await Database.getUserChats(username);
-    const withUserChatIds = await Database.getUserChats(withUsername);
-    const chatIds = [];
-    userChatIds.forEach(userChatId => {
-        if (withUserChatIds.includes(userChatId)) chatIds.push(userChatId);
-    });
+async function privateChatAlreadyExists(username, member) {
+    const userChats = await Database.getPrivateChats(username);
+    const memberChats = await Database.getPrivateChats(member);
+    const chatId = _.intersection(
+        userChats.map(item => item.chatId),
+        memberChats.map(item => item.chatId),
+    )[0];
 
-    if (chatIds.length) {
-        const requests = [];
-        chatIds.forEach(chatId => {
-            requests.push(Database.getChat(chatId));
-        });
+    if (chatId) return getChat(chatId, member);
 
-        const chats = await Promise.all(requests);
-
-        if (!chats.length) return null;
-
-        const findChat = chats.find(chat => chat.isPrivate);
-
-        return findChat ? getChatWithUser(findChat.chatId, withUsername) : null;
-    }
     return null;
 }
 
@@ -58,39 +61,55 @@ async function createChat(username, withUsername) {
         withUsername,
     );
     if (chatAlreadyExists) return chatAlreadyExists;
-    const chatId = await Database.createChat();
+    const chatId = await Database.createChat({ isPrivate: true });
     await Promise.all([
-        Database.createUserChat(username, chatId),
-        Database.createUserChat(withUsername, chatId),
+        Database.addMember(chatId, username),
+        Database.addMember(chatId, withUsername),
     ]);
-    return getChatWithUser(chatId, username);
+    return getChat(chatId, withUsername);
 }
 
 async function createGroup(username, { members, groupName }) {
-    const groupId = await Database.createGroup(groupName, username);
+    const groupId = await Database.createChat({
+        groupName,
+        admin: username,
+        isPrivate: false,
+    });
 
     await Promise.all(
         members.map(async member => {
-            Database.createUserChat(member, groupId);
+            Database.addMember(groupId, member);
         }),
-        Database.createUserChat(username, groupId),
+        Database.addMember(groupId, username),
     );
 
     return Database.getChat(groupId);
 }
 
 async function addMessage(chatId, username, { message }) {
-    return Database.addMessage(chatId, username, message);
+    const timestamp = +zonedTime(new Date());
+    await Database.addMessage(chatId, username, message, timestamp);
+    const users = await Database.getChatUsers(chatId);
+    const chatUsers = users.filter(u => u !== username);
+    await Promise.all(
+        chatUsers.map(async user => {
+            Database.newMessages(chatId, user, timestamp);
+        }),
+    );
 }
 
 async function getMessages(chatId) {
     return Database.getMessages(chatId);
 }
 
+async function viewedMessages(chatId, username) {
+    return Database.viewedMessages(chatId, username);
+}
 module.exports = {
     getAllChats,
     createChat,
     createGroup,
     getMessages,
     addMessage,
+    viewedMessages,
 };

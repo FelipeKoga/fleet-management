@@ -5,34 +5,28 @@ const docClient = new DynamoDB.DocumentClient();
 
 async function getUserChats(username) {
     const params = {
-        TableName: process.env.USER_CHAT_TABLE,
-        IndexName: 'usernameIndex',
-        KeyConditionExpression: 'username = :u',
-        ExpressionAttributeValues: {
-            ':u': username,
-        },
-        ProjectionExpression: 'chatId',
+        TableName: process.env.CHAT_TABLE,
+        IndexName: 'chatSortKeyIndex',
+        KeyConditionExpression: 'chatSortKey = :csk',
     };
+    const { Items } = await docClient
+        .query({
+            ...params,
+            ExpressionAttributeValues: {
+                ':csk': `MEMBER#${username}`,
+            },
+        })
+        .promise();
 
-    const { Items } = await docClient.query(params).promise();
+    const chats = Items.sort((a, b) => {
+        if (a.messageTimestamp < b.messageTimestamp) return -1;
 
-    return Items.map(item => item.chatId);
-}
+        if (a.messageTimestamp > b.messageTimestamp) return 1;
 
-async function getChatUsers(chatId) {
-    const params = {
-        TableName: process.env.USER_CHAT_TABLE,
-        IndexName: 'chatIdIndex',
-        KeyConditionExpression: 'chatId = :c',
-        ExpressionAttributeValues: {
-            ':c': chatId,
-        },
-        ProjectionExpression: 'username',
-    };
+        return 0;
+    });
 
-    const { Items } = await docClient.query(params).promise();
-
-    return Items.map(item => item.username);
+    return chats;
 }
 
 async function getChat(chatId) {
@@ -49,6 +43,18 @@ async function getChat(chatId) {
     return Items[0];
 }
 
+async function getPrivateChats(username) {
+    const userChats = await getUserChats(username);
+    const chats = [];
+    await Promise.all(
+        userChats.map(async ({ chatId }) => {
+            chats.push(await getChat(chatId));
+        }),
+    );
+
+    return chats.filter(chat => chat.isPrivate);
+}
+
 async function getUser(username) {
     const params = {
         TableName: process.env.USER_TABLE,
@@ -61,36 +67,30 @@ async function getUser(username) {
     return Items[0];
 }
 
-// async function createUserChat(username, chatId) {
-//     const params = {
-//         TableName: process.env.USER_CHAT_TABLE,
-//         Item: {
-//             userChatId: v4(),
-//             username,
-//             chatId,
-//         },
-//     };
+async function getChatUsers(chatId) {
+    const params = {
+        TableName: process.env.CHAT_TABLE,
+        KeyConditionExpression:
+            'chatId = :cId and begins_with(chatSortKey, :sk)',
+        ExpressionAttributeValues: {
+            ':cId': chatId,
+            ':sk': 'MEMBER#',
+        },
+    };
+    const { Items } = await docClient.query(params).promise();
+    return Items.map(item => {
+        return item.chatSortKey.split('#').pop();
+    });
+}
 
-//     await docClient.put(params).promise();
-// }
-
-
-/**
- 
-    getChats(username) => MEMBER#username GSI => chatIds => 
-
-
-
- */
-
-async function createChat() {
+async function createChat(args) {
     const chatId = v4();
     const params = {
         TableName: process.env.CHAT_TABLE,
         Item: {
             chatId,
-            chatSortKey: 'CONFIG',
-            isPrivate: true,
+            chatSortKey: `CONFIG`,
+            ...args,
         },
     };
 
@@ -98,25 +98,7 @@ async function createChat() {
     return chatId;
 }
 
-async function createGroup(groupName, admin) {
-    const groupId = v4();
-    const params = {
-        TableName: process.env.CHAT_TABLE,
-        Item: {
-            chatId: groupId,
-            chatSortKey: 'CONFIG',
-            isPrivate: false,
-            admin,
-            groupName,
-        },
-    };
-
-    await docClient.put(params).promise();
-    return groupId;
-}
-
 async function getMessages(chatId) {
-    console.log(chatId);
     const params = {
         TableName: process.env.CHAT_TABLE,
         KeyConditionExpression:
@@ -144,39 +126,95 @@ async function getLastMessage(chatId) {
         Limit: 1,
     };
     const { Items } = await docClient.query(params).promise();
-    return Items[0];
+    return Items[0] || {};
 }
 
-const zonedTime = date => {
-    const localeFormat = date.toLocaleString('en-US', {
-        timeZone: 'America/Sao_Paulo',
-    });
-    return new Date(localeFormat);
-};
-
-async function addMessage(chatId, username, message) {
+async function addMember(chatId, username) {
     const params = {
         TableName: process.env.CHAT_TABLE,
         Item: {
             chatId,
-            chatSortKey: `MESSAGE#${+zonedTime(new Date())}`,
+            chatSortKey: `MEMBER#${username}`,
+            newMessages: 0,
+        },
+    };
+    await docClient.put(params).promise();
+}
+
+async function addMessage(chatId, username, message, timestamp) {
+    const params = {
+        TableName: process.env.CHAT_TABLE,
+        Item: {
+            chatId,
+            chatSortKey: `MESSAGE#${timestamp}`,
             username,
             message,
+            timestamp,
         },
     };
 
     await docClient.put(params).promise();
 }
 
+async function getUserChatMetadata(chatId, username) {
+    const params = {
+        TableName: process.env.CHAT_TABLE,
+        KeyConditionExpression:
+            'chatId = :cId and begins_with(chatSortKey, :sk)',
+        ExpressionAttributeValues: {
+            ':cId': chatId,
+            ':sk': `MEMBER#${username}`,
+        },
+    };
+    const { Items } = await docClient.query(params).promise();
+    return Items[0] || {};
+}
+
+async function viewedMessages(chatId, username) {
+    const chat = await getUserChatMetadata(chatId, username);
+    const params = {
+        TableName: process.env.CHAT_TABLE,
+        Key: {
+            chatId,
+            chatSortKey: chat.chatSortKey,
+        },
+        UpdateExpression: 'set newMessages = :nm',
+        ExpressionAttributeValues: {
+            ':nm': 0,
+        },
+    };
+    await docClient.update(params).promise();
+}
+
+async function newMessages(chatId, username, timestamp) {
+    const chat = await getUserChatMetadata(chatId, username);
+    const params = {
+        TableName: process.env.CHAT_TABLE,
+        Key: {
+            chatId,
+            chatSortKey: chat.chatSortKey,
+        },
+        UpdateExpression:
+            'set newMessages = newMessages + :nm, newMessageTimestamp = :tp ',
+        ExpressionAttributeValues: {
+            ':nm': 1,
+            ':tp': timestamp,
+        },
+    };
+    await docClient.update(params).promise();
+}
+
 module.exports = {
     getUser,
     getChat,
-    getUserChats,
-    getChatUsers,
-    createUserChat,
+    getPrivateChats,
+    addMember,
     createChat,
-    createGroup,
     getMessages,
     addMessage,
     getLastMessage,
+    viewedMessages,
+    newMessages,
+    getChatUsers,
+    getUserChats,
 };
