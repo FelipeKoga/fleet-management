@@ -9,9 +9,9 @@ const zonedTime = date => {
 };
 
 async function getChat(chatId, member) {
-    const chat = await Database.getChat(chatId);
-    const chatMember = member ? await Database.getUser(member) : null;
-    const lastMessage = await Database.getLastMessage(chatId);
+    const chat = await Database.chat.getChat(chatId);
+    const chatMember = member ? await Database.user.getUser(member) : null;
+    const lastMessage = await Database.message.getLastMessage(chatId);
     return {
         ...chat,
         lastMessage,
@@ -20,17 +20,17 @@ async function getChat(chatId, member) {
 }
 
 async function getAllChats(username) {
-    const userChats = await Database.getUserChats(username);
+    const userChats = await Database.chat.getUserChats(username);
     const chats = await Promise.all(
         userChats.map(async ({ chatId }) => {
-            return Database.getChat(chatId);
+            return Database.chat.getChat(chatId);
         }),
     );
 
     return Promise.all(
         chats.map(async ({ chatId, isPrivate }) => {
             if (isPrivate) {
-                const users = await Database.getChatUsers(chatId);
+                const users = await Database.chat.getChatUsers(chatId);
                 const member = users.filter(
                     user => user.username !== username,
                 )[0];
@@ -43,8 +43,8 @@ async function getAllChats(username) {
 }
 
 async function privateChatAlreadyExists(username, member) {
-    const userChats = await Database.getPrivateChats(username);
-    const memberChats = await Database.getPrivateChats(member);
+    const userChats = await Database.chat.getPrivateChats(username);
+    const memberChats = await Database.chat.getPrivateChats(member);
     const chatId = _.intersection(
         userChats.map(item => item.chatId),
         memberChats.map(item => item.chatId),
@@ -61,16 +61,16 @@ async function createChat(username, withUsername) {
         withUsername,
     );
     if (chatAlreadyExists) return chatAlreadyExists;
-    const chatId = await Database.createChat({ isPrivate: true });
+    const chatId = await Database.chat.createChat({ isPrivate: true });
     await Promise.all([
-        Database.addMember(chatId, username),
-        Database.addMember(chatId, withUsername),
+        Database.chat.addMember(chatId, username),
+        Database.chat.addMember(chatId, withUsername),
     ]);
     return getChat(chatId, withUsername);
 }
 
 async function createGroup(username, { members, groupName }) {
-    const groupId = await Database.createChat({
+    const groupId = await Database.chat.createChat({
         groupName,
         admin: username,
         isPrivate: false,
@@ -78,32 +78,32 @@ async function createGroup(username, { members, groupName }) {
 
     await Promise.all(
         members.map(async member => {
-            Database.addMember(groupId, member);
+            Database.chat.addMember(groupId, member);
         }),
-        Database.addMember(groupId, username),
+        Database.chat.addMember(groupId, username),
     );
 
-    return Database.getChat(groupId);
+    return Database.chat.getChat(groupId);
 }
 
 async function addMessage(chatId, username, { message }) {
     const timestamp = +zonedTime(new Date());
     await Database.addMessage(chatId, username, message, timestamp);
-    const users = await Database.getChatUsers(chatId);
+    const users = await Database.chat.getChatUsers(chatId);
     const chatUsers = users.filter(u => u !== username);
     await Promise.all(
         chatUsers.map(async user => {
-            Database.newMessages(chatId, user, timestamp);
+            Database.message.newMessages(chatId, user, timestamp);
         }),
     );
 }
 
 async function getMessages(chatId) {
-    return Database.getMessages(chatId);
+    return Database.message.getMessages(chatId);
 }
 
 async function viewedMessages(chatId, username) {
-    return Database.viewedMessages(chatId, username);
+    return Database.message.viewedMessages(chatId, username);
 }
 module.exports = {
     getAllChats,
