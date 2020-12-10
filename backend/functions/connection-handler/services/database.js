@@ -2,31 +2,29 @@ const DynamoDB = require('aws-sdk/clients/dynamodb');
 
 const docClient = new DynamoDB.DocumentClient();
 
-async function getConnectionIDs(username, companyId) {
+async function getConnectionIds(companyId) {
     const params = {
-        TableName: process.env.CONNECTION_TABLE,
+        TableName: process.env.USER_TABLE,
         IndexName: 'companyIdIndex',
         KeyConditionExpression: 'companyId = :cId',
+        FilterExpression: 'begins_with(userSortKey, :sk)',
         ExpressionAttributeValues: {
             ':cId': companyId,
+            ':sk': 'connection',
         },
-        ProjectionExpression: 'connectionId',
+        ProjectionExpression: 'userSortKey',
     };
     const { Items } = await docClient.query(params).promise();
-
-    const connectionIds = [];
-    Items.forEach(item => {
-        if (item.username !== username) connectionIds.push(item.connectionId);
-    });
-    return connectionIds;
+    return Items.map(({ userSortKey }) => userSortKey.split('_').pop());
 }
 
-async function getUsernameByConnectionID(connectionId) {
+async function getUsernameByConnectionId(connectionId) {
     const params = {
-        TableName: process.env.CONNECTION_TABLE,
-        KeyConditionExpression: 'connectionId = :cId',
+        TableName: process.env.USER_TABLE,
+        IndexName: 'userSortKeyIndex',
+        KeyConditionExpression: 'userSortKey = :sk',
         ExpressionAttributeValues: {
-            ':cId': connectionId,
+            ':sk': `connection_${connectionId}`,
         },
     };
     const { Items } = await docClient.query(params).promise();
@@ -41,22 +39,19 @@ async function getUser(username) {
         ExpressionAttributeValues: {
             ':u': username,
         },
+        ProjectionExpression: 'username, customName, email, companyId',
     };
     const { Items } = await docClient.query(params).promise();
 
-    if (Items[0]) {
-        return Items[0];
-    }
-
-    throw new Error('User not found');
+    return Items[0];
 }
 
 async function insertConnectionId({ username, companyId, connectionId }) {
     const params = {
-        TableName: process.env.CONNECTION_TABLE,
+        TableName: process.env.USER_TABLE,
         Item: {
             username,
-            connectionId,
+            userSortKey: `connection_${connectionId}`,
             companyId,
         },
     };
@@ -64,11 +59,12 @@ async function insertConnectionId({ username, companyId, connectionId }) {
     return true;
 }
 
-async function deleteConnectionId(connectionId) {
+async function deleteConnectionId(username, connectionId) {
     const params = {
-        TableName: process.env.CONNECTION_TABLE,
+        TableName: process.env.USER_TABLE,
         Key: {
-            connectionId,
+            username,
+            userSortKey: `connection_${connectionId}`,
         },
     };
 
@@ -77,9 +73,9 @@ async function deleteConnectionId(connectionId) {
 }
 
 module.exports = {
-    getConnectionIDs,
+    getConnectionIds,
     getUser,
     insertConnectionId,
     deleteConnectionId,
-    getUsernameByConnectionID,
+    getUsernameByConnectionId,
 };

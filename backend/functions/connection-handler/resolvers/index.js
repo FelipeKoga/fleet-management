@@ -1,10 +1,7 @@
 const { Database, Lambda } = require('../services');
 
 async function postMessage(user, action) {
-    const connectionIds = await Database.getConnectionIDs(
-        user.username,
-        user.companyId,
-    );
+    const connectionIds = await Database.getConnectionIds(user.companyId);
 
     await Lambda.sendMessage(user, connectionIds, action);
 }
@@ -21,8 +18,8 @@ async function addConnection(connectionId, username) {
 }
 
 async function deleteConnection(connectionId) {
-    const { username } = await Database.getUsernameByConnectionID(connectionId);
-    await Database.deleteConnectionId(connectionId);
+    const { username } = await Database.getUsernameByConnectionId(connectionId);
+    await Database.deleteConnectionId(username, connectionId);
     const user = await Database.getUser(username);
     await postMessage(user, 'disconnected');
 }
