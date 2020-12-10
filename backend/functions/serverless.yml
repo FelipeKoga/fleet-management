@@ -39,21 +39,21 @@ chat:
                   authorizerId:
                       Ref: ApiGatewayAuthorizer
         - http:
-            path: company/{companyId}/users/{username}/group
-            method: POST
-            cors: true
-            authorizer:
-                type: COGNITO_USER_POOLS
-                authorizerId:
-                    Ref: ApiGatewayAuthorizer
+              path: company/{companyId}/users/{username}/group
+              method: POST
+              cors: true
+              authorizer:
+                  type: COGNITO_USER_POOLS
+                  authorizerId:
+                      Ref: ApiGatewayAuthorizer
         - http:
-            path: company/{companyId}/users/{username}/group/{groupId}
-            method: PUT
-            cors: true
-            authorizer:
-                type: COGNITO_USER_POOLS
-                authorizerId:
-                    Ref: ApiGatewayAuthorizer
+              path: company/{companyId}/users/{username}/group/{groupId}
+              method: PUT
+              cors: true
+              authorizer:
+                  type: COGNITO_USER_POOLS
+                  authorizerId:
+                      Ref: ApiGatewayAuthorizer
         - websocket:
               route: send-message
               routeResponseSelectionExpression: $default
@@ -132,7 +132,6 @@ user:
                       Ref: ApiGatewayAuthorizer
     environment:
         USER_TABLE: ${self:custom.userTable}
-        CONNECTION_TABLE: ${self:custom.connectionTable}
         APP: ${self:service}
         STAGE: ${self:custom.stage}
 
@@ -154,7 +153,6 @@ connection-handler:
     environment:
         WS_URL: ${self:custom.webSocketUrl}
         USER_TABLE: ${self:custom.userTable}
-        CONNECTION_TABLE: ${self:custom.connectionTable}
         APP: ${self:service}
         STAGE: ${self:custom.stage}
         # KEYS_URL:

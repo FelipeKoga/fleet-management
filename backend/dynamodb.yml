@@ -27,10 +27,16 @@ Resources:
             AttributeDefinitions:
                 - AttributeName: username
                   AttributeType: S
-                - AttributeName: companyId
+                - AttributeName: userSortKey
                   AttributeType: S
             BillingMode: PAY_PER_REQUEST
             GlobalSecondaryIndexes:
+                - IndexName: userSortKeyIndex
+                  KeySchema:
+                      - AttributeName: userSortKey
+                        KeyType: HASH
+                  Projection:
+                      ProjectionType: ALL
                 - IndexName: companyIdIndex
                   KeySchema:
                       - AttributeName: companyId
@@ -40,60 +46,9 @@ Resources:
             KeySchema:
                 - AttributeName: username
                   KeyType: HASH
-            TableName: ${self:app}-user-${self:custom.stage}
-
-    ConnectionTable:
-        Type: AWS::DynamoDB::Table
-        Properties:
-            AttributeDefinitions:
-                - AttributeName: connectionId
-                  AttributeType: S
-                - AttributeName: username
-                  AttributeType: S
-                - AttributeName: companyId
-                  AttributeType: S
-            BillingMode: PAY_PER_REQUEST
-            GlobalSecondaryIndexes:
-                - IndexName: companyIdIndex
-                  KeySchema:
-                      - AttributeName: companyId
-                        KeyType: HASH
-                  Projection:
-                      ProjectionType: ALL
-                - IndexName: usernameIndex
-                  KeySchema:
-                      - AttributeName: username
-                        KeyType: HASH
-                  Projection:
-                      ProjectionType: ALL
-            KeySchema:
-                - AttributeName: connectionId
-                  KeyType: HASH
-            TableName: ${self:app}-connection-${self:custom.stage}
-    LocationTable:
-        Type: AWS::DynamoDB::Table
-        Properties:
-            AttributeDefinitions:
-                - AttributeName: locationId
-                  AttributeType: S
-                - AttributeName: username
-                  AttributeType: S
-                - AttributeName: timestamp
-                  AttributeType: S
-            BillingMode: PAY_PER_REQUEST
-            GlobalSecondaryIndexes:
-                - IndexName: usernameIndex
-                  KeySchema:
-                      - AttributeName: username
-                        KeyType: HASH
-                  Projection:
-                      ProjectionType: ALL
-            KeySchema:
-                - AttributeName: locationId
-                  KeyType: HASH
-                - AttributeName: timestamp
+                - AttributeName: userSortKey
                   KeyType: RANGE
-            TableName: ${self:app}-location-${self:custom.stage}
+            TableName: ${self:app}-user-${self:custom.stage}
     CompanyTable:
         Type: AWS::DynamoDB::Table
         Properties:
@@ -101,7 +56,6 @@ Resources:
                 - AttributeName: companyId
                   AttributeType: S
             BillingMode: PAY_PER_REQUEST
-
             KeySchema:
                 - AttributeName: companyId
                   KeyType: HASH

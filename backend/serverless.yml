@@ -54,7 +54,6 @@ custom:
           type: javascript
           appClient: CognitoUserPoolClient
     userTable: !Ref UserTable
-    connectionTable: !Ref ConnectionTable
     companyTable: !Ref CompanyTable
     chatTable: !Ref ChatTable
     # userChatTable: !Ref UserChatTable
