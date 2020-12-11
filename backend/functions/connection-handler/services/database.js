@@ -35,9 +35,11 @@ async function getUsernameByConnectionId(connectionId) {
 async function getUser(username) {
     const params = {
         TableName: process.env.USER_TABLE,
-        KeyConditionExpression: 'username = :u',
+        KeyConditionExpression:
+            'username = :u and begins_with(userSortKey, :sk)',
         ExpressionAttributeValues: {
             ':u': username,
+            ':sk': 'config_',
         },
         ProjectionExpression: 'username, customName, email, companyId',
     };
