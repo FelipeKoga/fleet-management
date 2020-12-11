@@ -2,11 +2,11 @@
     "httpMethod": "PUT",
     "pathParameters": {
         "companyId": "1",
-        "username": "kosloski.fkoga@gmail.com"
+        "username": "teste2@gmail.com"
     },
     "body": {
         "name": "Eduardo",
-        "email": "koga1@gmail.com",
+        "email": "teste2@gmail.com",
         "phone": "213123",
         "customName": "Koga",
         "settings": {}

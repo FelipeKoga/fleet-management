@@ -8,7 +8,8 @@ async function postMessage(user, action) {
 
         await Lambda.sendMessage(user, connectionIds, action);
         return true;
-    } catch {
+    } catch (e) {
+        console.log(e);
         return false;
     }
 }
@@ -29,17 +30,17 @@ async function create(data, companyId) {
     return user;
 }
 
-async function update(data, username) {
-    await Database.user.update(data, username);
+async function update(data, username, companyId) {
+    await Database.user.update(data, username, companyId);
     const user = await Database.user.get(username);
     await postMessage(user, 'user_updated');
     return user;
 }
 
-async function remove(username) {
+async function remove(username, companyId) {
     const user = await Database.user.get(username);
     await Cognito.remove(username);
-    await Database.user.remove(username);
+    await Database.user.remove(username, companyId);
     await postMessage(user, 'user_removed');
     return true;
 }

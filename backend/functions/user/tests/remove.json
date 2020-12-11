@@ -2,6 +2,6 @@
     "httpMethod": "DELETE",
     "pathParameters": {
         "companyId": "1",
-        "username": "kosloski.fkoga@gmail.com"
+        "username": "teste2@gmail.com"
     }
 }

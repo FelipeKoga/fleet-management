@@ -2,43 +2,48 @@ const DynamoDB = require('aws-sdk/clients/dynamodb');
 
 const docClient = new DynamoDB.DocumentClient();
 
-async function getCompanyIDs(companyId) {
-    const { Items } = await docClient
-        .query({
-            TableName: process.env.CONNECTION_TABLE,
-            IndexName: 'companyIdIndex',
-            KeyConditionExpression: 'companyId = :cId',
-            ExpressionAttributeValues: {
-                ':cId': companyId,
-            },
-            ProjectionExpression: 'connectionId',
-        })
-        .promise();
+function mapConnectionResponse(items) {
+    return items.map(({ userSortKey }) => userSortKey.split('_').pop());
+}
 
-    return Items.map(item => item.connectionId);
+async function getCompanyIDs(companyId) {
+    const params = {
+        TableName: process.env.USER_TABLE,
+        IndexName: 'companyIdIndex',
+        KeyConditionExpression: 'companyId = :cId',
+        FilterExpression: 'begins_with(userSortKey, :sk)',
+        ExpressionAttributeValues: {
+            ':cId': companyId,
+            ':sk': 'connection',
+        },
+        ProjectionExpression: 'userSortKey',
+    };
+    const { Items } = await docClient.query(params).promise();
+    return mapConnectionResponse(Items);
 }
 
 async function getUserIDs(username) {
     const { Items } = await docClient
         .query({
-            TableName: process.env.CONNECTION_TABLE,
-            IndexName: 'usernameIndex',
-            KeyConditionExpression: 'username = :u',
+            TableName: process.env.USER_TABLE,
+            KeyConditionExpression:
+                'username = :u and begins_with(userSortKey, :sk)',
             ExpressionAttributeValues: {
                 ':u': username,
+                ':sk': 'connection_',
             },
             ProjectionExpression: 'connectionId',
         })
         .promise();
 
-    return Items.map(item => item.connectionId);
+    return mapConnectionResponse(Items);
 }
 
 async function removeUserIDs(username) {
     const connectionIds = await getUserIDs(username);
     const requests = [];
     const params = {
-        TableName: process.env.CONNECTION_TABLE,
+        TableName: process.env.USER_TABLE,
     };
     connectionIds.forEach(connectionId => {
         requests.push(
@@ -46,7 +51,8 @@ async function removeUserIDs(username) {
                 .delete({
                     ...params,
                     Key: {
-                        connectionId,
+                        username,
+                        userSortKey: `connection_${connectionId}`,
                     },
                 })
                 .promise(),

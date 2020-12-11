@@ -8,7 +8,7 @@ async function main(method, { username, companyId }, body) {
         case 'POST':
             return Resolvers.create(body, companyId);
         case 'PUT':
-            return Resolvers.update(body, username);
+            return Resolvers.update(body, username, companyId);
         case 'DELETE':
             return Resolvers.remove(username, companyId);
         default:

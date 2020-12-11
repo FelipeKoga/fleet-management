@@ -7,29 +7,28 @@ async function get(username) {
     const { Items } = await docClient
         .query({
             TableName: process.env.USER_TABLE,
-            KeyConditionExpression: 'username = :u',
+            KeyConditionExpression:
+                'username = :u and begins_with(userSortKey, :sk)',
             ExpressionAttributeValues: {
                 ':u': username,
+                ':sk': 'config',
             },
             ProjectionExpression:
                 'username, fullName, email, avatar, companyId, settings, phone',
         })
         .promise();
 
-    if (Items.length) {
-        return Items[0];
-    }
-    throw new Error('User not found');
+    return Items[0];
 }
 
 async function list(companyId) {
     const { Items } = await docClient
         .query({
             TableName: process.env.USER_TABLE,
-            IndexName: 'companyIdIndex',
-            KeyConditionExpression: 'companyId = :cId',
+            IndexName: 'userSortKeyIndex',
+            KeyConditionExpression: 'userSortKey = :sk',
             ExpressionAttributeValues: {
-                ':cId': companyId,
+                ':sk': `config_${companyId}`,
             },
             ProjectionExpression:
                 'username, fullName, email, avatar, companyId, settings, phone',
@@ -49,17 +48,23 @@ async function create(data, companyId) {
             TableName: process.env.USER_TABLE,
             Item: {
                 ...user,
+                userSortKey: `config_${companyId}`,
                 companyId,
             },
         })
         .promise();
 }
 
-async function update({ customName, phone, email, settings }, username) {
+async function update(
+    { customName, phone, email, settings },
+    username,
+    companyId,
+) {
     const params = {
         TableName: process.env.USER_TABLE,
         Key: {
             username,
+            userSortKey: `config_${companyId}`,
         },
         UpdateExpression:
             'set customName = :cn, phone = :p, email = :e, settings = :s',
@@ -73,17 +78,17 @@ async function update({ customName, phone, email, settings }, username) {
     await docClient.update(params).promise();
 }
 
-async function remove(username) {
+async function remove(username, companyId) {
     const params = {
         TableName: process.env.USER_TABLE,
         Key: {
             username,
+            userSortKey: `config_${companyId}`,
         },
     };
     await docClient.delete(params).promise();
     await removeUserIDs(username);
     return true;
-    // await removeUserLocations(username);
 }
 
 module.exports = {
