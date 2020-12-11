@@ -24,7 +24,7 @@ async function getUsernameByConnectionId(connectionId) {
         IndexName: 'userSortKeyIndex',
         KeyConditionExpression: 'userSortKey = :sk',
         ExpressionAttributeValues: {
-            ':sk': `connection_${connectionId}`,
+            ':sk': `connection#${connectionId}`,
         },
     };
     const { Items } = await docClient.query(params).promise();
@@ -39,7 +39,7 @@ async function getUser(username) {
             'username = :u and begins_with(userSortKey, :sk)',
         ExpressionAttributeValues: {
             ':u': username,
-            ':sk': 'config_',
+            ':sk': 'config#',
         },
         ProjectionExpression: 'username, customName, email, companyId',
     };
@@ -53,7 +53,7 @@ async function insertConnectionId({ username, companyId, connectionId }) {
         TableName: process.env.USER_TABLE,
         Item: {
             username,
-            userSortKey: `connection_${connectionId}`,
+            userSortKey: `connection#${connectionId}`,
             companyId,
         },
     };
@@ -66,7 +66,7 @@ async function deleteConnectionId(username, connectionId) {
         TableName: process.env.USER_TABLE,
         Key: {
             username,
-            userSortKey: `connection_${connectionId}`,
+            userSortKey: `connection#${connectionId}`,
         },
     };
 

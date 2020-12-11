@@ -3,7 +3,7 @@ const DynamoDB = require('aws-sdk/clients/dynamodb');
 const docClient = new DynamoDB.DocumentClient();
 
 function mapConnectionResponse(items) {
-    return items.map(({ userSortKey }) => userSortKey.split('_').pop());
+    return items.map(({ userSortKey }) => userSortKey.split('#').pop());
 }
 
 async function getCompanyIDs(companyId) {
@@ -30,7 +30,7 @@ async function getUserIDs(username) {
                 'username = :u and begins_with(userSortKey, :sk)',
             ExpressionAttributeValues: {
                 ':u': username,
-                ':sk': 'connection_',
+                ':sk': 'connection#',
             },
             ProjectionExpression: 'connectionId',
         })
@@ -52,7 +52,7 @@ async function removeUserIDs(username) {
                     ...params,
                     Key: {
                         username,
-                        userSortKey: `connection_${connectionId}`,
+                        userSortKey: `connection#${connectionId}`,
                     },
                 })
                 .promise(),

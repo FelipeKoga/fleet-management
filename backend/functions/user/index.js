@@ -23,7 +23,11 @@ exports.handler = async event => {
         return {
             statusCode: 200,
             body: JSON.stringify(
-                await main(httpMethod, pathParameters, JSON.parse(body)),
+                await main(
+                    httpMethod,
+                    pathParameters,
+                    typeof body === 'string' ? JSON.parse(body) : body,
+                ),
             ),
         };
     } catch (error) {

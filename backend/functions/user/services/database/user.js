@@ -28,7 +28,7 @@ async function list(companyId) {
             IndexName: 'userSortKeyIndex',
             KeyConditionExpression: 'userSortKey = :sk',
             ExpressionAttributeValues: {
-                ':sk': `config_${companyId}`,
+                ':sk': `config#${companyId}`,
             },
             ProjectionExpression:
                 'username, fullName, email, avatar, companyId, settings, phone',
@@ -48,7 +48,7 @@ async function create(data, companyId) {
             TableName: process.env.USER_TABLE,
             Item: {
                 ...user,
-                userSortKey: `config_${companyId}`,
+                userSortKey: `config#${companyId}`,
                 companyId,
             },
         })
@@ -64,7 +64,7 @@ async function update(
         TableName: process.env.USER_TABLE,
         Key: {
             username,
-            userSortKey: `config_${companyId}`,
+            userSortKey: `config#${companyId}`,
         },
         UpdateExpression:
             'set customName = :cn, phone = :p, email = :e, settings = :s',
@@ -83,7 +83,7 @@ async function remove(username, companyId) {
         TableName: process.env.USER_TABLE,
         Key: {
             username,
-            userSortKey: `config_${companyId}`,
+            userSortKey: `config#${companyId}`,
         },
     };
     await docClient.delete(params).promise();
