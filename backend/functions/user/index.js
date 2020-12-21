@@ -3,7 +3,7 @@ const Resolvers = require('./resolvers');
 async function main(method, { username, companyId }, body) {
     switch (method) {
         case 'GET':
-            if (username) return Resolvers.get(username);
+            if (username) return Resolvers.get(username, companyId);
             return Resolvers.list(companyId);
         case 'POST':
             return Resolvers.create(body, companyId);

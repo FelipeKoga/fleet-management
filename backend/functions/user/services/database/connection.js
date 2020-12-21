@@ -2,48 +2,75 @@ const DynamoDB = require('aws-sdk/clients/dynamodb');
 
 const docClient = new DynamoDB.DocumentClient();
 
-function mapConnectionResponse(items) {
-    return items.map(({ userSortKey }) => userSortKey.split('#').pop());
+function mapSortKey(items) {
+    return items.map(({ sortKey }) => sortKey.split('#').pop());
 }
 
 async function getCompanyIDs(companyId) {
     const params = {
-        TableName: process.env.USER_TABLE,
-        IndexName: 'companyIdIndex',
-        KeyConditionExpression: 'companyId = :cId',
-        FilterExpression: 'begins_with(userSortKey, :sk)',
-        ExpressionAttributeValues: {
-            ':cId': companyId,
-            ':sk': 'connection',
-        },
-        ProjectionExpression: 'userSortKey',
+        TableName: process.env.TABLE,
     };
-    const { Items } = await docClient.query(params).promise();
-    return mapConnectionResponse(Items);
+
+    const users = await docClient
+        .query({
+            ...params,
+            IndexName: 'sortKeyIndex',
+            KeyConditionExpression:
+                'sortKey = :sk and begins_with(partitionKey, :pk)',
+            ExpressionAttributeValues: {
+                ':sk': `CONFIG#${companyId}`,
+                ':pk': 'USER#',
+            },
+        })
+        .promise();
+
+    let connectionIds = [];
+
+    const promises = users.Items.map(async user => {
+        const userConnections = await docClient
+            .query({
+                ...params,
+                KeyConditionExpression:
+                    'partitionKey = :pk and begins_with(sortKey, :sk)',
+                ExpressionAttributeValues: {
+                    ':sk': `CONNECTION#`,
+                    ':pk': `USER#${user.partitionKey.split('#').pop()}`,
+                },
+            })
+            .promise();
+
+        connectionIds = [
+            ...connectionIds,
+            ...mapSortKey(userConnections.Items),
+        ];
+    });
+
+    await Promise.all(promises);
+
+    return connectionIds;
 }
 
 async function getUserIDs(username) {
     const { Items } = await docClient
         .query({
-            TableName: process.env.USER_TABLE,
+            TableName: process.env.TABLE,
             KeyConditionExpression:
-                'username = :u and begins_with(userSortKey, :sk)',
+                'partitionKey = :pk and begins_with(sortKey, :sk)',
             ExpressionAttributeValues: {
-                ':u': username,
-                ':sk': 'connection#',
+                ':pk': `USER#${username}`,
+                ':sk': 'CONNECTION#',
             },
-            ProjectionExpression: 'connectionId',
         })
         .promise();
 
-    return mapConnectionResponse(Items);
+    return mapSortKey(Items);
 }
 
 async function removeUserIDs(username) {
     const connectionIds = await getUserIDs(username);
     const requests = [];
     const params = {
-        TableName: process.env.USER_TABLE,
+        TableName: process.env.TABLE,
     };
     connectionIds.forEach(connectionId => {
         requests.push(
@@ -51,8 +78,8 @@ async function removeUserIDs(username) {
                 .delete({
                     ...params,
                     Key: {
-                        username,
-                        userSortKey: `connection#${connectionId}`,
+                        partitionKey: `USER#${username}`,
+                        sortKey: `CONNECTION#${connectionId}`,
                     },
                 })
                 .promise(),

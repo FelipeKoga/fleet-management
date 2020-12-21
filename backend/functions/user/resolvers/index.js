@@ -9,13 +9,12 @@ async function postMessage(user, action) {
         await Lambda.sendMessage(user, connectionIds, action);
         return true;
     } catch (e) {
-        console.log(e);
         return false;
     }
 }
 
-async function get(username) {
-    return Database.user.get(username);
+async function get(username, companyId) {
+    return Database.user.get(username, companyId);
 }
 
 async function list(companyId) {
@@ -25,20 +24,20 @@ async function list(companyId) {
 async function create(data, companyId) {
     await Cognito.create(data, companyId);
     await Database.user.create(data, companyId);
-    const user = await Database.user.get(data.email);
+    const user = await Database.user.get(data.email, companyId);
     await postMessage(user, 'user_created');
     return user;
 }
 
 async function update(data, username, companyId) {
     await Database.user.update(data, username, companyId);
-    const user = await Database.user.get(username);
+    const user = await Database.user.get(username, companyId);
     await postMessage(user, 'user_updated');
     return user;
 }
 
 async function remove(username, companyId) {
-    const user = await Database.user.get(username);
+    const user = await Database.user.get(username, companyId);
     await Cognito.remove(username);
     await Database.user.remove(username, companyId);
     await postMessage(user, 'user_removed');

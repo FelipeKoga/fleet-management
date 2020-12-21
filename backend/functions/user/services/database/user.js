@@ -3,32 +3,41 @@ const { removeUserIDs } = require('./connection');
 
 const docClient = new DynamoDB.DocumentClient();
 
-async function get(username) {
+async function get(username, companyId) {
     const { Items } = await docClient
         .query({
-            TableName: process.env.USER_TABLE,
+            TableName: process.env.TABLE,
             KeyConditionExpression:
-                'username = :u and begins_with(userSortKey, :sk)',
+                'partitionKey = :pk and begins_with(sortKey, :sk)',
             ExpressionAttributeValues: {
-                ':u': username,
-                ':sk': 'config',
+                ':pk': `USER#${username}`,
+                ':sk': `CONFIG#${companyId}`,
             },
             ProjectionExpression:
-                'username, fullName, email, avatar, companyId, settings, phone',
+                'username, fullName, email, avatar, settings, phone',
         })
         .promise();
 
-    return Items[0];
+    const user = Items[0];
+
+    if (user) {
+        return {
+            ...user,
+            companyId,
+        };
+    }
+
+    return {};
 }
 
 async function list(companyId) {
     const { Items } = await docClient
         .query({
-            TableName: process.env.USER_TABLE,
-            IndexName: 'userSortKeyIndex',
-            KeyConditionExpression: 'userSortKey = :sk',
+            TableName: process.env.TABLE,
+            IndexName: 'sortKeyIndex',
+            KeyConditionExpression: 'sortKey = :sk',
             ExpressionAttributeValues: {
-                ':sk': `config#${companyId}`,
+                ':sk': `CONFIG#${companyId}`,
             },
             ProjectionExpression:
                 'username, fullName, email, avatar, companyId, settings, phone',
@@ -38,18 +47,15 @@ async function list(companyId) {
 }
 
 async function create(data, companyId) {
-    const { password, ...user } = {
-        username: data.email,
-        ...data,
-    };
+    const { password, ...user } = data;
 
     await docClient
         .put({
-            TableName: process.env.USER_TABLE,
+            TableName: process.env.TABLE,
             Item: {
                 ...user,
-                userSortKey: `config#${companyId}`,
-                companyId,
+                partitionKey: `USER#${data.email}`,
+                sortKey: `CONFIG#${companyId}`,
             },
         })
         .promise();
@@ -61,10 +67,10 @@ async function update(
     companyId,
 ) {
     const params = {
-        TableName: process.env.USER_TABLE,
+        TableName: process.env.TABLE,
         Key: {
-            username,
-            userSortKey: `config#${companyId}`,
+            partitionKey: `USER#${username}`,
+            sortKey: `CONFIG#${companyId}`,
         },
         UpdateExpression:
             'set customName = :cn, phone = :p, email = :e, settings = :s',
@@ -75,19 +81,20 @@ async function update(
             ':s': settings,
         },
     };
+
     await docClient.update(params).promise();
 }
 
 async function remove(username, companyId) {
     const params = {
-        TableName: process.env.USER_TABLE,
+        TableName: process.env.TABLE,
         Key: {
-            username,
-            userSortKey: `config#${companyId}`,
+            partitionKey: `USER#${username}`,
+            sortKey: `CONFIG#${companyId}`,
         },
     };
-    await docClient.delete(params).promise();
     await removeUserIDs(username);
+    await docClient.delete(params).promise();
     return true;
 }
 

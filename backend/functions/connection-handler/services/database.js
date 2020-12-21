@@ -39,8 +39,6 @@ async function getConnectionIds(companyId) {
             })
             .promise();
 
-        console.log(userConnections);
-
         connectionIds = [
             ...connectionIds,
             ...mapSortKey(userConnections.Items),
