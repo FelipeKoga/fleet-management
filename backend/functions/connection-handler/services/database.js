@@ -2,59 +2,108 @@ const DynamoDB = require('aws-sdk/clients/dynamodb');
 
 const docClient = new DynamoDB.DocumentClient();
 
+function mapSortKey(items) {
+    return items.map(({ sortKey }) => sortKey.split('#').pop());
+}
+
 async function getConnectionIds(companyId) {
     const params = {
-        TableName: process.env.USER_TABLE,
-        IndexName: 'companyIdIndex',
-        KeyConditionExpression: 'companyId = :cId',
-        FilterExpression: 'begins_with(userSortKey, :sk)',
-        ExpressionAttributeValues: {
-            ':cId': companyId,
-            ':sk': 'connection',
-        },
-        ProjectionExpression: 'userSortKey',
+        TableName: process.env.TABLE,
     };
-    const { Items } = await docClient.query(params).promise();
-    return Items.map(({ userSortKey }) => userSortKey.split('_').pop());
+
+    const users = await docClient
+        .query({
+            ...params,
+            IndexName: 'sortKeyIndex',
+            KeyConditionExpression:
+                'sortKey = :sk and begins_with(partitionKey, :pk)',
+            ExpressionAttributeValues: {
+                ':sk': `CONFIG#${companyId}`,
+                ':pk': 'USER#',
+            },
+        })
+        .promise();
+
+    let connectionIds = [];
+
+    const promises = users.Items.map(async user => {
+        const userConnections = await docClient
+            .query({
+                ...params,
+                KeyConditionExpression:
+                    'partitionKey = :pk and begins_with(sortKey, :sk)',
+                ExpressionAttributeValues: {
+                    ':sk': `CONNECTION#`,
+                    ':pk': `USER#${user.partitionKey.split('#').pop()}`,
+                },
+            })
+            .promise();
+
+        console.log(userConnections);
+
+        connectionIds = [
+            ...connectionIds,
+            ...mapSortKey(userConnections.Items),
+        ];
+    });
+
+    await Promise.all(promises);
+
+    return connectionIds;
 }
 
 async function getUsernameByConnectionId(connectionId) {
     const params = {
-        TableName: process.env.USER_TABLE,
-        IndexName: 'userSortKeyIndex',
-        KeyConditionExpression: 'userSortKey = :sk',
+        TableName: process.env.TABLE,
+        IndexName: 'sortKeyIndex',
+        KeyConditionExpression:
+            'sortKey = :sk and begins_with(partitionKey, :pk)',
         ExpressionAttributeValues: {
-            ':sk': `connection#${connectionId}`,
+            ':sk': `CONNECTION#${connectionId}`,
+            ':pk': `USER#`,
         },
     };
+
     const { Items } = await docClient.query(params).promise();
 
-    return Items[0];
+    const connection = Items[0];
+
+    if (connection) return connection.partitionKey.split('#').pop();
+
+    return {};
 }
 
 async function getUser(username) {
     const params = {
-        TableName: process.env.USER_TABLE,
+        TableName: process.env.TABLE,
         KeyConditionExpression:
-            'username = :u and begins_with(userSortKey, :sk)',
+            'partitionKey = :pk and begins_with(sortKey, :sk)',
         ExpressionAttributeValues: {
-            ':u': username,
-            ':sk': 'config#',
+            ':pk': `USER#${username}`,
+            ':sk': 'CONFIG#',
         },
-        ProjectionExpression: 'username, customName, email, companyId',
     };
     const { Items } = await docClient.query(params).promise();
 
-    return Items[0];
+    const user = Items[0];
+
+    if (user) {
+        const { sortKey, ...data } = user;
+
+        return {
+            companyId: sortKey.split('#').pop(),
+            ...data,
+        };
+    }
+    return {};
 }
 
-async function insertConnectionId({ username, companyId, connectionId }) {
+async function insertConnectionId({ username, connectionId }) {
     const params = {
-        TableName: process.env.USER_TABLE,
+        TableName: process.env.TABLE,
         Item: {
-            username,
-            userSortKey: `connection#${connectionId}`,
-            companyId,
+            partitionKey: `USER#${username}`,
+            sortKey: `CONNECTION#${connectionId}`,
         },
     };
     await docClient.put(params).promise();
@@ -63,13 +112,12 @@ async function insertConnectionId({ username, companyId, connectionId }) {
 
 async function deleteConnectionId(username, connectionId) {
     const params = {
-        TableName: process.env.USER_TABLE,
+        TableName: process.env.TABLE,
         Key: {
-            username,
-            userSortKey: `connection#${connectionId}`,
+            partitionKey: `USER#${username}`,
+            sortKey: `CONNECTION#${connectionId}`,
         },
     };
-
     await docClient.delete(params).promise();
     return true;
 }
