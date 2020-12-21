@@ -1,62 +1,25 @@
 Resources:
-    ChatTable:
+    TccTable:
         Type: AWS::DynamoDB::Table
         Properties:
             AttributeDefinitions:
-                - AttributeName: chatId
+                - AttributeName: partitionKey
                   AttributeType: S
-                - AttributeName: chatSortKey
+                - AttributeName: sortKey
                   AttributeType: S
             BillingMode: PAY_PER_REQUEST
             GlobalSecondaryIndexes:
-                - IndexName: chatSortKeyIndex
+                - IndexName: sortKeyIndex
                   KeySchema:
-                      - AttributeName: chatSortKey
+                      - AttributeName: sortKey
                         KeyType: HASH
+                      - AttributeName: partitionKey
+                        KeyType: RANGE
                   Projection:
                       ProjectionType: ALL
             KeySchema:
-                - AttributeName: chatId
+                - AttributeName: partitionKey
                   KeyType: HASH
-                - AttributeName: chatSortKey
+                - AttributeName: sortKey
                   KeyType: RANGE
-            TableName: ${self:app}-chat-${self:custom.stage}
-    UserTable:
-        Type: AWS::DynamoDB::Table
-        Properties:
-            AttributeDefinitions:
-                - AttributeName: username
-                  AttributeType: S
-                - AttributeName: userSortKey
-                  AttributeType: S
-            BillingMode: PAY_PER_REQUEST
-            GlobalSecondaryIndexes:
-                - IndexName: userSortKeyIndex
-                  KeySchema:
-                      - AttributeName: userSortKey
-                        KeyType: HASH
-                  Projection:
-                      ProjectionType: ALL
-                - IndexName: companyIdIndex
-                  KeySchema:
-                      - AttributeName: companyId
-                        KeyType: HASH
-                  Projection:
-                      ProjectionType: ALL
-            KeySchema:
-                - AttributeName: username
-                  KeyType: HASH
-                - AttributeName: userSortKey
-                  KeyType: RANGE
-            TableName: ${self:app}-user-${self:custom.stage}
-    CompanyTable:
-        Type: AWS::DynamoDB::Table
-        Properties:
-            AttributeDefinitions:
-                - AttributeName: companyId
-                  AttributeType: S
-            BillingMode: PAY_PER_REQUEST
-            KeySchema:
-                - AttributeName: companyId
-                  KeyType: HASH
-            TableName: ${self:app}-company-${self:custom.stage}
+            TableName: ${self:app}-table-${self:custom.stage}

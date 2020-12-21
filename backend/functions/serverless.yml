@@ -61,13 +61,9 @@ chat:
               route: open-messages
               routeResponseSelectionExpression: $default
     environment:
-        USER_TABLE: ${self:custom.userTable}
-        CHAT_TABLE: ${self:custom.chatTable}
-        # USER_CHAT_TABLE: ${self:custom.userChatTable}
-        # MESSAGE_TABLE: ${self:custom.messageTable}
-
         APP: ${self:service}
         STAGE: ${self:custom.stage}
+        TABLE: ${self:custom.table}
 company:
     handler: functions/company/index.handler
     package:
@@ -131,9 +127,9 @@ user:
                   authorizerId:
                       Ref: ApiGatewayAuthorizer
     environment:
-        USER_TABLE: ${self:custom.userTable}
         APP: ${self:service}
         STAGE: ${self:custom.stage}
+        TABLE: ${self:custom.table}
 
 # Web Socket handlers
 connection-handler:
@@ -152,9 +148,10 @@ connection-handler:
               routeResponseSelectionExpression: $default
     environment:
         WS_URL: ${self:custom.webSocketUrl}
-        USER_TABLE: ${self:custom.userTable}
         APP: ${self:service}
         STAGE: ${self:custom.stage}
+        TABLE: ${self:custom.table}
+
         # KEYS_URL:
         #     !Join [
         #         '',

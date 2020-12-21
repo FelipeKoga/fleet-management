@@ -18,17 +18,11 @@ provider:
               - dynamodb:DeleteItem
               - dynamodb:UpdateItem
           Resource:
-              - arn:aws:dynamodb:us-east-1:603366505042:table/${self:app}-connection-${self:custom.stage}
-              - arn:aws:dynamodb:us-east-1:603366505042:table/${self:app}-user-${self:custom.stage}
-              - arn:aws:dynamodb:us-east-1:603366505042:table/${self:app}-chat-${self:custom.stage}
-              - arn:aws:dynamodb:us-east-1:603366505042:table/${self:app}-message-${self:custom.stage}
+              - arn:aws:dynamodb:us-east-1:603366505042:table/${self:app}-table-${self:custom.stage}
         - Effect: Allow
           Action: dynamodb:Query
           Resource:
-              - arn:aws:dynamodb:us-east-1:603366505042:table/${self:app}-user-${self:custom.stage}/index/*
-              - arn:aws:dynamodb:us-east-1:603366505042:table/${self:app}-chat-${self:custom.stage}/index/*
-              - arn:aws:dynamodb:us-east-1:603366505042:table/${self:app}-connection-${self:custom.stage}/index/*
-              - arn:aws:dynamodb:us-east-1:603366505042:table/${self:app}-message-${self:custom.stage}/index/*
+              - arn:aws:dynamodb:us-east-1:603366505042:table/${self:app}-table-${self:custom.stage}/index/*
         - Effect: Allow
           Action: lambda:InvokeFunction
           Resource:
@@ -53,11 +47,8 @@ custom:
         - filename: ../web/src/aws-exports.js
           type: javascript
           appClient: CognitoUserPoolClient
-    userTable: !Ref UserTable
-    companyTable: !Ref CompanyTable
-    chatTable: !Ref ChatTable
-    # userChatTable: !Ref UserChatTable
-    # messageTable: !Ref MessageTable
+
+    table: ${self:app}-table-${self:custom.stage}
 
     apiUrl: !Join
         - ''
