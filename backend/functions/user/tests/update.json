@@ -5,10 +5,11 @@
         "username": "teste2@gmail.com"
     },
     "body": {
-        "name": "Eduardo",
+        "name": "Felipe",
         "email": "teste2@gmail.com",
-        "phone": "213123",
-        "customName": "Koga",
-        "settings": {}
+        "customName": "Koguinha",
+        "status": "OFFLINE",
+        "role": "ADMIN",
+        "phone": "42999991093"
     }
 }

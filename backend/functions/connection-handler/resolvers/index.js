@@ -1,7 +1,9 @@
 const { Database, Lambda } = require('../services');
 
 async function postMessage(user, action) {
-    const connectionIds = await Database.getConnectionIds(user.companyId);
+    const connectionIds = await Database.fetchCompanyConnectionIDs(
+        user.companyId,
+    );
     await Lambda.sendMessage(user, connectionIds, action);
 }
 

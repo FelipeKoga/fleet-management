@@ -2,6 +2,6 @@
     "httpMethod": "GET",
     "pathParameters": {
         "companyId": "1",
-        "username": "kosloski@email.com"
+        "username": "teste2@gmail.com"
     }
 }
