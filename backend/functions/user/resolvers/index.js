@@ -2,7 +2,7 @@ const { Cognito, Database, Lambda } = require('../services');
 
 async function postMessage(user, action) {
     try {
-        const connectionIds = await Database.connection.getCompanyIDs(
+        const connectionIds = await Database.connection.fetchCompanyConnectionIDs(
             user.companyId,
         );
 
@@ -14,32 +14,32 @@ async function postMessage(user, action) {
 }
 
 async function get(username, companyId) {
-    return Database.user.get(username, companyId);
+    return Database.user.getUser(username, companyId);
 }
 
 async function list(companyId) {
-    return Database.user.list(companyId);
+    return Database.user.fetchUsers(companyId);
 }
 
 async function create(data, companyId) {
     await Cognito.create(data, companyId);
-    await Database.user.create(data, companyId);
-    const user = await Database.user.get(data.email, companyId);
+    await Database.user.createUser(data, companyId);
+    const user = await Database.user.getUser(data.email, companyId);
     await postMessage(user, 'user_created');
     return user;
 }
 
 async function update(data, username, companyId) {
-    await Database.user.update(data, username, companyId);
-    const user = await Database.user.get(username, companyId);
+    await Database.user.updateUser(data, username, companyId);
+    const user = await Database.user.getUser(username, companyId);
     await postMessage(user, 'user_updated');
     return user;
 }
 
 async function remove(username, companyId) {
-    const user = await Database.user.get(username, companyId);
+    const user = await Database.user.getUser(username, companyId);
     await Cognito.remove(username);
-    await Database.user.remove(username, companyId);
+    await Database.user.removeUser(username, companyId);
     await postMessage(user, 'user_removed');
     return true;
 }

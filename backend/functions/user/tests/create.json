@@ -4,10 +4,12 @@
         "companyId": "1"
     },
     "body": {
-        "name": "Teste 2",
-        "email": "teste2@gmail.com",
+        "name": "Teste 1",
+        "email": "teste1@gmail.com",
         "password": "123@1234",
-        "customName": "",
-        "settings": {}
+        "customName": "Koguinha",
+        "status": "OFFLINE",
+        "role": "ADMIN",
+        "phone": "42999991093"
     }
 }

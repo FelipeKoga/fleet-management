@@ -1,107 +1,88 @@
-const DynamoDB = require('aws-sdk/clients/dynamodb');
-const { removeUserIDs } = require('./connection');
+const { getByPK, fetchBySK, insert, update, remove } = require('./query');
+const { removeConnectionIds } = require('./connection');
 
-const docClient = new DynamoDB.DocumentClient();
+const ProjectionExpression =
+    'username, #name, email, avatar, #status, #role, phone, companyId';
 
-async function get(username, companyId) {
-    const { Items } = await docClient
-        .query({
-            TableName: process.env.TABLE,
-            KeyConditionExpression:
-                'partitionKey = :pk and begins_with(sortKey, :sk)',
-            ExpressionAttributeValues: {
-                ':pk': `USER#${username}`,
-                ':sk': `CONFIG#${companyId}`,
-            },
-            ProjectionExpression:
-                'username, fullName, email, avatar, settings, phone',
-        })
-        .promise();
-
-    const user = Items[0];
-
-    if (user) {
-        return {
-            ...user,
-            companyId,
-        };
-    }
-
-    return {};
+async function getUser(username, companyId) {
+    return getByPK({
+        ExpressionAttributeValues: {
+            ':pk': `USER#${username}`,
+            ':sk': `CONFIG#${companyId}`,
+        },
+        ExpressionAttributeNames: {
+            '#status': 'status',
+            '#role': 'role',
+            '#name': 'name',
+        },
+        ProjectionExpression,
+    });
 }
 
-async function list(companyId) {
-    const { Items } = await docClient
-        .query({
-            TableName: process.env.TABLE,
-            IndexName: 'sortKeyIndex',
-            KeyConditionExpression: 'sortKey = :sk',
-            ExpressionAttributeValues: {
-                ':sk': `CONFIG#${companyId}`,
-            },
-            ProjectionExpression:
-                'username, fullName, email, avatar, companyId, settings, phone',
-        })
-        .promise();
-    return Items;
+async function fetchUsers(companyId) {
+    return fetchBySK({
+        ExpressionAttributeValues: {
+            ':sk': `CONFIG#${companyId}`,
+            ':pk': 'USER#',
+        },
+        ExpressionAttributeNames: {
+            '#status': 'status',
+            '#role': 'role',
+            '#name': 'name',
+        },
+        ProjectionExpression,
+    });
 }
 
-async function create(data, companyId) {
+async function createUser(data, companyId) {
     const { password, ...user } = data;
-
-    await docClient
-        .put({
-            TableName: process.env.TABLE,
-            Item: {
-                ...user,
-                partitionKey: `USER#${data.email}`,
-                sortKey: `CONFIG#${companyId}`,
-            },
-        })
-        .promise();
+    await insert({
+        ...user,
+        partitionKey: `USER#${data.email}`,
+        username: data.email,
+        sortKey: `CONFIG#${companyId}`,
+        companyId,
+    });
 }
 
-async function update(
-    { customName, phone, email, settings },
+async function updateUser(
+    { customName, phone, email, role, status },
     username,
     companyId,
 ) {
-    const params = {
-        TableName: process.env.TABLE,
+    return update({
         Key: {
             partitionKey: `USER#${username}`,
             sortKey: `CONFIG#${companyId}`,
         },
         UpdateExpression:
-            'set customName = :cn, phone = :p, email = :e, settings = :s',
-        ExpressionAttributeValues: {
-            ':cn': customName,
-            ':p': phone,
-            ':e': email,
-            ':s': settings,
+            'set customName = :customName, phone = :phone, email = :email, #role = :role, #status = :status',
+        ExpressionAttributeNames: {
+            '#status': 'status',
+            '#role': 'role',
         },
-    };
-
-    await docClient.update(params).promise();
+        ExpressionAttributeValues: {
+            ':customName': customName,
+            ':phone': phone,
+            ':email': email,
+            ':role': role,
+            ':status': status,
+        },
+    });
 }
 
-async function remove(username, companyId) {
-    const params = {
-        TableName: process.env.TABLE,
-        Key: {
-            partitionKey: `USER#${username}`,
-            sortKey: `CONFIG#${companyId}`,
-        },
-    };
-    await removeUserIDs(username);
-    await docClient.delete(params).promise();
-    return true;
+async function removeUser(username, companyId) {
+    await removeConnectionIds(username);
+    await remove({
+        partitionKey: `USER#${username}`,
+        sortKey: `CONFIG#${companyId}`,
+    });
 }
 
 module.exports = {
-    get,
-    list,
-    create,
-    update,
-    remove,
+    getUser,
+    fetchUsers,
+    createUser,
+    updateUser,
+    removeUser,
 };
