@@ -38,28 +38,30 @@ class SplashScreenFragment : Fragment(R.layout.splash_screen_fragment) {
 
         viewModel.isLogged.observe(viewLifecycleOwner, { isLogged ->
             if (isLogged) {
-                initUserLogged()
-
+                findNavController().navigate(
+                    R.id.action_splashScreenFragment_to_chatsFragment,
+                )
             } else {
                 findNavController().navigate(
                     R.id.action_splashScreenFragment_to_loginFragment,
                 )
             }
-        })
-    }
 
-    private fun initUserLogged() {
-        viewModel.initCurrentUser().observe(viewLifecycleOwner, {
-            if (it.status == Resource.Status.SUCCESS) {
-                findNavController().navigate(
-                    R.id.action_splashScreenFragment_to_chatsFragment,
-                )
-            }
-            else if (it.status == Resource.Status.ERROR) {
-                showErrorToast()
-            }
         })
     }
+//
+//    private fun initUserLogged() {
+//        viewModel.initCurrentUser().observe(viewLifecycleOwner, {
+//            if (it.status == Resource.Status.SUCCESS) {
+//                findNavController().navigate(
+//                    R.id.action_splashScreenFragment_to_chatsFragment,
+//                )
+//            }
+//            else if (it.status == Resource.Status.ERROR) {
+//                showErrorToast()
+//            }
+//        })
+//    }
 
     private fun showErrorToast() {
         Toast.makeText(requireContext(), "Erro ao inicilizar o app.", Toast.LENGTH_LONG)

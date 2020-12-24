@@ -42,9 +42,7 @@ class NewGroupViewModel @Inject constructor(
 
     fun getUsers() = viewModelScope.launch {
         val users = userRepository.getLocalUsers()
-        _users.postValue(users.map {
-            User(it.username, it.email, it.fullName, it.phone, it.companyId, it.avatar)
-        })
+
     }
 
     fun handleSelectedUser(user: User) {

@@ -30,9 +30,12 @@ class ChatAdapter(
         RecyclerView.ViewHolder(binding.root) {
         fun bind(item: MessageEntity) {
             with(binding) {
-                textViewMessageSent.text = item.body
-                textViewMessageSentDate.text = getHourByTimestamp(item.createdAt)
-                if (item.sent) {
+                textViewMessageSent.text = item.message
+                if (!item.timestamp.isNullOrEmpty()) {
+                    textViewMessageSentDate.text = getHourByTimestamp(item.timestamp)
+
+                }
+                if (item.status === "sent") {
                     imageViewMessageStatus.setImageResource(R.drawable.ic_baseline_check)
                 } else {
                     imageViewMessageStatus.setImageResource(R.drawable.ic_baseline_timer)
@@ -62,14 +65,17 @@ class ChatAdapter(
         fun bind(item: MessageEntity, members: List<UserEntity>?) {
             with(binding) {
                 if (!members.isNullOrEmpty()) {
-                    val user = members.find { item.sender == it.username }
+                    val user = members.find { item.username == it.username }
                     linearLayoutMessageHeader.show()
                     linearLayoutMessageBody.layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT
                     textViewMessageSender.text = user?.fullName
 
                 }
-                textViewMessageReceived.text = item.body
-                textViewMessageReceivedHour.text = getHourByTimestamp(item.createdAt)
+                textViewMessageReceived.text = item.message
+                if (!item.timestamp.isNullOrEmpty()) {
+                    textViewMessageReceivedHour.text = getHourByTimestamp(item.timestamp)
+
+                }
             }
         }
     }
@@ -127,7 +133,7 @@ class ChatAdapter(
 
     override fun getItemViewType(position: Int): Int {
         val message = messages[position]
-        if (message.sender == username) {
+        if (message.username == username) {
             return viewSenderItem
         }
         return viewRecipientItem

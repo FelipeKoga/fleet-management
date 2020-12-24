@@ -3,6 +3,7 @@ package co.tcc.koga.android.data.database.dao
 import androidx.room.*
 import co.tcc.koga.android.data.database.entity.ChatEntity
 import co.tcc.koga.android.data.database.entity.MessageEntity
+import io.reactivex.Observable
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -29,8 +30,8 @@ interface ChatDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(chats: List<ChatEntity>)
 
-    @Query("SELECT * FROM chat WHERE lastMessage IS NOT NULL AND isPrivate ORDER BY lastMessage DESC")
-    fun getAll(): Flow<List<ChatEntity>>
+    @Query("SELECT * FROM chat")
+    fun getAll(): Observable<List<ChatEntity>>
 
     @Query("DELETE FROM chat")
     fun deleteAll()

@@ -1,20 +1,16 @@
 package co.tcc.koga.android.ui.splash_screen
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import co.tcc.koga.android.data.Resource
+import androidx.lifecycle.*
 import co.tcc.koga.android.data.repository.ClientRepository
-import kotlinx.coroutines.flow.map
-import androidx.lifecycle.asLiveData
-import co.tcc.koga.android.data.database.entity.UserEntity
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+
+import io.reactivex.disposables.CompositeDisposable
+
 import javax.inject.Inject
 
 class SplashScreenViewModel @Inject constructor(private val repository: ClientRepository) :
     ViewModel() {
 
+    private val compositeDisposable: CompositeDisposable = CompositeDisposable()
     private val _appStatus = MutableLiveData<Boolean>()
     private val _isLogged = MutableLiveData<Boolean>()
     val appStatus: LiveData<Boolean>
@@ -25,7 +21,7 @@ class SplashScreenViewModel @Inject constructor(private val repository: ClientRe
     fun initApp() {
         repository.initApp(
             fun() {
-                _isLogged.value = true
+                getUser()
             },
 
             fun() {
@@ -37,25 +33,38 @@ class SplashScreenViewModel @Inject constructor(private val repository: ClientRe
             })
     }
 
-    fun initCurrentUser(): LiveData<Resource<UserEntity>> =
-        repository.getCurrentUser().map {
-            println(it.status)
-            when (it.status) {
-                Resource.Status.LOADING -> {
-                    Resource.loading(null)
-                }
-                Resource.Status.SUCCESS -> {
-                    repository.initWebSocket()
-                    Resource.success(it.data)
-                }
-                Resource.Status.ERROR -> {
-                    _appStatus.value = false
-                    Resource.error(it.message!!, null)
-                }
-                Resource.Status.LOCAL -> {
-                    Resource.localData(it.data)
-                }
-            }
-        }.asLiveData(viewModelScope.coroutineContext)
+
+    private fun getUser() {
+        val disposable = repository.getCurrentUser().subscribe(
+            {
+                _isLogged.value = true
+            },
+            {
+                println(it)
+            },
+        )
+        compositeDisposable.add(disposable)
+    }
+
+//    fun initCurrentUser(): LiveData<Resource<UserEntity>> =
+//        repository.getCurrentUser().map {
+//            println(it.status)
+//            when (it.status) {
+//                Resource.Status.LOADING -> {
+//                    Resource.loading(null)
+//                }
+//                Resource.Status.SUCCESS -> {
+//                    repository.initWebSocket()
+//                    Resource.success(it.data)
+//                }
+//                Resource.Status.ERROR -> {
+//                    _appStatus.value = false
+//                    Resource.error(it.message!!, null)
+//                }
+//                Resource.Status.LOCAL -> {
+//                    Resource.localData(it.data)
+//                }
+//            }
+//        }.asLiveData(viewModelScope.coroutineContext)
 
 }

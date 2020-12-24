@@ -1,57 +1,47 @@
 package co.tcc.koga.android.data.repository.impl
 
 import androidx.lifecycle.LiveData
-import co.tcc.koga.android.data.Resource
 import co.tcc.koga.android.data.database.dao.ChatDAO
 import co.tcc.koga.android.data.database.dao.MessageDAO
 import co.tcc.koga.android.data.database.entity.MessageEntity
 import co.tcc.koga.android.data.network.*
 import co.tcc.koga.android.data.network.payload.WebSocketPayload
-import co.tcc.koga.android.data.networkBoundResource
 import co.tcc.koga.android.data.repository.MessageRepository
 import com.google.gson.Gson
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOn
+import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 
 class MessageRepositoryImpl @Inject constructor(
-    private val apiService: Service,
+    private val service: Service,
     private val messageDAO: MessageDAO,
     private val chatDAO: ChatDAO
 ) :
     MessageRepository {
 
-    @ExperimentalCoroutinesApi
-    override fun getMessages(
-        chatId: String
-    ): Flow<Resource<List<MessageEntity>>> {
-        val user = Client.getInstance().currentUser
-        println(chatId)
-        return networkBoundResource(
-            fetchFromLocal = {
-                println("GET MESSSAGES FROM LOCAL")
-                messageDAO.getAll(chatId)
-            },
-            shouldFetchFromRemote = {
-                println(it)
-                true
-            },
-            fetchFromRemote = {
-                apiService.getMessages(user.companyId, user.username, chatId)
-            },
-            processRemoteResponse = {
-                println("From remote")
-                println(it)
-            },
-            saveRemoteData = {
 
-                println(it)
-                messageDAO.insertAll(it)
-            },
-            onFetchFailed = { _, _ -> println("Failed") }
-        ).flowOn(Dispatchers.IO)
+    private fun getMessagesNetwork(chatId: String): Observable<List<MessageEntity>> {
+        val user = Client.getInstance().currentUser
+        return service.getMessages(user.companyId, user.username, chatId)
+            .subscribeOn(Schedulers.newThread())
+            .doOnNext { messages ->
+                if (messages.isEmpty()) {
+                    messageDAO.deleteAll(chatId)
+                } else {
+                    messageDAO.insertAll(messages)
+                }
+            }.subscribeOn(Schedulers.newThread())
+    }
+
+    private fun getMessagesDatabase(chatId: String): Observable<List<MessageEntity>> {
+        return messageDAO.getAll(chatId)
+            .subscribeOn(Schedulers.computation())
+    }
+
+    override fun getMessages(chatId: String): Observable<List<MessageEntity>> {
+        return Observable.merge(getMessagesDatabase(chatId), getMessagesNetwork(chatId))
+            .observeOn(AndroidSchedulers.mainThread())
     }
 
     override suspend fun sendMessage(
@@ -60,6 +50,8 @@ class MessageRepositoryImpl @Inject constructor(
         val gson = Gson()
         val payload = WebSocketPayload("send-message", gson.toJson(message))
         insertMessage(message)
+        println("SEND MESSAGE")
+        println(message)
         Socket.getConnection()
             .send(gson.toJson(payload))
         return message

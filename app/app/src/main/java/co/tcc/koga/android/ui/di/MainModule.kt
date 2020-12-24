@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import co.tcc.koga.android.di.ViewModelKey
 import co.tcc.koga.android.ui.chat.ChatViewModel
 import co.tcc.koga.android.ui.chats.ChatsViewModel
-import co.tcc.koga.android.ui.login.LoginViewModel
+import co.tcc.koga.android.ui.auth.login.LoginViewModel
 import co.tcc.koga.android.ui.new_chat.NewChatViewModel
 import co.tcc.koga.android.ui.new_group.NewGroupViewModel
 import co.tcc.koga.android.ui.settings.SettingsViewModel

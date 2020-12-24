@@ -5,6 +5,8 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import co.tcc.koga.android.data.database.entity.UserEntity
+import io.reactivex.Maybe
+import io.reactivex.Observable
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -13,7 +15,7 @@ interface UserDAO {
     fun setCurrentUser(userEntity: UserEntity)
 
     @Query("SELECT * FROM user WHERE username = :username ")
-    fun getCurrentUser(username: String): Flow<UserEntity>
+    fun getCurrentUser(username: String): Observable<UserEntity>
 
     @Query("SELECT * FROM user WHERE companyId = :companyId AND username != :username ")
     fun getAll(companyId: String, username: String): Flow<List<UserEntity>>

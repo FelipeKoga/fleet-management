@@ -79,7 +79,7 @@
     </fragment>
     <fragment
         android:id="@+id/loginFragment"
-        android:name="co.tcc.koga.android.ui.login.LoginFragment"
+        android:name="co.tcc.koga.android.ui.auth.login.LoginFragment"
         android:label="LoginFragment" >
         <action
             app:popUpToInclusive="true"

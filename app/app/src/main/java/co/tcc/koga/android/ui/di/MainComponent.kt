@@ -4,7 +4,7 @@ import co.tcc.koga.android.MainActivity
 import co.tcc.koga.android.ui.chat.ChatFragment
 import co.tcc.koga.android.ui.chats.ChatsFragment
 import co.tcc.koga.android.ui.new_group.NewGroupFragment
-import co.tcc.koga.android.ui.login.LoginFragment
+import co.tcc.koga.android.ui.auth.login.LoginFragment
 import co.tcc.koga.android.ui.new_chat.NewChatFragment
 import co.tcc.koga.android.ui.settings.SettingsFragment
 import co.tcc.koga.android.ui.splash_screen.SplashScreenFragment

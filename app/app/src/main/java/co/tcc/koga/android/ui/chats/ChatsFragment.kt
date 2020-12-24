@@ -36,16 +36,7 @@ class ChatsFragment : Fragment(R.layout.chats_fragment) {
         setupViews()
         setupRecyclerView()
         setupObservers()
-    }
-
-    override fun onResume() {
-        super.onResume()
-        viewModel.getAllChats().observe(viewLifecycleOwner, {
-            if (it.status === Resource.Status.LOADING) {
-                if (!it.data.isNullOrEmpty()) progress_bar_chats.hide()
-            }
-        })
-
+        viewModel.getAllChats()
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -72,6 +63,7 @@ class ChatsFragment : Fragment(R.layout.chats_fragment) {
             if (!it.isNullOrEmpty()) {
                 recycler_view_chats.show()
                 progress_bar_chats.hide()
+                println("================ SIZE: ${it.size}")
                 adapter.chats = it
                 adapter.notifyDataSetChanged()
 

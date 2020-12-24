@@ -1,12 +1,14 @@
 package co.tcc.koga.android.data.network
 
 import android.content.Context
+import android.content.res.Resources
 import co.tcc.koga.android.data.database.entity.UserEntity
 import com.amazonaws.mobile.client.AWSMobileClient
 import com.amazonaws.mobile.client.Callback
 import com.amazonaws.mobile.client.UserState
 import com.amazonaws.mobile.client.UserStateDetails
 import com.amazonaws.mobile.client.results.SignInResult
+import com.amazonaws.services.cognitoidentityprovider.model.NotAuthorizedException
 import java.lang.Exception
 
 class Client {
@@ -29,7 +31,6 @@ class Client {
                 }
 
                 override fun onError(e: Exception?) {
-                    println("ENTREI")
                     onInitError()
                 }
 
@@ -53,7 +54,7 @@ class Client {
                 }
 
                 override fun onError(e: Exception?) {
-                    println(e)
+                    println(e is NotAuthorizedException)
                     onSignInError(e)
                 }
 

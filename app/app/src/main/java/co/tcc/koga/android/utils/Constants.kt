@@ -5,3 +5,9 @@ object CONSTANTS {
     val WEBSOCKET_URL = "https://ljdjapabh7.execute-api.us-east-1.amazonaws.com/dev"
     val API_URL = "https://2p8b6trvua.execute-api.us-east-1.amazonaws.com/dev/"
 }
+enum class AUTH_STATUS {
+    LOGGED_IN,
+    ERROR,
+    UNAUTHORIZED,
+    PENDING
+}

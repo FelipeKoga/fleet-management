@@ -7,6 +7,7 @@ import co.tcc.koga.android.data.network.Client
 import co.tcc.koga.android.data.repository.ChatsRepository
 import co.tcc.koga.android.data.repository.ClientRepository
 import co.tcc.koga.android.data.repository.MessageRepository
+import io.reactivex.disposables.CompositeDisposable
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import java.lang.Exception
@@ -16,9 +17,24 @@ class ChatViewModel @Inject constructor(
     private val repository: MessageRepository,
     private val chatsRepository: ChatsRepository
 ) : ViewModel() {
+    private val compositeDisposable: CompositeDisposable = CompositeDisposable()
     private val _messages = MutableLiveData<List<MessageEntity>>()
     val messages: LiveData<List<MessageEntity>>
         get() = _messages
+
+    override fun onCleared() {
+        super.onCleared()
+        compositeDisposable.dispose()
+    }
+
+    fun getMessages(chatId: String) {
+        compositeDisposable.add(repository.getMessages(chatId).subscribe({
+            _messages.postValue(it)
+        }, {
+            println("ERROR GET MESSAGES")
+            println(it)
+        }))
+    }
 
     fun messageReceived(): LiveData<MessageEntity> {
         return repository.messageReceived()
@@ -32,33 +48,16 @@ class ChatViewModel @Inject constructor(
         chatsRepository.openChat(chatId)
     }
 
-    fun getMessages(chatId: String) = repository.getMessages(chatId).map {
-        when (it.status) {
-            Resource.Status.LOADING -> {
-                Resource.loading(null)
-            }
-            Resource.Status.SUCCESS -> {
-                _messages.value = it.data
-                Resource.success(it.data)
-            }
-            Resource.Status.ERROR -> {
-                Resource.error(it.message!!, null)
-            }
-            Resource.Status.LOCAL -> {
-                _messages.value = it.data
-                Resource.localData(it.data)
-            }
-        }
-    }.asLiveData(viewModelScope.coroutineContext)
 
     fun sendMessage(text: String, chatId: String) = viewModelScope.launch {
         try {
             val msgs = _messages.value?.toMutableList()
-            val message = MessageEntity(chatId, text, Client.getInstance().username())
+            val message = MessageEntity(chatId, text, Client.getInstance().username(), "", "", "")
             msgs?.add(message)
             _messages.postValue(msgs)
             repository.sendMessage(message)
         } catch (e: Exception) {
+            println("ERROR SEND MESSAGES")
             println(e)
         }
     }
@@ -69,21 +68,21 @@ class ChatViewModel @Inject constructor(
                 if (chatId != message.chatId) return@launch
                 val msgs = messages.value?.toMutableList()
                 if (msgs !== null) {
-                    val findMsg = msgs.find { it.messageId == message.messageId }
-                    if (sent && findMsg != null) {
-                        _messages.postValue(msgs.map {
-                            if (it.messageId == message.messageId) {
-                                message
-                            } else {
-                                it
-                            }
-                        })
-
-                    } else {
-                        msgs.add(message)
-                        _messages.postValue(msgs)
-                    }
-                    repository.insertMessage(message)
+//                    val findMsg = msgs.find { it.messageId == message.messageId }
+//                    if (sent && findMsg != null) {
+//                        _messages.postValue(msgs.map {
+//                            if (it.messageId == message.messageId) {
+//                                message
+//                            } else {
+//                                it
+//                            }
+//                        })
+//
+//                    } else {
+//                        msgs.add(message)
+//                        _messages.postValue(msgs)
+//                    }
+//                    repository.insertMessage(message)
                 }
             } catch (e: Exception) {
                 println(e)

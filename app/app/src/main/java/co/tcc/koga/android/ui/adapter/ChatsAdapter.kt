@@ -39,18 +39,17 @@ class ChatsAdapter(
             context: Context,
             onContactClicked: (chat: ChatEntity) -> Unit
         ) {
-            println("BIND VIEW ----------------------------")
-            println(chat)
             if (chat.isPrivate) {
-                textViewName.text = chat.user?.fullName
+                textViewName.text = chat.user?.name
             } else {
                 imageViewUserStatus.visibility = View.GONE
                 textViewName.text = chat.groupName
             }
 
             if (chat.lastMessage !== null) {
-                textViewLastMessage.text = chat.lastMessage.body
-                textViewLastMessageHour.text = getHourByTimestamp(chat.lastMessage.createdAt)
+                textViewLastMessage.text = chat.lastMessage.message
+                if (!chat.lastMessage.timestamp.isNullOrEmpty())
+                    textViewLastMessageHour.text = getHourByTimestamp(chat.lastMessage.timestamp)
             }
 
 

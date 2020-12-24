@@ -2,6 +2,14 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
+    <data>
+
+        <import type="android.view.View" />
+
+        <variable
+            name="viewModel"
+            type="co.tcc.koga.android.ui.chats.ChatsViewModel" />
+    </data>
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -113,13 +121,14 @@
                 app:titleTextColor="?textColor">
 
                 <ProgressBar
+                    android:visibility="@{viewModel.loadingChats ? View.VISIBLE : View.GONE}"
                     android:layout_width="24dp"
                     android:layout_gravity="center"
                     android:layout_height="24dp"
                     android:id="@+id/progress_bar_chats" />
 
                 <androidx.recyclerview.widget.RecyclerView
-                    android:visibility="gone"
+                    android:visibility="@{viewModel.loadingChats ? View.GONE : View.VISIBLE}"
                     android:id="@+id/recycler_view_chats"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"

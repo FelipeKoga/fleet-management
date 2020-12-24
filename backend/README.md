@@ -10,18 +10,28 @@ serverless deploy function --function sendMessage
 
 ## USER
 
-yarn test user get "-e USER_TABLE=tcc-user-dev -e CONNECTION_TABLE=tcc-connection-dev"
-yarn test user create "-e USER_TABLE=tcc-user-dev -e CONNECTION_TABLE=tcc-connection-dev"
-yarn test user remove "-e USER_TABLE=tcc-user-dev -e CONNECTION_TABLE=tcc-connection-dev"
-yarn test user list "-e USER_TABLE=tcc-user-dev -e CONNECTION_TABLE=tcc-connection-dev"
-yarn test user update "-e USER_TABLE=tcc-user-dev -e CONNECTION_TABLE=tcc-connection-dev"
+yarn test user get
+yarn test user create
+yarn test user remove
+yarn test user list
+yarn test user update
 
-wscat -c wss://ljdjapabh7.execute-api.us-east-1.amazonaws.com/dev?username=kosloski@email.com
+wscat -c wss://ljdjapabh7.execute-api.us-east-1.amazonaws.com/dev?username=teste2@gmail.com
+wscat -c wss://ljdjapabh7.execute-api.us-east-1.amazonaws.com/dev?username=teste1@gmail.com
+
+## CONNECTION
+
+yarn test connection-handler connect
+yarn test connection-handler disconnect
 
 ## CHAT
 
-yarn test chat addMessage "-e CHAT_TABLE=tcc-chat-dev -e USER_CHAT_TABLE=tcc-user-chat-dev -e USER_TABLE=tcc-user-dev"
-yarn test chat createChat "-e CHAT_TABLE=tcc-chat-dev -e USER_CHAT_TABLE=tcc-user-chat-dev -e USER_TABLE=tcc-user-dev"
-yarn test chat createGroup "-e CHAT_TABLE=tcc-chat-dev -e USER_CHAT_TABLE=tcc-user-chat-dev -e USER_TABLE=tcc-user-dev "
-yarn test chat chats "-e CHAT_TABLE=tcc-chat-dev -e USER_CHAT_TABLE=tcc-user-chat-dev -e USER_TABLE=tcc-user-dev"
-yarn test chat messages "-e CHAT_TABLE=tcc-chat-dev -e USER_CHAT_TABLE=tcc-user-chat-dev -e USER_TABLE=tcc-user-dev"
+yarn test chat addMessage
+yarn test chat createChat
+yarn test chat createGroup
+yarn test chat chats
+yarn test chat messages
+
+## WEBSOCKET
+
+{"action": "send-message", "data": { "chatId": "YCNzfqYoL0NvQqIPit1Yb", "username": "teste1@gmail.com", "message": "Ola from cmd" }}

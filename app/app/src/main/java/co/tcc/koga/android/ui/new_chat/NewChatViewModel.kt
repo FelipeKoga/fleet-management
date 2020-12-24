@@ -53,9 +53,5 @@ class NewChatViewModel @Inject constructor(
         }
     }
 
-    fun getSelectUser() {
-        _selectUser.postValue(_users.value?.map {
-            User(it.username, it.email, it.fullName, it.phone, it.companyId, it.avatar)
-        })
-    }
+
 }

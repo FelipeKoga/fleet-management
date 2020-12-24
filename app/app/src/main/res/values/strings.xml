@@ -3,29 +3,18 @@
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
+
+    <string name="unauthorized">Usuário e/ou senha incorretos.</string>
+    <string name="loginError">Não foi possível realizar o login.</string>
+    <string name="user">Usuário</string>
+    <string name="loginInfo">Informe os dados abaixo para continuar</string>
+    <string name="hello">Olá!</string>
+    <string name="password">Senha</string>
+    <string name="forgotPassword">Esqueceu sua senha?</string>
+    <string name="signIn">Entrar</string>
+    <string name="login">Login</string>
+    <string name="required">Campo obrigatório.</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
-    <!-- Strings related to login -->
-    <string name="prompt_email">Email</string>
-    <string name="prompt_password">Password</string>
-    <string name="action_sign_in">Sign in or register</string>
-    <string name="action_sign_in_short">Sign in</string>
-    <string name="welcome">"Welcome!"</string>
-    <string name="invalid_username">Not a valid username</string>
-    <string name="invalid_password">Password must be >5 characters</string>
-    <string name="login_failed">"Login failed"</string>
 
-    <string name="beil_biography">"Christian Charles Philip Bale (born 30 January 1974) is an English-American actor. He is known for his intense method acting style, often transforming his body drastically for his roles. The recipient of many awards, including an Academy Award and a Golden Globe, he was featured in the Time 100 list of 2011.
-        Born in Haverfordwest, Wales, to English parents, Bale had his first starring role at age 13 in Steven Spielberg\'s war film Empire of the Sun (1987). Following a decade of leading and supporting roles, including in Little Women (1994), he gained wider recognition for portraying the serial killer Patrick Bateman in American Psycho (2000).
-        In 2004, he lost 63 pounds (28.5 kg) for his role in the psychological thriller The Machinist (2004). Within six months he gained 100 lb (45 kg) to star as Batman in Christopher Nolan\'s superhero film Batman Begins (2005). He later reprised his role in subsequent installments of the Dark Knight Trilogy, which ranks as the 8th highest-grossing film series. Bale continued to take on starring roles in Nolan's period drama The Prestige (2006), the western 3:10 to Yuma (2007), the science fiction film Terminator Salvation (2009), and the crime drama Public Enemies (2009).
-        He won the Academy Award for Best Supporting Actor for his portrayal of Dicky Eklund in the David O. Russell-directed biographical film The Fighter (2010). This acclaim continued with his Oscar-nominated roles in Russell's black comedy American Hustle (2013) and in Adam McKay's financial satire The Big Short (2015)."
-    </string>
-    <string name="go_demo_2">Demo 2</string>
-    <string name="demo_1">Demo 1</string>
-    <string name="heath_ledger">Heath Ledger</string>
-    <string name="heath_andrew_ledger_full_txt">Heath Andrew Ledger</string>
-
-    <string name="ledger_biography">"Heath Andrew Ledger[a] (4 April 1979 – 22 January 2008) was an Australian actor and music video director. After performing roles in several Australian television and film productions during the 1990s, Ledger left for the United States in 1998 to further develop his film career. His work comprised nineteen films, including 10 Things I Hate About You (1999), The Patriot (2000), A Knight's Tale (2001), Monster's Ball (2001), Lords of Dogtown (2005), Brokeback Mountain (2005), Casanova (2005), The Dark Knight (2008), and The Imaginarium of Doctor Parnassus (2009), the latter two being posthumous releases. He also produced and directed music videos and aspired to be a film director."</string>
-    <string name="christian_charles_n_philip_bale">Christian Charles\nPhilip Bale</string>
-    <string name="christian_bale">Christian Bale</string>
 </resources>

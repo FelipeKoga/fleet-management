@@ -11,8 +11,9 @@ data class UserEntity(
     @PrimaryKey
     val username: String,
     val email: String,
-    val fullName: String,
-    val phone: String,
+    val fullName: String? = "",
+    val phone: String?  = "",
     val companyId: String,
-    val avatar: String?
+    val avatar: String?  = "",
+    val name: String?  = ""
 ) : Parcelable

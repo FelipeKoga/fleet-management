@@ -15,7 +15,6 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import co.tcc.koga.android.MainActivity
 import co.tcc.koga.android.R
-import co.tcc.koga.android.data.Resource
 import co.tcc.koga.android.data.network.Client
 import co.tcc.koga.android.databinding.GroupDetailsFragmentBinding
 import co.tcc.koga.android.ui.adapter.ChatAdapter
@@ -51,6 +50,7 @@ class ChatFragment : Fragment(R.layout.chat_fragment) {
         setupViews()
         setupRecyclerView()
         setupObservers()
+        viewModel.getMessages(args.chat.chatId)
     }
 
     override fun onResume() {
@@ -90,20 +90,16 @@ class ChatFragment : Fragment(R.layout.chat_fragment) {
 
     private fun setupObservers() {
         viewModel.messages.observe(viewLifecycleOwner, {
+            progress_bar_loading_messages.visibility = View.GONE
             if (!it.isNullOrEmpty()) {
                 adapter.messages = it
                 adapter.notifyDataSetChanged()
                 if (adapter.messages.size > 2) {
                     recycler_view_chat_messages.scrollToPosition(adapter.messages.size - 1)
                 }
-            }
-        })
-        viewModel.getMessages(args.chat.chatId).observe(viewLifecycleOwner, {
-            println(it)
-            if (it.status === Resource.Status.LOADING && adapter.messages.isEmpty()) {
-                progress_bar_loading_messages.show()
             } else {
-                progress_bar_loading_messages.hide()
+                adapter.messages = listOf()
+                adapter.notifyDataSetChanged()
             }
         })
 

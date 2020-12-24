@@ -1,19 +1,17 @@
 package co.tcc.koga.android.data.repository.impl
 
 import android.content.Context
-import co.tcc.koga.android.data.Resource
 import co.tcc.koga.android.data.database.dao.UserDAO
 import co.tcc.koga.android.data.database.entity.UserEntity
 import co.tcc.koga.android.data.network.Client
 import co.tcc.koga.android.data.network.Service
 import co.tcc.koga.android.data.network.Socket
-import co.tcc.koga.android.data.networkBoundResource
 import co.tcc.koga.android.data.repository.ClientRepository
 import com.amazonaws.mobile.auth.core.internal.util.ThreadUtils
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOn
+import com.amazonaws.services.cognitoidentityprovider.model.NotAuthorizedException
+import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 
 class ClientRepositoryImpl @Inject constructor(
@@ -41,29 +39,44 @@ class ClientRepositoryImpl @Inject constructor(
         })
     }
 
-    @ExperimentalCoroutinesApi
-    override fun getCurrentUser(): Flow<Resource<UserEntity>> {
-
-        return networkBoundResource(
-            fetchFromLocal = { userDao.getCurrentUser(Client.getInstance().username()) },
-            shouldFetchFromRemote = {
-                if (it !== null) {
-                    Client.getInstance().currentUser = it
-                    false
-                } else {
-                    true
-                }
-            },
-            fetchFromRemote = { service.getCurrentUser(Client.getInstance().username()) },
-            processRemoteResponse = { },
-            saveRemoteData = {
-                Client.getInstance().currentUser = it
-                userDao.setCurrentUser(it)
-            },
-            onFetchFailed = { _, _ -> println("Failed") }
-        ).flowOn(Dispatchers.IO)
+    private fun getUserDatabase(): Observable<UserEntity> {
+        return userDao.getCurrentUser(Client.getInstance().username())
+            .subscribeOn(Schedulers.computation()).doOnNext { user ->
+                Client.getInstance().currentUser = user
+            }
     }
 
+    private fun getUserNetwork(): Observable<UserEntity> {
+        return service.getCurrentUser(Client.getInstance().username()).subscribeOn(Schedulers.newThread())
+            .doOnNext { user ->
+                userDao.setCurrentUser(user)
+                Client.getInstance().currentUser = user
+            }.subscribeOn(Schedulers.newThread())
+
+    }
+
+    override fun getCurrentUser(): Observable<UserEntity> {
+        return Observable.merge(getUserDatabase(), getUserNetwork())
+            .observeOn(AndroidSchedulers.mainThread())
+    }
+
+    override fun signIn(
+        username: String,
+        password: String,
+        loggedIn: () -> Unit,
+        unauthorized: () -> Unit,
+        error: () -> Unit
+    ) {
+
+        Client.getInstance().signIn(username, password, loggedIn, fun(e) {
+            println(e)
+            if (e is NotAuthorizedException) {
+                unauthorized()
+            } else {
+                error()
+            }
+        })
+    }
 
     override suspend fun signOut() {
 //        Thread { appDatabase.clearAllTables() }.start()

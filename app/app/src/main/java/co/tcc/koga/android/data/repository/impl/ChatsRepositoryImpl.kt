@@ -17,38 +17,42 @@ import co.tcc.koga.android.data.networkBoundResource
 import co.tcc.koga.android.data.repository.ChatsRepository
 import co.tcc.koga.android.domain.User
 import com.google.gson.Gson
+import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.subscribeOn
 import javax.inject.Inject
 import kotlin.reflect.jvm.internal.impl.load.kotlin.JvmType
 
 
 class ChatsRepositoryImpl @Inject constructor(
-    private val apiService: Service,
-    private val chatDAO: ChatDAO,
+    private val service: Service,
+    private val chatDao: ChatDAO,
     private val messageDAO: MessageDAO
 ) : ChatsRepository {
-    @ExperimentalCoroutinesApi
-    override fun getChats(): Flow<Resource<List<ChatEntity>>> {
-        val currentUser = Client.getInstance().currentUser
-        return networkBoundResource(
-            fetchFromLocal = { chatDAO.getAll() },
-            shouldFetchFromRemote = {
-                println(it)
-                true
-            },
-            fetchFromRemote = { apiService.getChats(currentUser.companyId, currentUser.username) },
-            processRemoteResponse = {
-                println("From remote")
-                println(it) },
-            saveRemoteData = {
-                chatDAO.deleteAll()
-                chatDAO.insertAll(it)
-            },
-            onFetchFailed = { _, _ -> }
-        ).flowOn(Dispatchers.IO)
+
+
+    private fun getChatsDatabase(): Observable<List<ChatEntity>> {
+        return chatDao.getAll()
+            .subscribeOn(Schedulers.computation())
+    }
+
+    private fun getChatsNetwork(): Observable<List<ChatEntity>> {
+        val user = Client.getInstance().currentUser
+        return service.getChats(user.companyId, user.username).subscribeOn(Schedulers.newThread())
+            .doOnNext { chats ->
+                chatDao.insertAll(chats)
+            }.subscribeOn(Schedulers.newThread())
+    }
+
+    override fun getChats(): Observable<List<ChatEntity>> {
+        return Observable.merge(getChatsDatabase(), getChatsNetwork())
+            .observeOn(AndroidSchedulers.mainThread())
+
     }
 
 
@@ -56,12 +60,12 @@ class ChatsRepositoryImpl @Inject constructor(
         member_username: String,
     ): ChatEntity {
         val currentUser = Client.getInstance().currentUser
-        val newChat = apiService.createChat(
+        val newChat = service.createChat(
             currentUser.username,
             currentUser.companyId,
             NewChatPayload(member_username, true, "", "")
         )
-        chatDAO.insert(newChat)
+        chatDao.insert(newChat)
         return newChat
 
     }
@@ -75,12 +79,12 @@ class ChatsRepositoryImpl @Inject constructor(
         val usersEntity = members.map {
             UserEntity(it.username, it.email, it.fullName, it.phone, it.companyId, it.avatar)
         }
-        val newChat = apiService.createChat(
+        val newChat = service.createChat(
             currentUser.username,
             currentUser.companyId,
             NewChatPayload("", false, groupName, avatar, currentUser.username, usersEntity)
         )
-        chatDAO.insert(newChat)
+        chatDao.insert(newChat)
         return newChat
 
     }
@@ -95,14 +99,14 @@ class ChatsRepositoryImpl @Inject constructor(
         Socket.getConnection()
             .send(gson.toJson(payload))
         println("VIEWED MESSAGES")
-        chatDAO.viewedMessages(chatId)
+        chatDao.viewedMessages(chatId)
     }
 
     override suspend fun updateChat(messageEntity: MessageEntity, received: Boolean): ChatEntity {
-        if (received) chatDAO.receivedNewMessage(messageEntity.chatId)
-        chatDAO.updateLastMessage(messageEntity.chatId, messageEntity)
+        if (received) chatDao.receivedNewMessage(messageEntity.chatId)
+        chatDao.updateLastMessage(messageEntity.chatId, messageEntity)
         messageDAO.insert(messageEntity)
-        return chatDAO.getChat(messageEntity.chatId)
+        return chatDao.getChat(messageEntity.chatId)
     }
 
     override fun messageSent(): LiveData<MessageEntity> {

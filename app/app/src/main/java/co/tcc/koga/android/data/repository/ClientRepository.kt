@@ -1,9 +1,10 @@
 package co.tcc.koga.android.data.repository
 
 
-import co.tcc.koga.android.data.Resource
 import co.tcc.koga.android.data.database.entity.UserEntity
-import kotlinx.coroutines.flow.Flow
+import io.reactivex.Observable
+
+import java.util.*
 
 
 interface ClientRepository {
@@ -14,7 +15,10 @@ interface ClientRepository {
         onError: () -> Unit
     )
 
-    fun getCurrentUser(): Flow<Resource<UserEntity>>
+    fun getCurrentUser(): Observable<UserEntity>
+
+    fun signIn(username: String, password: String, loggedIn: () -> Unit, unauthorized: () -> Unit, error: () -> Unit)
+
 
     suspend fun signOut()
 

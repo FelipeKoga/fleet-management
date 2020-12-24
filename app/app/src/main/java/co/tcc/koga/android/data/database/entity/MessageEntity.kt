@@ -1,21 +1,19 @@
 package co.tcc.koga.android.data.database.entity
 
 import android.os.Parcelable
-import androidx.annotation.Nullable
-import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import kotlinx.android.parcel.Parcelize
-import java.util.*
+import java.util.UUID
 
 @Parcelize
 @Entity(tableName = "message")
 data class MessageEntity(
     val chatId: String,
-    val body: String,
-    val sender: String,
-    val sent: Boolean = false,
+    val message: String,
+    val username: String,
+    val timestamp: String? = "${System.currentTimeMillis() / 1000}",
+    val status: String,
     @PrimaryKey
-    val messageId: String = UUID.randomUUID().toString(),
-    val createdAt: String = "${System.currentTimeMillis() / 1000}",
+    val messageId: String
 ) : Parcelable
