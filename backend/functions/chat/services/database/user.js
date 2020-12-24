@@ -1,19 +1,33 @@
-const { DynamoDB } = require('aws-sdk');
-
-const docClient = new DynamoDB.DocumentClient();
+const { getByPK, fetchByPK } = require('./query');
 
 async function getUser(username) {
-    const params = {
-        TableName: process.env.USER_TABLE,
-        KeyConditionExpression: 'username = :u',
-        ExpressionAttributeValues: {
-            ':u': username,
+    return getByPK(
+        {
+            ExpressionAttributeValues: {
+                ':pk': `USER#${username}`,
+                ':sk': 'CONFIG#',
+            },
         },
-    };
-    const { Items } = await docClient.query(params).promise();
-    return Items[0];
+        false,
+    );
+}
+
+async function fetchConnectionIds(username) {
+    const connectionIds = await fetchByPK(
+        {
+            ExpressionAttributeValues: {
+                ':pk': `USER#${username}`,
+                ':sk': 'CONNECTION#',
+            },
+            ProjectionExpression: 'connectionId',
+        },
+        false,
+    );
+
+    return connectionIds.map(res => res.connectionId);
 }
 
 module.exports = {
     getUser,
+    fetchConnectionIds,
 };

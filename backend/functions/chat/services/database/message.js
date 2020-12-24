@@ -1,92 +1,80 @@
-const { DynamoDB } = require('aws-sdk');
-const { getUserChatMetadata } = require('./chat');
+const { nanoid } = require('nanoid');
+const { fetchByPK, getByPK, insert, update } = require('./query');
 
-const docClient = new DynamoDB.DocumentClient();
-
-async function getMessages(chatId) {
-    const params = {
-        TableName: process.env.CHAT_TABLE,
-        KeyConditionExpression:
-            'chatId = :cId and begins_with(chatSortKey, :sk)',
-        ScanIndexForward: true,
+async function fetchMessages(chatId) {
+    const messages = await fetchByPK({
         ExpressionAttributeValues: {
-            ':cId': chatId,
+            ':pk': `CHAT#${chatId}`,
             ':sk': 'MESSAGE#',
         },
-    };
-    const { Items } = await docClient.query(params).promise();
-    return Items;
+        ScanIndexForward: true,
+    });
+    return messages.map(item => {
+        const { sortKey, ...message } = item;
+        const messageId = sortKey;
+        return {
+            messageId,
+            ...message,
+        };
+    });
 }
 
-async function addMessage(chatId, username, message, timestamp) {
-    const params = {
-        TableName: process.env.CHAT_TABLE,
-        Item: {
-            chatId,
-            chatSortKey: `MESSAGE#${timestamp}`,
-            username,
-            message,
-            timestamp,
-        },
+async function addMessage(chatId, username, message, createdAt, status) {
+    const payload = {
+        partitionKey: `CHAT#${chatId}`,
+        sortKey: `MESSAGE#${createdAt}#${nanoid(4)}`,
+        username,
+        message,
+        createdAt,
+        status,
     };
-
-    await docClient.put(params).promise();
+    await insert(payload);
+    return payload;
 }
 
 async function viewedMessages(chatId, username) {
-    const chat = await getUserChatMetadata(chatId, username);
-    const params = {
-        TableName: process.env.CHAT_TABLE,
+    await update({
         Key: {
-            chatId,
-            chatSortKey: chat.chatSortKey,
+            partitionKey: `CHAT#${chatId}`,
+            sortKey: `MEMBER#${username}`,
         },
         UpdateExpression: 'set newMessages = :nm',
         ExpressionAttributeValues: {
             ':nm': 0,
         },
-    };
-    await docClient.update(params).promise();
+    });
 }
 
-async function newMessages(chatId, username, timestamp) {
-    const chat = await getUserChatMetadata(chatId, username);
-    const params = {
-        TableName: process.env.CHAT_TABLE,
+async function newMessages(chatId, username, createdAt) {
+    await update({
         Key: {
-            chatId,
-            chatSortKey: chat.chatSortKey,
+            partitionKey: `CHAT#${chatId}`,
+            sortKey: `MEMBER#${username}`,
         },
         UpdateExpression:
-            'set newMessages = newMessages + :nm, newMessageTimestamp = :tp ',
+            'set newMessages = newMessages + :nm, createdAt = :ca ',
         ExpressionAttributeValues: {
             ':nm': 1,
-            ':tp': timestamp,
+            ':ca': createdAt,
         },
-    };
-    await docClient.update(params).promise();
+    });
 }
 
 async function getLastMessage(chatId) {
-    const params = {
-        TableName: process.env.CHAT_TABLE,
-        KeyConditionExpression:
-            'chatId = :cId and begins_with(chatSortKey, :sk)',
+    return getByPK({
         ScanIndexForward: false,
         ExpressionAttributeValues: {
-            ':cId': chatId,
+            ':pk': `CHAT#${chatId}`,
             ':sk': 'MESSAGE#',
         },
         Limit: 1,
-    };
-    const { Items } = await docClient.query(params).promise();
-    return Items[0] || {};
+    });
 }
 
 module.exports = {
-    getMessages,
+    fetchMessages,
+    getLastMessage,
     addMessage,
     viewedMessages,
     newMessages,
-    getLastMessage,
 };

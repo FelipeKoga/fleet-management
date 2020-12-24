@@ -3,6 +3,6 @@
     "resource": "/company/{companyId}/users/{username}/chats",
     "pathParameters": {
         "companyId": "1",
-        "username": "kosloski@email.com"
+        "username": "teste1@gmail.com"
     }
 }

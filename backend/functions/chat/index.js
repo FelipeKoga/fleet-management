@@ -13,14 +13,21 @@ async function handlePostMethod(resource, body, { username, chatId }) {
 
 async function handleGetMethod(resource, { username, chatId }) {
     const method = resource.split('/').pop();
-    if (method === 'chats') return Resolver.getAllChats(username);
+    let response = [];
+    if (method === 'chats') response = await Resolver.getAllChats(username);
 
-    if (method === 'messages') return Resolver.getMessages(chatId);
+    if (method === 'messages') response = await Resolver.getMessages(chatId);
 
-    throw new Error();
+    return JSON.stringify(response);
 }
 
-async function main({ httpMethod, resource, pathParameters, body }) {
+async function main({
+    httpMethod,
+    resource,
+    requestContext,
+    pathParameters,
+    body,
+}) {
     if (httpMethod) {
         switch (httpMethod) {
             case 'POST':
@@ -29,6 +36,21 @@ async function main({ httpMethod, resource, pathParameters, body }) {
                 return handleGetMethod(resource, pathParameters);
             default:
                 throw new Error('Method not allowed');
+        }
+    }
+
+    if (requestContext && body) {
+        const payload = JSON.parse(body);
+        const { routeKey } = requestContext;
+
+        const { username, chatId, message } = payload.data;
+
+        if (routeKey === 'open-messages') {
+            return Resolver.viewedMessages(chatId, username);
+        }
+
+        if (routeKey === 'send-message') {
+            return Resolver.addMessage(chatId, username, message);
         }
     }
 

@@ -1,10 +1,10 @@
 {
-  "requestContext": {
-    "routeKey": "open-chat"
-  },
-  "body": {
-    "data": {
-      "chatId": "1"
+    "requestContext": {
+        "routeKey": "viewed-messages"
+    },
+    "body": {
+        "data": {
+            "chatId": "f3ee5753-d525-48b2-ad3e-9fa34d0fc178"
+        }
     }
-  }
 }

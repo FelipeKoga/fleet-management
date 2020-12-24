@@ -1,123 +1,101 @@
-const { DynamoDB } = require('aws-sdk');
-const { v4 } = require('uuid');
+const { nanoid } = require('nanoid');
+const { fetchByPK, fetchBySK, getByPK, insert } = require('./query');
 
-const docClient = new DynamoDB.DocumentClient();
+async function fetchUserChats(username) {
+    return fetchBySK({
+        ExpressionAttributeValues: {
+            ':pk': 'CHAT#',
+            ':sk': `MEMBER#${username}`,
+        },
+    });
+}
 
-async function getUserChats(username) {
-    const params = {
-        TableName: process.env.CHAT_TABLE,
-        IndexName: 'chatSortKeyIndex',
-        KeyConditionExpression: 'chatSortKey = :csk',
-    };
-    const { Items } = await docClient
-        .query({
-            ...params,
-            ExpressionAttributeValues: {
-                ':csk': `MEMBER#${username}`,
-            },
-        })
-        .promise();
+async function getPrivateChat(username, withUsername) {
+    const userChatsMetadata = await fetchUserChats(username);
 
-    const chats = Items.sort((a, b) => {
-        if (a.messageTimestamp < b.messageTimestamp) return -1;
+    if (!userChatsMetadata) return null;
 
-        if (a.messageTimestamp > b.messageTimestamp) return 1;
-
-        return 0;
+    const promises = [];
+    userChatsMetadata.forEach(userChat => {
+        promises.push(
+            getByPK({
+                FilterExpression: 'contains(#private, :user)',
+                ExpressionAttributeNames: {
+                    '#private': 'private',
+                },
+                ExpressionAttributeValues: {
+                    ':pk': `CHAT#${userChat.id}`,
+                    ':sk': `CONFIG`,
+                    ':user': withUsername,
+                },
+            }),
+        );
     });
 
-    return chats;
+    const response = await Promise.all(promises);
+
+    const chat = response.find(res => res);
+
+    return chat ? chat.id : null;
 }
 
 async function getUserChatMetadata(chatId, username) {
-    const params = {
-        TableName: process.env.CHAT_TABLE,
-        KeyConditionExpression:
-            'chatId = :cId and begins_with(chatSortKey, :sk)',
+    return getByPK({
         ExpressionAttributeValues: {
-            ':cId': chatId,
+            ':pk': `CHAT#${chatId}`,
             ':sk': `MEMBER#${username}`,
         },
-    };
-    const { Items } = await docClient.query(params).promise();
-    return Items[0] || {};
+    });
 }
 
 async function addMember(chatId, username) {
-    const params = {
-        TableName: process.env.CHAT_TABLE,
-        Item: {
-            chatId,
-            chatSortKey: `MEMBER#${username}`,
-            newMessages: 0,
-        },
-    };
-    await docClient.put(params).promise();
+    await insert({
+        partitionKey: `CHAT#${chatId}`,
+        sortKey: `MEMBER#${username}`,
+        newMessages: 0,
+    });
 }
 
 async function createChat(args) {
-    const chatId = v4();
-    const params = {
-        TableName: process.env.CHAT_TABLE,
-        Item: {
-            chatId,
-            chatSortKey: `CONFIG`,
-            ...args,
-        },
-    };
-
-    await docClient.put(params).promise();
+    const chatId = nanoid();
+    await insert({
+        partitionKey: `CHAT#${chatId}`,
+        sortKey: `CONFIG`,
+        ...args,
+    });
     return chatId;
 }
 
-async function getChatUsers(chatId) {
-    const params = {
-        TableName: process.env.CHAT_TABLE,
-        KeyConditionExpression:
-            'chatId = :cId and begins_with(chatSortKey, :sk)',
+async function fetchChatUsers(chatId) {
+    const chatUsers = await fetchByPK({
         ExpressionAttributeValues: {
-            ':cId': chatId,
+            ':pk': `CHAT#${chatId}`,
             ':sk': 'MEMBER#',
         },
-    };
-    const { Items } = await docClient.query(params).promise();
-    return Items.map(item => {
-        return item.chatSortKey.split('#').pop();
+    });
+
+    return chatUsers.map(item => {
+        return item.sortKey;
     });
 }
 
 async function getChat(chatId) {
-    const params = {
-        TableName: process.env.CHAT_TABLE,
-        KeyConditionExpression:
-            'chatId = :cId AND begins_with(chatSortKey, :sk)',
+    const { sortKey, ...chat } = await getByPK({
         ExpressionAttributeValues: {
-            ':cId': chatId,
+            ':pk': `CHAT#${chatId}`,
             ':sk': 'CONFIG',
         },
-    };
-    const { Items } = await docClient.query(params).promise();
-    return Items[0];
-}
+    });
 
-async function getPrivateChats(username) {
-    const userChats = await getUserChats(username);
-    const chats = [];
-    await Promise.all(
-        userChats.map(async ({ chatId }) => {
-            chats.push(await getChat(chatId));
-        }),
-    );
-
-    return chats.filter(chat => chat.isPrivate);
+    return chat;
 }
 
 module.exports = {
-    getPrivateChats,
-    getChatUsers,
+    fetchChatUsers,
+    fetchUserChats,
+    getPrivateChat,
+    getUserChatMetadata,
+    getChat,
     createChat,
     addMember,
-    getUserChatMetadata,
-    getUserChats,
-    getChat,
 };

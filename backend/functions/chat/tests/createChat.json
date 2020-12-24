@@ -3,9 +3,9 @@
     "resource": "/company/{companyId}/users/{username}/chats",
     "pathParameters": {
         "companyId": "1",
-        "username": "kosloski@email.com"
+        "username": "teste2@gmail.com"
     },
     "body": {
-        "withUsername": "koga@koga.com"
+        "withUsername": "teste1@gmail.com"
     }
 }

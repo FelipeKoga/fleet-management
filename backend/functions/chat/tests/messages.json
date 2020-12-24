@@ -3,7 +3,7 @@
     "resource": "/company/{companyId}/users/{username}/chats/{chatId/messages",
     "pathParameters": {
         "companyId": "1",
-        "username": "kosloski@email.com",
-        "chatId": "9db8e6ec-aa9a-489c-9796-7710132ea5e3"
+        "username": "teste1@gmail.com",
+        "chatId": "YCNzfqYoL0NvQqIPit1Yb"
     }
 }
