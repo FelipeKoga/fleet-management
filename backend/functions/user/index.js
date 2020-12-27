@@ -29,6 +29,10 @@ exports.handler = async event => {
                     typeof body === 'string' ? JSON.parse(body) : body,
                 ),
             ),
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Credentials': true,
+            },
         };
     } catch (error) {
         return {
