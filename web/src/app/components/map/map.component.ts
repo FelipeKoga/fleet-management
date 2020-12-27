@@ -5,7 +5,7 @@ import { CoreService } from "src/app/services/core/core.service";
 import { Observable } from "rxjs";
 import { trigger, transition, style, animate } from "@angular/animations";
 import { ContactsService } from "src/app/services/core/contacts.service";
-import { Contact } from "src/app/interfaces/contact";
+import { Contact } from "src/app/interfaces/user";
 
 @Component({
   selector: "app-map",

@@ -1,5 +1,4 @@
 import { Injectable } from "@angular/core";
-import { Contact } from "src/app/interfaces/contact";
 
 @Injectable({
   providedIn: "root",
@@ -7,7 +6,7 @@ import { Contact } from "src/app/interfaces/contact";
 export class ContactsService {
   constructor() {}
 
-  public getContacts = (): Contact[] => {
+  public getContacts = () => {
     return [
       {
         name: "Usuário 1",

@@ -1,0 +1,51 @@
+<div class="container">
+  <div class="wrapper">
+    <p id="title">Bem-vindo!</p>
+    <p id="subtitle">Informe os dados abaixo para continuar:</p>
+    <form class="form" [formGroup]="authForm" (ngSubmit)="signIn()">
+      <mat-form-field appearance="outline">
+        <mat-label>Usuário</mat-label>
+        <input formControlName="username" matInput />
+        <mat-icon
+          [ngClass]="username.invalid && username.touched ? 'error' : 'icon'"
+          matSuffix
+          >person</mat-icon
+        >
+        <mat-error *ngIf="username.invalid">Campo é obrigatório.</mat-error>
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Senha</mat-label>
+        <input
+          matInput
+          formControlName="password"
+          [type]="isPasswordHidden ? 'password' : 'text'"
+        />
+        <mat-icon
+          (click)="togglePassword()"
+          [ngClass]="password.invalid && password.touched ? 'error' : 'icon'"
+          class="icon"
+          style="cursor: pointer"
+          matSuffix
+          >{{ isPasswordHidden ? "visibility_off" : "visibility" }}</mat-icon
+        >
+
+        <mat-error *ngIf="password.invalid">Campo é obrigatório.</mat-error>
+      </mat-form-field>
+      <mat-error style="font-size: 75%" *ngIf="errorMessage">{{
+        errorMessage
+      }}</mat-error>
+      <button
+        [disabled]="authForm.invalid"
+        mat-stroked-button
+        type="submit "
+        color="primary"
+        style="display: flex; justify-content: center; align-items: center"
+      >
+        <ng-container *ngIf="store.isLoading; else elseTemplate">
+          <mat-spinner style="margin: 2px" [diameter]="30"></mat-spinner>
+        </ng-container>
+        <ng-template #elseTemplate> Entrar </ng-template>
+      </button>
+    </form>
+  </div>
+</div>
