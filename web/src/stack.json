@@ -1,9 +1,9 @@
 {
-  "UserPoolClientId": "7v9bv1er5ckgmn0quptepbdjms",
-  "UserPoolId": "us-east-1_KVttzPJIM",
+  "UserPoolClientId": "4ssv3lk591ehbtcspheg30n6ot",
+  "UserPoolId": "us-east-1_qtIxjoqVD",
   "Region": "us-east-1",
-  "IdentityPoolId": "us-east-1:7bfeb24d-6a9e-4ab6-8783-7fb40af5705a",
-  "ServiceEndpoint": "https://1kcmfehg7j.execute-api.us-east-1.amazonaws.com/dev",
-  "ServiceEndpointWebsocket": "wss://a2xzjwkbb8.execute-api.us-east-1.amazonaws.com/dev",
-  "ServerlessDeploymentBucketName": "tcc-backend-dev-serverlessdeploymentbucket-1hrcoalyqzhet"
+  "IdentityPoolId": "us-east-1:37c2e9f4-7fac-4274-bd9e-747803cbbedb",
+  "ServiceEndpoint": "https://2p8b6trvua.execute-api.us-east-1.amazonaws.com/dev",
+  "ServiceEndpointWebsocket": "wss://ljdjapabh7.execute-api.us-east-1.amazonaws.com/dev",
+  "ServerlessDeploymentBucketName": "tcc-backend-dev-serverlessdeploymentbucket-q730t9xeco0a"
 }
