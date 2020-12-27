@@ -37,6 +37,7 @@ provider:
           Resource: '*'
 
 plugins:
+    - serverless-stack-output
     - aws-amplify-serverless-plugin
 custom:
     stage: ${opt:stage, self:provider.stage}
@@ -44,12 +45,10 @@ custom:
         - filename: ../app/app/src/main/res/raw/awsconfiguration.json
           type: native
           appClient: CognitoUserPoolClient
-        - filename: ../web/src/aws-exports.js
-          type: javascript
-          appClient: CognitoUserPoolClient
 
     table: ${self:app}-table-${self:custom.stage}
-
+    output:
+        file: ../web/src/stack.json
     apiUrl: !Join
         - ''
         - - 'https://'
