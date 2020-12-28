@@ -7,10 +7,31 @@ import { LoginComponent } from "./components/auth/login/login.component";
 import { AuthGuard } from "./services/auth/guards/auth-guard.service";
 
 const routes: Routes = [
-  { path: "login", component: LoginComponent },
-  { path: "messages", component: ChatComponent },
-  { path: "employees", component: EmployeesComponent },
-  { path: "map", component: MapComponent, canActivate: [AuthGuard] },
+  {
+    path: "",
+    children: [
+      {
+        path: "",
+        pathMatch: "full",
+        redirectTo: "/map",
+      },
+      { path: "map", component: MapComponent, canActivate: [AuthGuard] },
+      { path: "login", component: LoginComponent },
+      { path: "messages", component: ChatComponent, canActivate: [AuthGuard] },
+      {
+        path: "employees",
+        component: EmployeesComponent,
+        canActivate: [AuthGuard],
+      },
+    ],
+  },
+
+  {
+    path: "**",
+    pathMatch: "full",
+    redirectTo: "map",
+    canActivate: [AuthGuard],
+  },
 ];
 
 @NgModule({

@@ -5,7 +5,6 @@ import { CoreService } from "src/app/services/core/core.service";
 import { Observable } from "rxjs";
 import { trigger, transition, style, animate } from "@angular/animations";
 import { ContactsService } from "src/app/services/core/contacts.service";
-import { Contact } from "src/app/interfaces/user";
 
 @Component({
   selector: "app-map",
@@ -28,7 +27,7 @@ import { Contact } from "src/app/interfaces/user";
 export class MapComponent implements OnInit {
   public mapStyle: Array<any>;
   public showUserDetails: boolean = false;
-  private contacts: Contact[] = [];
+  private contacts = [];
   infoWindowOpened = null;
   previousInfoWindow = null;
   latitude = -25.4242909;
@@ -62,6 +61,7 @@ export class MapComponent implements OnInit {
   }
 
   ngOnInit() {
+    console.log("PAO");
     setTimeout(() => {
       console.log("ENTREI");
       const contact = {

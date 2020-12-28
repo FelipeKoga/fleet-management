@@ -1,5 +1,6 @@
 import { Component, OnInit } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
+import { Router } from "@angular/router";
 import {
   AuthService,
   AuthServiceStore,
@@ -19,7 +20,8 @@ export class LoginComponent implements OnInit {
 
   constructor(
     private authService: AuthService,
-    private formBuilder: FormBuilder
+    private formBuilder: FormBuilder,
+    private router: Router
   ) {
     this.authForm = this.formBuilder.group({
       username: ["", Validators.required],
@@ -31,7 +33,12 @@ export class LoginComponent implements OnInit {
     this.authService.authStore().subscribe((authStore) => {
       this.store = authStore;
       this.errorMessage = "";
-      const { errorCode } = authStore;
+      const { errorCode, isLoggedIn } = authStore;
+
+      if (isLoggedIn) {
+        this.router.navigate(["/map"]);
+      }
+
       if (errorCode) {
         if (errorCode === "NotAuthorizedException") {
           this.errorMessage = "Usuário e/ou senha incorretos.";

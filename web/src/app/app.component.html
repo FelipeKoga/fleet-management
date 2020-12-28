@@ -1,3 +1,70 @@
 <!-- <app-navigation (themeSwitched)="switchMode($event)"></app-navigation> -->
 
-<router-outlet></router-outlet>
+<ng-container *ngIf="isAppLoading; else elseTemplate">
+  <div class="splash-screen">
+    <mat-spinner [diameter]="30"></mat-spinner>
+  </div>
+</ng-container>
+<ng-template #elseTemplate>
+  <div class="container">
+    <div class="sidenav" *ngIf="isLoggedIn">
+      <div class="header">
+        <span class="title">Koga Transportes </span>
+      </div>
+      <ul class="list">
+        <li class="item" [routerLink]="['/map']" routerLinkActive="itemActive">
+          <mat-icon>map</mat-icon>
+          <span>Monitoramento</span>
+        </li>
+        <li
+          class="item"
+          [routerLink]="['/messages']"
+          routerLinkActive="itemActive"
+        >
+          <mat-icon>messages</mat-icon>
+          <span>Mensagens</span>
+        </li>
+        <li
+          class="item"
+          [routerLink]="['/employees']"
+          routerLinkActive="itemActive"
+        >
+          <mat-icon>group</mat-icon>
+          <span>Funcionários</span>
+        </li>
+      </ul>
+      <div [matMenuTriggerFor]="menu" class="footer">
+        <mat-divider style="margin-bottom: 8px"></mat-divider>
+        <div class="user-wrapper">
+          <img class="user-photo" src="" />
+          <div class="user-details">
+            <div class="user-name">Felipe Kosloski Koga</div>
+            <div class="user-role">Gestor</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="main">
+      <router-outlet></router-outlet>
+    </div>
+  </div>
+</ng-template>
+
+<mat-menu #menu="matMenu">
+  <button style="background-color: #fafafa; color: #32cd32" mat-menu-item>
+    <mat-icon>check_circle_outline</mat-icon>
+    <span>Online</span>
+  </button>
+  <button style="background-color: #fafafa" mat-menu-item>
+    <mat-icon>person</mat-icon>
+    <span>Perfil</span>
+  </button>
+  <button style="background-color: #fafafa" mat-menu-item>
+    <mat-icon>notifications_off</mat-icon>
+    <span>Desabilitar notificações</span>
+  </button>
+  <button (click)="signOut()" style="background-color: #fafafa" mat-menu-item>
+    <mat-icon>power_settings_new</mat-icon>
+    <span>Sair</span>
+  </button>
+</mat-menu>

@@ -37,7 +37,7 @@
       <button
         [disabled]="authForm.invalid"
         mat-stroked-button
-        type="submit "
+        type="submit"
         color="primary"
         style="display: flex; justify-content: center; align-items: center"
       >
@@ -45,6 +45,9 @@
           <mat-spinner style="margin: 2px" [diameter]="30"></mat-spinner>
         </ng-container>
         <ng-template #elseTemplate> Entrar </ng-template>
+      </button>
+      <button style="margin-top: 24px" mat-button color="primary">
+        Esqueçeu sua senha?
       </button>
     </form>
   </div>

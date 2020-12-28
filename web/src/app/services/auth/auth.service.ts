@@ -25,7 +25,10 @@ export class AuthService {
 
   constructor(private http: HttpClient) {}
 
-  public async getUser(username: string, companyId: string): Promise<void> {
+  public async getUserFromRemote(
+    username: string,
+    companyId: string
+  ): Promise<void> {
     const currentUser = await this.http
       .get<User>(`${ServiceEndpoint}/company/${companyId}/users/${username}`)
       .toPromise();
@@ -37,18 +40,8 @@ export class AuthService {
     this.subAuthStore.next({ isLoading: true, isLoggedIn: false });
     try {
       await Auth.signIn(username, password);
-      const cognitoUser = await Auth.currentAuthenticatedUser();
-      const token = await Auth.currentSession();
-      this.authToken = token.getIdToken().getJwtToken();
-      const companyId = cognitoUser.attributes["custom:companyId"];
-      this.subAuthStore.next({
-        isLoading: false,
-        isLoggedIn: true,
-      });
-
-      await this.getUser(cognitoUser.username, companyId);
+      await this.getCurrentUser();
     } catch (e) {
-      console.log(e);
       this.subAuthStore.next({
         isLoading: false,
         errorCode: e.code,
@@ -56,12 +49,28 @@ export class AuthService {
     }
   }
 
-  public isAuthenticated(): boolean {
-    return this.subAuthStore.getValue().isLoggedIn;
+  public async getCurrentUser(): Promise<void> {
+    try {
+      this.subAuthStore.next({ isLoading: true });
+      const cognitoUser = await Auth.currentAuthenticatedUser();
+      const token = await Auth.currentSession();
+      this.authToken = token.getIdToken().getJwtToken();
+      const companyId = cognitoUser.attributes["custom:companyId"];
+      await this.getUserFromRemote(cognitoUser.username, companyId);
+      this.subAuthStore.next({
+        isLoading: false,
+        isLoggedIn: true,
+      });
+    } catch {
+      this.subAuthStore.next({
+        isLoading: false,
+        isLoggedIn: false,
+      });
+    }
   }
 
-  public signOut() {
-    Auth.signOut();
+  public async signOut() {
+    await Auth.signOut();
     this.authToken = "";
     this.subAuthStore.next({ user: null });
   }

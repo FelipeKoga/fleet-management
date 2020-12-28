@@ -4,7 +4,6 @@ import { NgModule } from "@angular/core";
 import { AppComponent } from "./app.component";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { MaterialModule } from "./material.module";
-import { NavigationComponent } from "./components/navigation/navigation.component";
 import { LayoutModule } from "@angular/cdk/layout";
 import { AppRoutingModule } from "./app-routing.module";
 import { MapComponent } from "./components/map/map.component";
@@ -19,12 +18,12 @@ import { getDutchPaginatorIntl } from "./utils/getPortuguesePaginatorIntl";
 import { LoginComponent } from "./components/auth/login/login.component";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { AuthInterceptor } from "./services/auth/interceptor/auth.interceptor";
-import { ForgotPasswordComponent } from './components/auth/forgot-password/forgot-password.component';
+import { ForgotPasswordComponent } from "./components/auth/forgot-password/forgot-password.component";
+import { AuthGuard } from "./services/auth/guards/auth-guard.service";
 
 @NgModule({
   declarations: [
     AppComponent,
-    NavigationComponent,
     MapComponent,
     ChatComponent,
     EmployeesComponent,
@@ -47,6 +46,7 @@ import { ForgotPasswordComponent } from './components/auth/forgot-password/forgo
     AgmDirectionModule,
   ],
   providers: [
+    AuthGuard,
     { provide: MatPaginatorIntl, useValue: getDutchPaginatorIntl() },
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
   ],
