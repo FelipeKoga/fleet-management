@@ -135,3 +135,31 @@ ul {
   box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.2), 0 4px 5px 0 rgba(0, 0, 0, 0.14),
     0 1px 10px 0 rgba(0, 0, 0, 0.12);
 }
+
+.main-container {
+  height: 100vh;
+  width: 100%;
+  background-image: linear-gradient(
+    to bottom right,
+    $color-primary,
+    $color-dark
+  );
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.snackbar-success {
+  background-color: $color-success;
+  color: white;
+}
+
+.snackbar-error {
+  background-color: $color-error;
+  color: white;
+}
+
+.snackbar-info {
+  background-color: $color-info;
+  color: white;
+}

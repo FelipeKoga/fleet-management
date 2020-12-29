@@ -5,6 +5,7 @@ import { ChatComponent } from "./components/chat/chat.component";
 import { EmployeesComponent } from "./components/employees/employees.component";
 import { LoginComponent } from "./components/auth/login/login.component";
 import { AuthGuard } from "./services/auth/guards/auth-guard.service";
+import { ForgotPasswordComponent } from "./components/auth/forgot-password/forgot-password.component";
 
 const routes: Routes = [
   {
@@ -17,6 +18,7 @@ const routes: Routes = [
       },
       { path: "map", component: MapComponent, canActivate: [AuthGuard] },
       { path: "login", component: LoginComponent },
+      { path: "forgot-password", component: ForgotPasswordComponent },
       { path: "messages", component: ChatComponent, canActivate: [AuthGuard] },
       {
         path: "employees",

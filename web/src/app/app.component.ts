@@ -19,9 +19,9 @@ export class AppComponent implements OnInit {
     this.authService.authStore().subscribe((store) => {
       this.isAppLoading = false;
       this.isLoggedIn = store.isLoggedIn;
-      if (!store.isLoggedIn && !store.isLoading) {
-        this.router.navigate(["/login"]);
-      }
+      // if (!store.isLoggedIn && !store.isLoading) {
+      //   this.router.navigate(["/login"]);
+      // }
     });
   }
   public async signOut() {

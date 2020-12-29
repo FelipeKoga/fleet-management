@@ -56,6 +56,10 @@ export class LoginComponent implements OnInit {
     this.isPasswordHidden = !this.isPasswordHidden;
   }
 
+  public redirectToForgotPassword() {
+    this.router.navigate(["/forgot-password"]);
+  }
+
   get password() {
     return this.authForm.get("password");
   }

@@ -32,40 +32,55 @@ export class AuthService {
     const currentUser = await this.http
       .get<User>(`${ServiceEndpoint}/company/${companyId}/users/${username}`)
       .toPromise();
-    console.log(currentUser);
-    this.subAuthStore.next({ isLoggedIn: true, user: currentUser });
+    this.setStoreValue({ isLoggedIn: true, user: currentUser });
   }
 
   public async signIn(username: string, password: string): Promise<void> {
-    this.subAuthStore.next({ isLoading: true, isLoggedIn: false });
+    this.setStoreValue({ isLoading: true, isLoggedIn: false });
     try {
       await Auth.signIn(username, password);
       await this.getCurrentUser();
     } catch (e) {
-      this.subAuthStore.next({
-        isLoading: false,
-        errorCode: e.code,
-      });
+      this.setStoreValue({ isLoading: false, errorCode: e.code });
     }
   }
 
   public async getCurrentUser(): Promise<void> {
     try {
+      this.setStoreValue({ isLoading: true });
       this.subAuthStore.next({ isLoading: true });
       const cognitoUser = await Auth.currentAuthenticatedUser();
       const token = await Auth.currentSession();
       this.authToken = token.getIdToken().getJwtToken();
       const companyId = cognitoUser.attributes["custom:companyId"];
       await this.getUserFromRemote(cognitoUser.username, companyId);
-      this.subAuthStore.next({
-        isLoading: false,
-        isLoggedIn: true,
-      });
+      this.setStoreValue({ isLoading: false, isLoggedIn: true });
     } catch {
-      this.subAuthStore.next({
-        isLoading: false,
-        isLoggedIn: false,
-      });
+      this.setStoreValue({ isLoading: false, isLoggedIn: false });
+    }
+  }
+
+  public async sendVerificationCode(username: string) {
+    try {
+      this.setStoreValue({ isLoading: true, errorCode: "" });
+      await Auth.forgotPassword(username);
+      this.setStoreValue({ isLoading: false });
+    } catch (e) {
+      this.setStoreValue({ isLoading: false, errorCode: e.code });
+    }
+  }
+
+  public async changePassword(
+    username: string,
+    code: string,
+    password: string
+  ) {
+    try {
+      this.setStoreValue({ isLoading: true, errorCode: "" });
+      await Auth.forgotPasswordSubmit(username, code, password);
+      this.setStoreValue({ isLoading: false });
+    } catch (e) {
+      this.setStoreValue({ isLoading: false, errorCode: e.code });
     }
   }
 
@@ -81,5 +96,13 @@ export class AuthService {
 
   public authStore(): Observable<AuthServiceStore> {
     return this.subAuthStore.asObservable();
+  }
+
+  private setStoreValue(store: AuthServiceStore) {
+    const value = { ...this.subAuthStore.getValue() };
+    this.subAuthStore.next({
+      ...value,
+      ...store,
+    });
   }
 }

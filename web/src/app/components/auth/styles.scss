@@ -1,0 +1,45 @@
+@import "../../variables";
+
+.wrapper {
+  background-color: $background-color;
+  border-radius: 12px;
+  padding: 32px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+#title {
+  font-size: 28px;
+  font-weight: 500;
+  color: $color-primary;
+  margin-bottom: 32px;
+}
+
+#subtitle {
+  font-size: 20px;
+  margin-bottom: 24px;
+}
+
+.icon {
+  color: $color-primary;
+  cursor: pointer;
+}
+
+.error {
+  color: $color-error;
+}
+
+.error-message {
+  font-size: 75%;
+}
+
+.actions {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  margin-top: 24px;
+}
