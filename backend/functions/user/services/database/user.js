@@ -46,7 +46,7 @@ async function createUser(data, companyId) {
 }
 
 async function updateUser(
-    { customName, phone, email, role, status },
+    { customName, name, phone, email, role, status },
     username,
     companyId,
 ) {
@@ -56,10 +56,11 @@ async function updateUser(
             sortKey: `CONFIG#${companyId}`,
         },
         UpdateExpression:
-            'set customName = :customName, phone = :phone, email = :email, #role = :role, #status = :status',
+            'set customName = :customName, phone = :phone, email = :email, #role = :role, #status = :status, #name = :name',
         ExpressionAttributeNames: {
             '#status': 'status',
             '#role': 'role',
+            '#name': 'name',
         },
         ExpressionAttributeValues: {
             ':customName': customName,
@@ -67,6 +68,7 @@ async function updateUser(
             ':email': email,
             ':role': role,
             ':status': status,
+            ':name': name,
         },
     });
 }

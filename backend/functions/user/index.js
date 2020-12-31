@@ -1,5 +1,10 @@
 const Resolvers = require('./resolvers');
 
+const headers = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Credentials': true,
+};
+
 async function main(method, { username, companyId }, body) {
     switch (method) {
         case 'GET':
@@ -17,10 +22,11 @@ async function main(method, { username, companyId }, body) {
 }
 
 exports.handler = async event => {
+    console.log(event);
     const { body, pathParameters, httpMethod } = event;
 
     try {
-        return {
+        const response = {
             statusCode: 200,
             body: JSON.stringify(
                 await main(
@@ -29,15 +35,19 @@ exports.handler = async event => {
                     typeof body === 'string' ? JSON.parse(body) : body,
                 ),
             ),
-            headers: {
-                'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Credentials': true,
-            },
+            headers,
         };
+
+        console.log(response);
+        return response;
     } catch (error) {
+        console.log(error);
+        console.log(error.name);
         return {
             statusCode: 500,
-            body: JSON.stringify(error.message),
+            errorType: error.name,
+            errorMessage: error.message,
+            headers,
         };
     }
 };

@@ -1,5 +1,17 @@
 const { Cognito, Database, Lambda } = require('../services');
 
+const generateRandomString = length => {
+    const characters =
+        'abcdefghijklmnopqrstuvwxyz123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    let randomPassword = '';
+    for (let i = 0; i <= length; i += 1) {
+        randomPassword += characters.charAt(
+            Math.floor(Math.random() * characters.length),
+        );
+    }
+    return randomPassword;
+};
+
 async function postMessage(user, action) {
     try {
         const connectionIds = await Database.connection.fetchCompanyConnectionIDs(
@@ -22,9 +34,11 @@ async function list(companyId) {
 }
 
 async function create(data, companyId) {
-    await Cognito.create(data, companyId);
-    await Database.user.createUser(data, companyId);
-    const user = await Database.user.getUser(data.email, companyId);
+    const password = generateRandomString(8);
+    const newUser = { ...data, password };
+    await Cognito.create(newUser, companyId);
+    await Database.user.createUser(newUser, companyId);
+    const user = await Database.user.getUser(newUser.email, companyId);
     await postMessage(user, 'user_created');
     return user;
 }
