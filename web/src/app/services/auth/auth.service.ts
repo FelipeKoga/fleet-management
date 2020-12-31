@@ -2,10 +2,9 @@ import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { Auth } from "aws-amplify";
 import { BehaviorSubject, Observable } from "rxjs";
+import { User } from "src/app/models/user";
 
 import { ServiceEndpoint } from "../../../stack.json";
-
-import { User } from "../../interfaces/user";
 
 export interface AuthServiceStore {
   user?: User;
@@ -96,6 +95,10 @@ export class AuthService {
 
   public authStore(): Observable<AuthServiceStore> {
     return this.subAuthStore.asObservable();
+  }
+
+  public getUser(): User {
+    return this.subAuthStore.getValue().user;
   }
 
   private setStoreValue(store: AuthServiceStore) {

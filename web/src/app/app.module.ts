@@ -20,6 +20,8 @@ import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { AuthInterceptor } from "./services/auth/interceptor/auth.interceptor";
 import { ForgotPasswordComponent } from "./components/auth/forgot-password/forgot-password.component";
 import { AuthGuard } from "./services/auth/guards/auth-guard.service";
+import { UsersComponent } from "./components/users/users.component";
+import { FormDialogComponent } from "./components/users/form-dialog/form-dialog.component";
 
 @NgModule({
   declarations: [
@@ -30,14 +32,16 @@ import { AuthGuard } from "./services/auth/guards/auth-guard.service";
     MapBottomSheetComponent,
     LoginComponent,
     ForgotPasswordComponent,
+    UsersComponent,
+    FormDialogComponent,
   ],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
     ReactiveFormsModule,
     FormsModule,
-    MaterialModule,
     LayoutModule,
+    MaterialModule,
     AppRoutingModule,
     HttpClientModule,
     AgmCoreModule.forRoot({

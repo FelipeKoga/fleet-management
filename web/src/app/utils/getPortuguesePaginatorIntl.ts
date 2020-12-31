@@ -24,6 +24,8 @@ export function getDutchPaginatorIntl() {
   paginatorIntl.itemsPerPageLabel = "Itens por página:";
   paginatorIntl.nextPageLabel = "Próxima página";
   paginatorIntl.previousPageLabel = "Voltar página";
+  paginatorIntl.lastPageLabel = "Última página";
+  paginatorIntl.firstPageLabel = "Primeira página";
   paginatorIntl.getRangeLabel = ptBrRangeLabel;
 
   return paginatorIntl;

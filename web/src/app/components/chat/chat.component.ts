@@ -3,12 +3,8 @@ import {
   OnInit,
   ViewChild,
   ElementRef,
-  ViewChildren,
-  QueryList,
 } from "@angular/core";
-import { Route } from "@angular/compiler/src/core";
-import { Router, ActivatedRoute } from "@angular/router";
-import { map } from "rxjs/operators";
+import { ActivatedRoute } from "@angular/router";
 import { ContactsService } from "src/app/services/core/contacts.service";
 import { MatBottomSheet } from "@angular/material/bottom-sheet";
 import { MapBottomSheetComponent } from "../map/map-bottom-sheet/map-bottom-sheet.component";
@@ -24,35 +20,11 @@ export class ChatComponent implements OnInit {
   public uuid = 0;
   public messages = [
     {
-      message: `          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec varius
-    tincidunt iaculis. Nunc erat massa, venenatis at ex sit amet, pulvinar
-    suscipit orci. In id dui efficitur, dictum tortor ut, mattis neque.
-    Nam pellentesque blandit tortor. Aenean viverra lobortis rhoncus.
-    Etiam convallis bibendum magna dapibus lacinia. Pellentesque ac felis
-    eu enim mattis fringilla. Pellentesque hendrerit suscipit nulla, id
-    iaculis nunc tempus pharetra. Vivamus pharetra euismod neque, accumsan
-    fermentum nunc fringilla sit amet. Cras ut tellus a massa pretium
-    gravida eget ac ante. Nulla cursus non lectus sed commodo. Suspendisse
-    tincidunt rhoncus risus, id facilisis libero accumsan et. Etiam vitae
-    risus convallis, malesuada risus et, scelerisque nunc. Integer
-    vehicula nec risus sit amet lacinia. Ut ultrices leo ligula, in
-    fringilla leo feugiat at.`,
+      message: ``,
       uuid: 1,
     },
     {
-      message: `          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec varius
-    tincidunt iaculis. Nunc erat massa, venenatis at ex sit amet, pulvinar
-    suscipit orci. In id dui efficitur, dictum tortor ut, mattis neque.
-    Nam pellentesque blandit tortor. Aenean viverra lobortis rhoncus.
-    Etiam convallis bibendum magna dapibus lacinia. Pellentesque ac felis
-    eu enim mattis fringilla. Pellentesque hendrerit suscipit nulla, id
-    iaculis nunc tempus pharetra. Vivamus pharetra euismod neque, accumsan
-    fermentum nunc fringilla sit amet. Cras ut tellus a massa pretium
-    gravida eget ac ante. Nulla cursus non lectus sed commodo. Suspendisse
-    tincidunt rhoncus risus, id facilisis libero accumsan et. Etiam vitae
-    risus convallis, malesuada risus et, scelerisque nunc. Integer
-    vehicula nec risus sit amet lacinia. Ut ultrices leo ligula, in
-    fringilla leo feugiat at.`,
+      message: ``,
       uuid: 2,
     },
   ];

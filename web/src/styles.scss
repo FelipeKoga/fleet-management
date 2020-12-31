@@ -74,14 +74,7 @@ $web-warn: mat-palette($warn);
 
 $web-theme-dark: mat-dark-theme($web-primary, $web-accent, $web-warn);
 $web-theme-ligth: mat-light-theme($web-primary, $web-accent, $web-warn);
-
-.theme-dark {
-  @include angular-material-theme($web-theme-dark);
-}
-
-.theme-light {
-  @include angular-material-theme($web-theme-ligth);
-}
+@include angular-material-theme($web-theme-ligth);
 
 html,
 body {

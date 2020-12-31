@@ -1,0 +1,77 @@
+<div class="container">
+  <div class="header">
+    <div style="width: 100%">Funcionários</div>
+    <div class="search-wrapper">
+      <input
+        (keyup)="applyFilter($event)"
+        class="search-input"
+        placeholder="Pesquise um funcionário"
+      />
+      <mat-icon color="primary">search</mat-icon>
+    </div>
+  </div>
+  <table mat-table [dataSource]="dataSource">
+    <ng-container matColumnDef="name" style="width: 100%">
+      <th mat-header-cell *matHeaderCellDef>Nome</th>
+      <td mat-cell *matCellDef="let element">{{ element.name }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="email" style="width: 30%">
+      <th mat-header-cell *matHeaderCellDef>E-mail</th>
+      <td mat-cell *matCellDef="let element">{{ element.email }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="phone">
+      <th mat-header-cell *matHeaderCellDef>Telefone</th>
+      <td mat-cell *matCellDef="let element">
+        {{ element.phone }}
+      </td>
+    </ng-container>
+    <ng-container matColumnDef="role">
+      <th mat-header-cell *matHeaderCellDef>Cargo</th>
+      <td mat-cell *matCellDef="let element">
+        <span [ngSwitch]="element.role">
+          <p style="margin: auto" *ngSwitchCase="'ADMIN'">Administrador</p>
+          <p style="margin: auto" *ngSwitchCase="'OPERATOR'">Operador</p>
+          <p style="margin: auto" *ngSwitchDefault>Funcionário</p>
+        </span>
+      </td>
+    </ng-container>
+    <ng-container matColumnDef="actions">
+      <th style="width: 10%" mat-header-cell *matHeaderCellDef>
+        <button (click)="openInsert()" mat-icon-button color="primary">
+          <mat-icon>add</mat-icon>
+        </button>
+      </th>
+      <td mat-cell *matCellDef="let element">
+        <button
+          (click)="selectedUser = element"
+          [matMenuTriggerFor]="menu"
+          mat-icon-button
+        >
+          <mat-icon>more_vert</mat-icon>
+        </button>
+      </td>
+    </ng-container>
+    <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
+    <tr mat-row *matRowDef="let row; columns: columnsToDisplay"></tr>
+  </table>
+  <mat-spinner
+    color="primary"
+    style="margin: auto; margin-top: 42px"
+    *ngIf="(state$ | async).isLoading && !dataSource.data.length"
+    [diameter]="30"
+  ></mat-spinner>
+  <mat-paginator [pageSizeOptions]="[25]" showFirstLastButtons></mat-paginator>
+
+  <mat-menu #menu="matMenu">
+    <button (click)="openUpdate()" style="background-color: #fff" mat-menu-item>
+      <mat-icon>edit</mat-icon>
+      <span>Editar</span>
+    </button>
+    <button (click)="openDelete()" style="background-color: #fff" mat-menu-item>
+      <mat-icon>delete</mat-icon>
+      <span>Excluir</span>
+    </button>
+  </mat-menu>
+</div>
