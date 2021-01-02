@@ -27,7 +27,7 @@ async function getAllChats(username) {
         }),
     );
 
-    return Promise.all(
+    const response = await Promise.all(
         chats.map(async chat => {
             if (chat.private) {
                 const users = await Database.chat.fetchChatUsers(chat.id);
@@ -37,6 +37,14 @@ async function getAllChats(username) {
             return getChat(chat.id);
         }),
     );
+
+    return response.sort((a, b) => {
+        if (!a.lastMessage) return 1;
+
+        if (a.lastMessage && !b.lastMessage) return -1;
+
+        return b.lastMessage.createdAt - a.lastMessage.createdAt;
+    });
 }
 
 async function createChat(username, withUsername) {
