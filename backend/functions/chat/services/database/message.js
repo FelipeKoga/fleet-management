@@ -48,13 +48,14 @@ async function addMessage({
     };
     await insert(payload);
 
-    const { sortKey, ...newMessage } = await getMessage(
+    const { sortKey, id, ...newMessage } = await getMessage(
         payload.partitionKey,
         payload.sortKey,
     );
 
     return {
         ...newMessage,
+        chatId: id,
         messageId: sortKey,
     };
 }
