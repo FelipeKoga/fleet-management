@@ -1,0 +1,61 @@
+<div class="chat-container">
+  <div class="chat-list">
+    <div class="chat-header">
+      <span class="chat-header-text">Chats</span>
+    </div>
+    <div class="chat-header-actions">
+      <button color="primary" mat-button>
+        <mat-icon>chat</mat-icon>
+        Novo chat
+      </button>
+      <button color="primary" mat-button>
+        <mat-icon>group</mat-icon>
+        Novo grupo
+      </button>
+    </div>
+    <div class="chat-header-filter">
+      <input
+        class="chat-header-filter-input"
+        placeholder="Pesquisa por nome do funcionário ou grupo"
+      />
+      <mat-icon style="padding: 12px" color="primary">search</mat-icon>
+    </div>
+    <div class="chat-list-container">
+      <div class="chat-list-wrapper">
+        <mat-card
+          (click)="openChat(chat)"
+          [ngClass]="
+            selectedChat.id === chat.id
+              ? 'chat-item-card-active'
+              : 'chat-item-card'
+          "
+          *ngFor="let chat of chats"
+          class="chat-item-card"
+        >
+          <div class="chat-item-wrapper">
+            <div mat-card-avatar class="photo">
+              <img [src]="chat.photo" />
+            </div>
+            <div class="chat-item-content">
+              <div class="chat-item-name">
+                <span *ngIf="chat.private">{{ chat.user.name }}</span>
+                <span *ngIf="chat.groupName">{{ chat.groupName }} </span>
+              </div>
+              <div *ngIf="chat.lastMessage" class="chat-item-message-content">
+                <div class="chat-item-message-text">
+                  {{ chat.lastMessage.message }}
+                </div>
+                <div class="chat-item-message-date-text">
+                  {{ convertMessageDate(chat.lastMessage.createdAt) }}
+                </div>
+              </div>
+            </div>
+          </div>
+        </mat-card>
+      </div>
+    </div>
+  </div>
+  <div *ngIf="selectedChat.id">
+    <app-chat [chat]="selectedChat"></app-chat>
+  </div>
+</div>

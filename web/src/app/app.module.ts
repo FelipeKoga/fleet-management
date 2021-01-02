@@ -9,9 +9,7 @@ import { AppRoutingModule } from "./app-routing.module";
 import { MapComponent } from "./components/map/map.component";
 import { AgmCoreModule } from "@agm/core";
 import { AgmDirectionModule } from "agm-direction";
-import { ChatComponent } from "./components/chat/chat.component";
 import { HttpClientModule, HTTP_INTERCEPTORS } from "@angular/common/http";
-import { EmployeesComponent } from "./components/employees/employees.component";
 import { MapBottomSheetComponent } from "./components/map/map-bottom-sheet/map-bottom-sheet.component";
 import { MatPaginatorIntl } from "@angular/material/paginator";
 import { getDutchPaginatorIntl } from "./utils/getPortuguesePaginatorIntl";
@@ -22,13 +20,12 @@ import { ForgotPasswordComponent } from "./components/auth/forgot-password/forgo
 import { AuthGuard } from "./services/auth/guards/auth-guard.service";
 import { UsersComponent } from "./components/users/users.component";
 import { FormDialogComponent } from "./components/users/form-dialog/form-dialog.component";
+import { ChatsModule } from "./components/chats/chats.module";
 
 @NgModule({
   declarations: [
     AppComponent,
     MapComponent,
-    ChatComponent,
-    EmployeesComponent,
     MapBottomSheetComponent,
     LoginComponent,
     ForgotPasswordComponent,
@@ -41,6 +38,7 @@ import { FormDialogComponent } from "./components/users/form-dialog/form-dialog.
     ReactiveFormsModule,
     FormsModule,
     LayoutModule,
+    ChatsModule,
     MaterialModule,
     AppRoutingModule,
     HttpClientModule,

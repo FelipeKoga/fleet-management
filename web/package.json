@@ -24,6 +24,7 @@
     "@angular/router": "~11.0.5",
     "agm-direction": "^0.8.0",
     "aws-amplify": "^3.3.13",
+    "date-fns": "^2.16.1",
     "rxjs": "^6.6.3",
     "tslib": "^2.0.0",
     "zone.js": "~0.10.3"

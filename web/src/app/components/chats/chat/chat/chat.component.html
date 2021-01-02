@@ -1,0 +1,68 @@
+<div class="chat-container">
+  <div class="toolbar">
+    <img class="user-photo" src="" />
+    <div style="display: flex; flex-direction: column">
+      <span class="user-name" *ngIf="chat.user">{{ chat.user.name }}</span>
+      <span class="user-name" *ngIf="chat.groupName">{{ chat.groupName }}</span>
+
+      <div *ngIf="chat.private" class="status-wrapper">
+        <span class="status-color"></span>
+        <span class="status-text"> {{ chat.user.status }} </span>
+      </div>
+    </div>
+
+    <button mat-mini-fab (click)="openBottomSheetMap()" color="primary">
+      <mat-icon>map</mat-icon>
+    </button>
+  </div>
+  <mat-divider></mat-divider>
+  <div #content class="messages-container">
+    <div class="messages-list" #messageList>
+      <div *ngFor="let message of messages">
+        <div class="message-row sender" *ngIf="message.username === username">
+          <div class="message-text">
+            {{ message.message }}
+
+            <div class="message-timestamp">12:14</div>
+          </div>
+        </div>
+        <div
+          class="message-row recipient"
+          *ngIf="message.username !== username"
+        >
+          <div class="message-text">
+            {{ message.message }}
+
+            <div class="message-timestamp">12:14</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <mat-divider></mat-divider>
+    <div class="messages-action-container">
+      <input
+        #sendInput
+        class="messages-action-input"
+        (keydown.enter)="sendMessage($event.target.value)"
+        placeholder="Digite uma mensagem"
+      />
+
+      <!-- <mat-form-field
+          style="width: 90%; padding-right: 8px; padding-left: 8px;"
+        >
+          <mat-label>Digite uma mensagem...</mat-label>
+          <input
+            matInput
+            (keydown.enter)="sendMessage($event.target.value)"
+            autocomplete="off"
+          />
+        </mat-form-field> -->
+      <button mat-icon-button style="color: gray">
+        <mat-icon>attach_file</mat-icon>
+      </button>
+      <button mat-icon-button style="color: gray">
+        <mat-icon>mic</mat-icon>
+      </button>
+    </div>
+  </div>
+</div>
