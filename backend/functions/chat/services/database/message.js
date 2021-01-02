@@ -19,17 +19,35 @@ async function fetchMessages(chatId) {
     });
 }
 
+async function getMessage(partitionKey, sortKey) {
+    return getByPK({
+        ExpressionAttributeValues: {
+            ':pk': partitionKey,
+            ':sk': sortKey,
+        },
+    });
+}
+
 async function addMessage(chatId, username, message, createdAt, status) {
     const payload = {
         partitionKey: `CHAT#${chatId}`,
-        sortKey: `MESSAGE#${createdAt}#${nanoid(4)}`,
+        sortKey: `MESSAGE#${createdAt}#${nanoid()}`,
         username,
         message,
         createdAt,
         status,
     };
     await insert(payload);
-    return payload;
+
+    const { sortKey, ...newMessage } = await getMessage(
+        payload.partitionKey,
+        payload.sortKey,
+    );
+
+    return {
+        ...newMessage,
+        messageId: sortKey,
+    };
 }
 
 async function viewedMessages(chatId, username) {

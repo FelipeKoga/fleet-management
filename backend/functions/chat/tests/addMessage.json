@@ -3,10 +3,10 @@
     "resource": "/company/{companyId}/users/{username}/chats/{chatId}/messages",
     "pathParameters": {
         "companyId": "1",
-        "username": "teste1@gmail.com",
-        "chatId": "YCNzfqYoL0NvQqIPit1Yb"
+        "username": "kosloski.fkoga@gmail.com",
+        "chatId": "GEsCoZjHnh4ArTKWYVHso"
     },
     "body": {
-        "message": "Olá 1"
+        "message": "Olá 2"
     }
 }

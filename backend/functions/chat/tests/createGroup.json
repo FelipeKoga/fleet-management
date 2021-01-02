@@ -3,11 +3,11 @@
     "resource": "/company/{companyId}/users/{username}/group",
     "pathParameters": {
         "companyId": "1",
-        "username": "teste1@gmail.com"
+        "username": "kosloski.fkoga@gmail.com"
     },
     "body": {
-        "members": ["teste2@gmail.com"],
+        "members": ["felipe.koga@hotmail.com"],
 
-        "groupName": "Teste 2"
+        "groupName": "Grupos dos Koga"
     }
 }
