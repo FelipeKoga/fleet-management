@@ -72,7 +72,7 @@
 }
 
 .chat-item-card-active {
-  background-color: #e0e5f5;
+  background-color: #ebeef7;
 }
 
 .chat-item-wrapper {
@@ -134,9 +134,19 @@
 }
 
 .chat-item-message-text {
+  display: flex;
+  align-items: center;
   font-size: 12px;
   width: 100%;
 }
 .chat-item-message-date-text {
   font-size: 10px;
+}
+.message-status {
+  height: auto;
+  width: auto;
+  margin-right: 4px;
+  display: flex;
+  align-items: center;
+  font-size: 12px;
 }

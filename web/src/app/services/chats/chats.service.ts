@@ -6,6 +6,7 @@ import { AuthService } from "../auth/auth.service";
 import { StateService } from "../state.service";
 import { ServiceEndpoint as API } from "../../../stack.json";
 import { User } from "src/app/models/user";
+import { Message } from "src/app/models/message";
 
 export interface ChatsState {
   chats: Chat[];
@@ -39,5 +40,21 @@ export class ChatsService extends StateService<ChatsState> {
       .subscribe((chats) => {
         this.setState({ chats, isLoading: false });
       });
+  }
+
+  public replaceLastMessage(message: Message) {
+    const chats = [...this.state.chats];
+    console.log("replace", message);
+    this.setState({
+      ...this.state,
+      chats: chats.map((chat) => {
+        const newChat = { ...chat };
+        if (message.chatId === newChat.id) {
+          newChat.lastMessage = message;
+        }
+
+        return newChat;
+      }),
+    });
   }
 }

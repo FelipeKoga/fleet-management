@@ -51,6 +51,22 @@
                 </div>
                 <div *ngIf="chat.lastMessage" class="chat-item-message-content">
                   <div class="chat-item-message-text">
+                    <div *ngIf="chat.lastMessage.username === username">
+                      <ng-container
+                        *ngIf="
+                          chat.lastMessage.status === 'SENT';
+                          else elseTemplate
+                        "
+                      >
+                        <mat-icon class="message-status">check</mat-icon>
+                      </ng-container>
+                      <ng-template #elseTemplate>
+                        <mat-icon class="message-status"
+                          >query_builder</mat-icon
+                        >
+                      </ng-template>
+                    </div>
+
                     {{ chat.lastMessage.message }}
                   </div>
                   <div class="chat-item-message-date-text">
