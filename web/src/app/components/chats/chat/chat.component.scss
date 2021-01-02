@@ -95,7 +95,6 @@
 
 .message-container {
   width: 100%;
-  min-height: 80px;
   display: flex;
   align-items: center;
   bottom: 0;
@@ -106,6 +105,8 @@
   height: 480px;
   display: flex;
   flex-direction: column;
+  border-top: 1px solid #e0e0e0;
+
   overflow-y: auto;
 }
 

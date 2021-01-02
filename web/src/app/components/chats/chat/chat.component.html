@@ -23,7 +23,7 @@
       <mat-icon>map</mat-icon>
     </button>
   </div>
-  <mat-divider></mat-divider>
+  <!-- <mat-divider></mat-divider> -->
   <div #content class="messages-container">
     <div class="messages-list" #messageList>
       <ng-container *ngIf="(state$ | async).isLoading; else elseTemplate">

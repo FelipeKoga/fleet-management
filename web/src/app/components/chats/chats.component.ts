@@ -30,11 +30,9 @@ export class ChatsComponent implements OnInit {
     this.selectedChat = new Chat();
     this.state$ = this.chatsService.chatsState$;
     this.webSocketService.messages.subscribe((response) => {
-      if (
-        response.action === Actions.MESSAGE_SENT ||
-        response.action === Actions.MESSAGE_RECEIVED
-      ) {
-        this.chatsService.replaceLastMessage(response.body);
+      console.log(response);
+      if (response.action === Actions.CHAT_UPDATED) {
+        this.chatsService.replaceChat(response.body);
       }
     });
     this.chatsService.fetch();

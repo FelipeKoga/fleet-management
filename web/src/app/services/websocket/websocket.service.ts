@@ -11,6 +11,8 @@ export enum Actions {
   SEND_MESSAGE = "send-message",
   MESSAGE_RECEIVED = "new_message",
   MESSAGE_SENT = "message_sent",
+  CHAT_UPDATED = "chat_updated",
+  VIEWED_MESSAGES = "open-messages",
 }
 
 interface WebSocketPayload {
@@ -35,7 +37,6 @@ export class WebsocketService {
       this.socket$.subscribe(
         (response) => {
           const data = response.data as WebSocketPayload;
-          console.log(data);
           if (data) {
             this.messages$.next(data);
           }
@@ -50,6 +51,7 @@ export class WebsocketService {
   }
 
   public sendMessage(message: WebSocketPayload) {
+    console.log(message);
     this.socket$.next(message);
   }
 

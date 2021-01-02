@@ -5,6 +5,7 @@ export class Chat {
   id: string;
   private?: string;
   lastMessage?: Message;
+  newMessages: number;
   groupName?: string;
   admin?: string;
   user?: User;

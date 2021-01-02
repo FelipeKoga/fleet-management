@@ -72,7 +72,7 @@
 }
 
 .chat-item-card-active {
-  background-color: #ebeef7;
+  background-color: #eceef7;
 }
 
 .chat-item-wrapper {
@@ -124,6 +124,9 @@
 }
 
 .chat-item-name {
+  display: flex;
+  justify-content: space-between;
+  width: 95%;
   font-weight: 500;
   font-size: 16px;
 }
@@ -131,16 +134,23 @@
 .chat-item-message-content {
   display: flex;
   width: 100%;
+  overflow: hidden;
+  max-width: 260px;
 }
 
 .chat-item-message-text {
   display: flex;
+  height: 20px;
   align-items: center;
+  overflow: hidden;
   font-size: 12px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
   width: 100%;
 }
 .chat-item-message-date-text {
   font-size: 10px;
+  margin-left: 10px;
 }
 .message-status {
   height: auto;

@@ -42,18 +42,16 @@ export class ChatsService extends StateService<ChatsState> {
       });
   }
 
-  public replaceLastMessage(message: Message) {
+  public replaceChat(newChat: Chat) {
     const chats = [...this.state.chats];
-    console.log("replace", message);
     this.setState({
       ...this.state,
       chats: chats.map((chat) => {
-        const newChat = { ...chat };
-        if (message.chatId === newChat.id) {
-          newChat.lastMessage = message;
+        if (chat.id === newChat.id) {
+          return newChat;
         }
 
-        return newChat;
+        return chat;
       }),
     });
   }

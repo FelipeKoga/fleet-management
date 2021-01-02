@@ -45,9 +45,15 @@
                 <img [src]="chat.photo" />
               </div>
               <div class="chat-item-content">
-                <div class="chat-item-name">
-                  <span *ngIf="chat.private">{{ chat.user.name }}</span>
-                  <span *ngIf="chat.groupName">{{ chat.groupName }} </span>
+                <div
+                  class="chat-item-name"
+                  [matBadge]="chat.newMessages"
+                  matBadgeOverlap="false"
+                  [matBadgeHidden]="!chat.newMessages"
+                  matBadgeColor="primary"
+                >
+                  <div *ngIf="chat.private">{{ chat.user.name }}</div>
+                  <div *ngIf="chat.groupName">{{ chat.groupName }}</div>
                 </div>
                 <div *ngIf="chat.lastMessage" class="chat-item-message-content">
                   <div class="chat-item-message-text">

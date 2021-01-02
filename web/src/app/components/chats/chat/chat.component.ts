@@ -44,9 +44,12 @@ export class ChatComponent implements OnInit {
         response.action === Actions.MESSAGE_SENT ||
         response.action === Actions.MESSAGE_RECEIVED
       ) {
+        this.viewedMessages();
         this.messagesService.addOrReplaceMessage(response.body);
       }
     });
+
+    this.viewedMessages();
   }
 
   ngOnChanges(_: SimpleChanges): void {
@@ -57,7 +60,17 @@ export class ChatComponent implements OnInit {
     this.scrollToBottom();
   }
 
-  scrollToBottom(): void {
+  private viewedMessages() {
+    this.webSocketService.sendMessage({
+      action: Actions.VIEWED_MESSAGES,
+      body: {
+        username: this.username,
+        chatId: this.chat.id,
+      },
+    });
+  }
+
+  public scrollToBottom(): void {
     try {
       this.myScrollContainer.nativeElement.scrollTop = this.myScrollContainer.nativeElement.scrollHeight;
     } catch (err) {}
