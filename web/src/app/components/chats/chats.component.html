@@ -22,36 +22,45 @@
     </div>
     <div class="chat-list-container">
       <div class="chat-list-wrapper">
-        <mat-card
-          (click)="openChat(chat)"
-          [ngClass]="
-            selectedChat.id === chat.id
-              ? 'chat-item-card-active'
-              : 'chat-item-card'
-          "
-          *ngFor="let chat of chats"
-          class="chat-item-card"
-        >
-          <div class="chat-item-wrapper">
-            <div mat-card-avatar class="photo">
-              <img [src]="chat.photo" />
-            </div>
-            <div class="chat-item-content">
-              <div class="chat-item-name">
-                <span *ngIf="chat.private">{{ chat.user.name }}</span>
-                <span *ngIf="chat.groupName">{{ chat.groupName }} </span>
+        <ng-container *ngIf="(state$ | async).isLoading; else elseTemplate">
+          <mat-spinner
+            style="margin: auto"
+            color="primary"
+            [diameter]="30"
+          ></mat-spinner>
+        </ng-container>
+        <ng-template #elseTemplate>
+          <mat-card
+            (click)="openChat(chat)"
+            [ngClass]="
+              selectedChat.id === chat.id
+                ? 'chat-item-card-active'
+                : 'chat-item-card'
+            "
+            *ngFor="let chat of (state$ | async).chats"
+            class="chat-item-card"
+          >
+            <div class="chat-item-wrapper">
+              <div mat-card-avatar class="photo">
+                <img [src]="chat.photo" />
               </div>
-              <div *ngIf="chat.lastMessage" class="chat-item-message-content">
-                <div class="chat-item-message-text">
-                  {{ chat.lastMessage.message }}
+              <div class="chat-item-content">
+                <div class="chat-item-name">
+                  <span *ngIf="chat.private">{{ chat.user.name }}</span>
+                  <span *ngIf="chat.groupName">{{ chat.groupName }} </span>
                 </div>
-                <div class="chat-item-message-date-text">
-                  {{ convertMessageDate(chat.lastMessage.createdAt) }}
+                <div *ngIf="chat.lastMessage" class="chat-item-message-content">
+                  <div class="chat-item-message-text">
+                    {{ chat.lastMessage.message }}
+                  </div>
+                  <div class="chat-item-message-date-text">
+                    {{ convertMessageDate(chat.lastMessage.createdAt) }}
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        </mat-card>
+          </mat-card>
+        </ng-template>
       </div>
     </div>
   </div>

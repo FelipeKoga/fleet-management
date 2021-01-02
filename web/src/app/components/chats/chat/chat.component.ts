@@ -1,11 +1,15 @@
 import { ElementRef, SimpleChanges, ViewChild } from "@angular/core";
 import { Component, Input, OnInit } from "@angular/core";
 import { format, toDate } from "date-fns";
+import { Observable } from "rxjs";
 import { Chat } from "src/app/models/chat";
 import { Message, MessageStatus } from "src/app/models/message";
 import { UserStatus } from "src/app/models/user";
 import { AuthService } from "src/app/services/auth/auth.service";
-import { MessagesService } from "src/app/services/messages/messages.service";
+import {
+  MessagesService,
+  MessagesState,
+} from "src/app/services/messages/messages.service";
 import {
   Actions,
   WebsocketService,
@@ -21,8 +25,9 @@ export class ChatComponent implements OnInit {
   @ViewChild("sendInput") sendInput: ElementRef;
   @ViewChild("messageList") private myScrollContainer: ElementRef;
   @Input() chat: Chat;
-  public messages: Message[];
   public username: string;
+
+  public state$: Observable<MessagesState>;
 
   constructor(
     private messagesService: MessagesService,
@@ -32,10 +37,7 @@ export class ChatComponent implements OnInit {
 
   ngOnInit(): void {
     this.username = this.authService.getUser().username;
-    this.messagesService.messageState$.subscribe((state) => {
-      console.log(state.messages);
-      this.messages = state.messages;
-    });
+    this.state$ = this.messagesService.messageState$;
 
     this.webSocketService.messages.subscribe((response) => {
       if (

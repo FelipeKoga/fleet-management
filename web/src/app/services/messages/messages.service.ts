@@ -41,20 +41,6 @@ export class MessagesService extends StateService<MessagesState> {
       });
   }
 
-  public send(message: string, chatId: string) {
-    this.http
-      .post<Message>(
-        `${API}/company/${this.user.companyId}/users/${this.user.username}/chats/${chatId}/messages`,
-        message
-      )
-      .subscribe((response) => {
-        this.setState({
-          messages: [...this.state.messages, response],
-          isLoading: false,
-        });
-      });
-  }
-
   public addMessage(message: Message) {
     this.setState({
       messages: [...this.state.messages, message],

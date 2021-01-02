@@ -1,7 +1,8 @@
 import { Component, OnInit } from "@angular/core";
 import { format, toDate } from "date-fns";
+import { Observable } from "rxjs";
 import { Chat } from "src/app/models/chat";
-import { ChatsService } from "src/app/services/chats/chats.service";
+import { ChatsService, ChatsState } from "src/app/services/chats/chats.service";
 
 @Component({
   selector: "app-chats",
@@ -10,16 +11,14 @@ import { ChatsService } from "src/app/services/chats/chats.service";
 })
 export class ChatsComponent implements OnInit {
   public chats: Chat[];
-
   public selectedChat: Chat;
+  public state$: Observable<ChatsState>;
 
   constructor(private chatsService: ChatsService) {}
 
   ngOnInit(): void {
     this.selectedChat = new Chat();
-    this.chatsService.chatsState$.subscribe((state) => {
-      this.chats = state.chats;
-    });
+    this.state$ = this.chatsService.chatsState$;
     this.chatsService.fetch();
   }
 
