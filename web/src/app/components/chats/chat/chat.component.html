@@ -6,8 +6,16 @@
       <span class="user-name" *ngIf="chat.groupName">{{ chat.groupName }}</span>
 
       <div *ngIf="chat.private" class="status-wrapper">
-        <span class="status-color"></span>
-        <span class="status-text"> {{ chat.user.status }} </span>
+        <span
+          [ngClass]="
+            chat.user.status === 'ONLINE'
+              ? 'user-status online'
+              : 'user-status offline'
+          "
+        ></span>
+        <span class="status-text">
+          {{ translateStatus(chat.user.status) }}
+        </span>
       </div>
     </div>
 
@@ -23,7 +31,17 @@
           <div class="message-text">
             {{ message.message }}
 
-            <div class="message-timestamp">12:14</div>
+            <div class="message-timestamp">
+              {{ convertMessageDate(message.createdAt) }}
+              <ng-container
+                *ngIf="message.status === 'SENT'; else elseTemplate"
+              >
+                <mat-icon class="message-status">check</mat-icon>
+              </ng-container>
+              <ng-template #elseTemplate>
+                <mat-icon class="message-status">query_builder</mat-icon>
+              </ng-template>
+            </div>
           </div>
         </div>
         <div
@@ -33,12 +51,14 @@
           <div class="message-text">
             {{ message.message }}
 
-            <div class="message-timestamp">12:14</div>
+            <div class="message-timestamp">
+              {{ convertMessageDate(message.createdAt) }}
+            </div>
           </div>
         </div>
       </div>
     </div>
-    <mat-divider></mat-divider>
+    <mat-divider style="margin-bottom: 8px"></mat-divider>
     <div class="messages-action-container">
       <input
         #sendInput

@@ -1,9 +1,9 @@
-enum UserStatus {
+export enum UserStatus {
   ONLINE = "ONLINE",
   OFFLINE = "OFFLINE",
 }
 
-enum UserRole {
+export enum UserRole {
   ADMIN = "ADMIN",
   OPERATOR = "OPERATOR",
   EMPLOYEEE = "EMPLOYEEE",

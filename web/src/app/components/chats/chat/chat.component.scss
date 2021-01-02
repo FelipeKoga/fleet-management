@@ -32,11 +32,17 @@
   padding-left: 24px;
 }
 
-.status-color {
-  background-color: #32cd32;
+.user-status {
   width: 8px;
   height: 8px;
   border-radius: 50%;
+}
+.online {
+  background-color: #32cd32;
+}
+
+.offline {
+  background-color: #7e7e7e;
 }
 
 .status-text {
@@ -68,14 +74,11 @@
   border: 0;
   height: 100%;
   width: 90%;
-  padding: 18px;
+  padding-top: 12px;
+  margin-bottom: 12px;
   font-size: 16px;
   background: transparent;
   word-break: break-all;
-}
-//
-.messages {
-  flex: 1;
 }
 
 .user-item {
@@ -128,6 +131,14 @@
   text-align: justify;
 }
 
+.message-status {
+  width: auto;
+  margin-left: 4px;
+  display: flex;
+  align-items: center;
+  font-size: 12px;
+}
+
 .message-timestamp {
   font-size: 10px;
   text-align: end;
@@ -135,6 +146,9 @@
 
 .sender .message-timestamp {
   color: rgb(80, 80, 80);
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
 }
 
 .recipient .message-timestamp {
@@ -143,7 +157,7 @@
 
 .sender .message-text {
   min-width: 80px;
-  background-color: #d4ddfa;
+  background-color: #e0e5f5;
   color: black;
   border: 1px solid #c8d5ff;
   border-radius: 14px 14px 0 14px;

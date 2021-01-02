@@ -1,8 +1,9 @@
-import { Message } from "@angular/compiler/src/i18n/i18n_ast";
 import { ElementRef, SimpleChanges, ViewChild } from "@angular/core";
 import { Component, Input, OnInit } from "@angular/core";
-import { FormBuilder, FormGroup } from "@angular/forms";
+import { format, toDate } from "date-fns";
 import { Chat } from "src/app/models/chat";
+import { Message, MessageStatus } from "src/app/models/message";
+import { UserStatus } from "src/app/models/user";
 import { AuthService } from "src/app/services/auth/auth.service";
 import { MessagesService } from "src/app/services/messages/messages.service";
 import {
@@ -37,12 +38,11 @@ export class ChatComponent implements OnInit {
     });
 
     this.webSocketService.messages.subscribe((response) => {
-      console.log("RESPONSE FROM CHAT", response);
       if (
         response.action === Actions.MESSAGE_SENT ||
         response.action === Actions.MESSAGE_RECEIVED
       ) {
-        this.messagesService.wsAddMessage(response.body as Message);
+        this.messagesService.addOrReplaceMessage(response.body);
       }
     });
   }
@@ -61,15 +61,29 @@ export class ChatComponent implements OnInit {
     } catch (err) {}
   }
 
-  public sendMessage(message: string) {
+  public sendMessage(text: string) {
     this.sendInput.nativeElement.value = "";
+    const message = new Message({
+      chatId: this.chat.id,
+      message: text,
+      username: this.authService.getUser().username,
+      status: MessageStatus.PENDING,
+    });
+
+    this.messagesService.addOrReplaceMessage(message);
+
     this.webSocketService.sendMessage({
       action: Actions.SEND_MESSAGE,
-      body: {
-        message,
-        chatId: this.chat.id,
-        username: this.authService.getUser().username,
-      },
+      body: message,
     });
+  }
+
+  public translateStatus(status: UserStatus) {
+    if (status === UserStatus.ONLINE) return "Online";
+    if (status === UserStatus.OFFLINE) return "Offline";
+  }
+
+  public convertMessageDate(createdAt: number) {
+    return format(toDate(createdAt), "HH:mm");
   }
 }

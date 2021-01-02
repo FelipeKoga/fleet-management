@@ -1,15 +1,11 @@
 import { HttpClient } from "@angular/common/http";
-import { Message } from "@angular/compiler/src/i18n/i18n_ast";
 import { Injectable } from "@angular/core";
 import { Observable } from "rxjs";
+import { Message } from "src/app/models/message";
 import { User } from "src/app/models/user";
-import {
-  ServiceEndpoint as API,
-  ServiceEndpointWebsocket,
-} from "../../../stack.json";
+import { ServiceEndpoint as API } from "../../../stack.json";
 import { AuthService } from "../auth/auth.service";
 import { StateService } from "../state.service";
-import { webSocket } from "rxjs/webSocket";
 
 export interface MessagesState {
   messages: Message[];
@@ -59,9 +55,30 @@ export class MessagesService extends StateService<MessagesState> {
       });
   }
 
-  public wsAddMessage(message: Message) {
+  public addMessage(message: Message) {
     this.setState({
       messages: [...this.state.messages, message],
     });
+  }
+
+  public addOrReplaceMessage(message: Message) {
+    const messages = [...this.state.messages];
+
+    if (messages.find((msg) => msg.messageId === message.messageId)) {
+      this.setState({
+        ...this.state,
+        messages: this.state.messages.map((msg) => {
+          if (msg.messageId === message.messageId) {
+            return message;
+          }
+          return msg;
+        }),
+      });
+    } else {
+      this.setState({
+        ...this.state,
+        messages: [...this.state.messages, message],
+      });
+    }
   }
 }
