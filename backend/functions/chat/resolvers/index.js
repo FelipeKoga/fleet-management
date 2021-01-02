@@ -6,13 +6,18 @@ async function sendWebSocketMessage(username, body, action) {
     await Lambda.sendMessage(body, connectionIds, action);
 }
 
-async function getChat(chatId, member) {
+async function getChat(chatId, username, member) {
     const chat = await Database.chat.getChat(chatId);
+    const { newMessages } = await Database.chat.getUserChatMetadata(
+        chatId,
+        username,
+    );
     const chatMember = member ? await Database.user.getUser(member) : null;
     const lastMessage = await Database.message.getLastMessage(chatId);
 
     return {
         ...chat,
+        newMessages,
         lastMessage: lastMessage || null,
         user: chatMember,
     };
@@ -32,9 +37,9 @@ async function getAllChats(username) {
             if (chat.private) {
                 const users = await Database.chat.fetchChatUsers(chat.id);
                 const member = users.filter(user => user !== username)[0];
-                return getChat(chat.id, member);
+                return getChat(chat.id, username, member);
             }
-            return getChat(chat.id);
+            return getChat(chat.id, username);
         }),
     );
 
@@ -82,7 +87,7 @@ async function createGroup(username, { members, groupName }) {
         private: null,
     });
 
-    const chat = await Database.chat.getChat(groupId);
+    const chat = await Database.chat.getChat(groupId, username);
 
     await Promise.all(
         members.map(async member => {
@@ -106,14 +111,46 @@ async function addMessage({ chatId, username, message, createdAt, messageId }) {
         status: 'SENT',
     });
 
+    const chatConfig = await Database.chat.getChat(chatId);
+
     const users = await Database.chat.fetchChatUsers(chatId);
     const chatUsers = users.filter(u => u !== username);
+
+    const currentUserChat = chatConfig.private
+        ? await getChat(
+              chatId,
+              username,
+              chatConfig.private
+                  .split(':')
+                  .filter(member => member !== username),
+          )
+        : await getChat(chatId, username);
+
     await Promise.all(
-        chatUsers.map(async user => {
-            await Database.message.newMessages(chatId, user, createdAt);
-            await sendWebSocketMessage(user, messageResponse, 'new_message');
+        chatUsers.map(async memberUsername => {
+            await Database.message.newMessages(
+                chatId,
+                memberUsername,
+                createdAt,
+            );
+            const memberChat = chatConfig.private
+                ? await getChat(chatId, memberUsername, username)
+                : await getChat(chatId, memberUsername);
+
+            await sendWebSocketMessage(
+                memberUsername,
+                messageResponse,
+                'new_message',
+            );
+            await sendWebSocketMessage(
+                memberUsername,
+                memberChat,
+                'chat_updated',
+            );
         }),
-        await sendWebSocketMessage(username, messageResponse, 'message_sent'),
+
+        sendWebSocketMessage(username, messageResponse, 'message_sent'),
+        sendWebSocketMessage(username, currentUserChat, 'chat_updated'),
     );
 }
 
@@ -122,7 +159,19 @@ async function getMessages(chatId) {
 }
 
 async function viewedMessages({ chatId, username }) {
-    return Database.message.viewedMessages(chatId, username);
+    await Database.message.viewedMessages(chatId, username);
+    const chatConfig = await Database.chat.getChat(chatId);
+    const chat = chatConfig.private
+        ? await getChat(
+              chatId,
+              username,
+              chatConfig.private
+                  .split(':')
+                  .filter(member => member !== username),
+          )
+        : await getChat(chatId, username);
+
+    await sendWebSocketMessage(username, chat, 'chat_updated');
 }
 
 module.exports = {
