@@ -96,15 +96,16 @@ async function createGroup(username, { members, groupName }) {
     return chat;
 }
 
-async function addMessage(chatId, username, message) {
-    const createdAt = Date.now();
-    const messageResponse = await Database.message.addMessage(
+async function addMessage({ chatId, username, message, createdAt, messageId }) {
+    const messageResponse = await Database.message.addMessage({
         chatId,
         username,
         message,
-        Date.now(),
-        'sent',
-    );
+        messageId,
+        createdAt,
+        status: 'SENT',
+    });
+
     const users = await Database.chat.fetchChatUsers(chatId);
     const chatUsers = users.filter(u => u !== username);
     await Promise.all(
@@ -120,7 +121,7 @@ async function getMessages(chatId) {
     return Database.message.fetchMessages(chatId);
 }
 
-async function viewedMessages(chatId, username) {
+async function viewedMessages({ chatId, username }) {
     return Database.message.viewedMessages(chatId, username);
 }
 

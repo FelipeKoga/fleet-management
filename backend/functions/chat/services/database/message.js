@@ -1,4 +1,3 @@
-const { nanoid } = require('nanoid');
 const { fetchByPK, getByPK, insert, update } = require('./query');
 
 async function fetchMessages(chatId) {
@@ -20,18 +19,28 @@ async function fetchMessages(chatId) {
 }
 
 async function getMessage(partitionKey, sortKey) {
-    return getByPK({
-        ExpressionAttributeValues: {
-            ':pk': partitionKey,
-            ':sk': sortKey,
+    return getByPK(
+        {
+            ExpressionAttributeValues: {
+                ':pk': partitionKey,
+                ':sk': sortKey,
+            },
         },
-    });
+        true,
+    );
 }
 
-async function addMessage(chatId, username, message, createdAt, status) {
+async function addMessage({
+    chatId,
+    username,
+    message,
+    messageId,
+    createdAt,
+    status,
+}) {
     const payload = {
         partitionKey: `CHAT#${chatId}`,
-        sortKey: `MESSAGE#${createdAt}#${nanoid()}`,
+        sortKey: `MESSAGE#${createdAt}#${messageId}`,
         username,
         message,
         createdAt,

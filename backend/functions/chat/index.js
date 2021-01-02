@@ -5,7 +5,7 @@ const headers = {
     'Access-Control-Allow-Credentials': true,
 };
 
-async function handlePostMethod(resource, body, { username, chatId }) {
+async function handlePostMethod(resource, body, { username }) {
     const method = resource.split('/').pop();
     if (method === 'group') return Resolver.createGroup(username, body);
 
@@ -45,14 +45,12 @@ async function main({
         const payload = JSON.parse(body);
         const { routeKey } = requestContext;
 
-        const { username, chatId, message } = payload.body;
-
         if (routeKey === 'open-messages') {
-            return Resolver.viewedMessages(chatId, username);
+            return Resolver.viewedMessages(payload.body);
         }
 
         if (routeKey === 'send-message') {
-            return Resolver.addMessage(chatId, username, message);
+            return Resolver.addMessage(payload.body);
         }
     }
 
