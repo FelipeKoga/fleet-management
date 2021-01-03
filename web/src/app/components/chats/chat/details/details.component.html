@@ -116,8 +116,23 @@
               "
             >
               <div>{{ member.name }}</div>
-              <div class="admin-badge" *ngIf="chat.admin === member.username">
+              <div *ngIf="chat.admin === member.username" class="admin-badge">
                 Administrador
+              </div>
+              <div
+                style="position: relative"
+                *ngIf="
+                  chat.admin !== member.username && username === chat.admin
+                "
+              >
+                <button
+                  style="position: absolute; right: 0"
+                  (click)="openRemoveMember(member)"
+                  mat-icon-button
+                  color="warn"
+                >
+                  <mat-icon>delete</mat-icon>
+                </button>
               </div>
             </div>
             <div style="display: flex; justify-content: space-between">

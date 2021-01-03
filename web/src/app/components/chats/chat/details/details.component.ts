@@ -71,6 +71,26 @@ export class DetailsComponent implements OnInit {
     });
   }
 
+  public openRemoveMember(member: User) {
+    this.dialog.open(ConfirmationDialogComponent, {
+      data: {
+        title: "Remover membro",
+        body: `Tem certeza que deseja remover o membro ${member.name} do grupo?`,
+        confirmationLabel: "Sim",
+        onConfirm: () => {
+          this.chatsService
+            .removeMember(this.chat.id, member.username)
+            .subscribe((response) => {
+              this.members = this.members.filter(
+                (m) => m.username !== member.username
+              );
+              console.log(response);
+            });
+        },
+      },
+    });
+  }
+
   public backToChat() {
     this.onBackToChat.emit(true);
   }
