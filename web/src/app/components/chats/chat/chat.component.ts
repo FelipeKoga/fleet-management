@@ -1,6 +1,5 @@
 import { ElementRef, SimpleChanges, ViewChild } from "@angular/core";
 import { Component, Input, OnInit } from "@angular/core";
-import { format, toDate } from "date-fns";
 import { Observable } from "rxjs";
 import { Chat } from "src/app/models/chat";
 import { Message, MessageStatus } from "src/app/models/message";
@@ -14,6 +13,7 @@ import {
   Actions,
   WebsocketService,
 } from "src/app/services/websocket/websocket.service";
+import { convertDate } from "src/app/utils/date";
 
 @Component({
   selector: "app-chat",
@@ -25,6 +25,9 @@ export class ChatComponent implements OnInit {
   @ViewChild("sendInput") sendInput: ElementRef;
   @ViewChild("messageList") private myScrollContainer: ElementRef;
   @Input() chat: Chat;
+  public showChatDetails: boolean;
+  public convertDate = convertDate;
+
   public username: string;
 
   public state$: Observable<MessagesState>;
@@ -53,6 +56,8 @@ export class ChatComponent implements OnInit {
   }
 
   ngOnChanges(_: SimpleChanges): void {
+    this.viewedMessages();
+    this.showChatDetails = false;
     this.messagesService.fetch(this.chat.id);
   }
 
@@ -61,13 +66,15 @@ export class ChatComponent implements OnInit {
   }
 
   private viewedMessages() {
-    this.webSocketService.sendMessage({
-      action: Actions.VIEWED_MESSAGES,
-      body: {
-        username: this.username,
-        chatId: this.chat.id,
-      },
-    });
+    if (this.username && this.chat.id) {
+      this.webSocketService.sendMessage({
+        action: Actions.VIEWED_MESSAGES,
+        body: {
+          username: this.username,
+          chatId: this.chat.id,
+        },
+      });
+    }
   }
 
   public scrollToBottom(): void {
@@ -77,6 +84,7 @@ export class ChatComponent implements OnInit {
   }
 
   public sendMessage(text: string) {
+    if (!text.length) return;
     this.sendInput.nativeElement.value = "";
     const message = new Message({
       chatId: this.chat.id,
@@ -98,7 +106,11 @@ export class ChatComponent implements OnInit {
     if (status === UserStatus.OFFLINE) return "Offline";
   }
 
-  public convertMessageDate(createdAt: number) {
-    return format(toDate(createdAt), "HH:mm");
+  public onShowChatDetails() {
+    this.showChatDetails = true;
+  }
+
+  public handleBackToChat() {
+    this.showChatDetails = false;
   }
 }

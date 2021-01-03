@@ -6,7 +6,6 @@ import { AuthService } from "../auth/auth.service";
 import { StateService } from "../state.service";
 import { ServiceEndpoint as API } from "../../../stack.json";
 import { User } from "src/app/models/user";
-import { Message } from "src/app/models/message";
 
 export interface ChatsState {
   chats: Chat[];
@@ -42,17 +41,91 @@ export class ChatsService extends StateService<ChatsState> {
       });
   }
 
-  public replaceChat(newChat: Chat) {
+  public newPrivateChat(
+    withUsername: string,
+    onComplete: (chat: Chat) => void
+  ) {
+    this.http
+      .post<Chat>(
+        `${API}/company/${this.user.companyId}/users/${this.user.username}/chats`,
+        { withUsername }
+      )
+      .subscribe((newChat) => {
+        onComplete(newChat);
+      });
+  }
+
+  public newGroup(
+    groupName: string,
+    members: string[],
+    onComplete: (chat: Chat) => void
+  ) {
+    this.http
+      .post<Chat>(
+        `${API}/company/${this.user.companyId}/users/${this.user.username}/group`,
+        { groupName, members }
+      )
+      .subscribe((newChat) => {
+        onComplete(newChat);
+      });
+  }
+
+  public addOrReplaceChat(newChat: Chat) {
     const chats = [...this.state.chats];
+    if (chats.find((chat) => chat.id === newChat.id)) {
+      this.setState({
+        chats: chats
+          .map((chat) => {
+            if (chat.id === newChat.id) return newChat;
+            return chat;
+          })
+          .filter((chat) => {
+            return !chat.private || chat.lastMessage;
+          })
+          .sort(this.sort),
+      });
+    } else {
+      chats.unshift(newChat);
+      this.setState({
+        chats: chats
+          .filter((chat) => !chat.private || chat.lastMessage)
+          .sort(this.sort),
+      });
+    }
+  }
+
+  public removeChat({ chatId }) {
     this.setState({
       ...this.state,
-      chats: chats.map((chat) => {
-        if (chat.id === newChat.id) {
-          return newChat;
-        }
-
-        return chat;
-      }),
+      chats: this.state.chats.filter((chat) => chat.id !== chatId),
     });
+  }
+
+  public getChatMembers(chatId: string) {
+    return this.http.get<User[]>(
+      `${API}/company/${this.user.companyId}/users/${this.user.username}/group/${chatId}`
+    );
+  }
+
+  public addMember(chatId: string, member: string) {
+    return this.http.put<boolean>(
+      `${API}/company/${this.user.companyId}/users/${this.user.username}/group/${chatId}`,
+      { member, chatId }
+    );
+  }
+
+  public removeMember(chatId: string, member: string) {
+    return this.http.put<boolean>(
+      `${API}/company/${this.user.companyId}/users/${this.user.username}/group/${chatId}/remove`,
+      { member, chatId }
+    );
+  }
+
+  private sort(c1: Chat, c2: Chat) {
+    if (!c1.lastMessage) return 1;
+
+    if (c1.lastMessage && !c2.lastMessage) return -1;
+
+    return c2.lastMessage.createdAt - c1.lastMessage.createdAt;
   }
 }

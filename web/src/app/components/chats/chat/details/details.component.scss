@@ -1,0 +1,51 @@
+@import "../chat.component.scss";
+.toolbar {
+  display: grid;
+  grid-template-columns: 20px auto 280px;
+  cursor: auto;
+}
+
+.chat-details-wrapper {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  margin-left: 12px;
+  justify-content: center;
+}
+
+.chat-details-row {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.member-item {
+  display: flex;
+  flex-direction: column;
+  margin-top: 12px;
+  border-bottom: 1px solid #eeeeee;
+}
+
+.admin-badge {
+  font-style: italic;
+  border: 1px solid #013220;
+  color: #013220;
+  padding-right: 4px;
+  padding-left: 4px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+mat-card {
+  width: 100%;
+  margin-top: 4px;
+  margin-right: 4px;
+}
+
+mat-card-title {
+  font-size: 14px;
+}
+
+mat-card-subtitle {
+  font-size: 12px;
+}

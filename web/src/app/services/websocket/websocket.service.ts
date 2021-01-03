@@ -12,6 +12,8 @@ export enum Actions {
   MESSAGE_RECEIVED = "new_message",
   MESSAGE_SENT = "message_sent",
   CHAT_UPDATED = "chat_updated",
+  CHAT_CREATED = "created_chat",
+  CHAT_REMOVED = "chat_removed",
   VIEWED_MESSAGES = "open-messages",
 }
 
@@ -41,7 +43,11 @@ export class WebsocketService {
             this.messages$.next(data);
           }
         },
-        (error) => {}
+        (error) => {
+          console.log(error);
+          this.socket$.complete();
+          this.connect();
+        }
       ),
         () => {
           this.socket$.complete();

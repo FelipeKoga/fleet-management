@@ -1,0 +1,9 @@
+<div>
+  <h2>Adicionar membro</h2>
+  <h4>Selecione um funcionário para adicionar no grupo.</h4>
+  <div (click)="addMember(user)" *ngFor="let user of users" class="user-item">
+    <div style="font-weight: 500">{{ user.name }}</div>
+    <div>{{ user.email }}</div>
+    <mat-divider></mat-divider>
+  </div>
+</div>

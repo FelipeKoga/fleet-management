@@ -1,5 +1,5 @@
-<div class="chat-container">
-  <div class="toolbar">
+<div class="chat-container" *ngIf="!showChatDetails">
+  <div class="toolbar" (click)="onShowChatDetails()">
     <img class="user-photo" src="" />
     <div style="display: flex; flex-direction: column">
       <span class="user-name" *ngIf="chat.user">{{ chat.user.name }}</span>
@@ -17,13 +17,21 @@
           {{ translateStatus(chat.user.status) }}
         </span>
       </div>
+      <div *ngIf="!chat.private" class="status-wrapper">
+        Criado em: {{ convertDate(chat.createdAt, "dd/MM/yyyy HH:mm") }}<br />
+        Administrador: {{ chat.admin }}
+      </div>
     </div>
 
-    <button mat-mini-fab (click)="openBottomSheetMap()" color="primary">
+    <button
+      mat-mini-fab
+      (click)="openBottomSheetMap()"
+      *ngIf="chat.user"
+      color="primary"
+    >
       <mat-icon>map</mat-icon>
     </button>
   </div>
-  <!-- <mat-divider></mat-divider> -->
   <div #content class="messages-container">
     <div class="messages-list" #messageList>
       <ng-container *ngIf="(state$ | async).isLoading; else elseTemplate">
@@ -40,7 +48,7 @@
               {{ message.message }}
 
               <div class="message-timestamp">
-                {{ convertMessageDate(message.createdAt) }}
+                {{ convertDate(message.createdAt, "HH:mm") }}
                 <ng-container
                   *ngIf="message.status === 'SENT'; else elseTemplate"
                 >
@@ -57,10 +65,16 @@
             *ngIf="message.username !== username"
           >
             <div class="message-text">
-              {{ message.message }}
+              <div
+                style="font-weight: 500; color: grey; font-size: 12px"
+                *ngIf="!chat.private && message.username !== username"
+              >
+                {{ message.username }}
+              </div>
+              <div style="margin-top: 2px">{{ message.message }}</div>
 
               <div class="message-timestamp">
-                {{ convertMessageDate(message.createdAt) }}
+                {{ convertDate(message.createdAt, "HH:mm") }}
               </div>
             </div>
           </div>
@@ -69,23 +83,13 @@
     </div>
     <mat-divider style="margin-bottom: 8px"></mat-divider>
     <div class="messages-action-container">
-      <input
+      <textarea
+        matInput
         #sendInput
         class="messages-action-input"
         (keydown.enter)="sendMessage($event.target.value)"
         placeholder="Digite uma mensagem"
-      />
-
-      <!-- <mat-form-field
-          style="width: 90%; padding-right: 8px; padding-left: 8px;"
-        >
-          <mat-label>Digite uma mensagem...</mat-label>
-          <input
-            matInput
-            (keydown.enter)="sendMessage($event.target.value)"
-            autocomplete="off"
-          />
-        </mat-form-field> -->
+      ></textarea>
       <button mat-icon-button style="color: gray">
         <mat-icon>attach_file</mat-icon>
       </button>
@@ -94,4 +98,8 @@
       </button>
     </div>
   </div>
+</div>
+
+<div *ngIf="showChatDetails">
+  <app-details [chat]="chat" (onBackToChat)="handleBackToChat()"></app-details>
 </div>

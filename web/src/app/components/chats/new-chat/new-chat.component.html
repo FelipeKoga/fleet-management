@@ -1,0 +1,85 @@
+<div class="container">
+  <ng-container *ngIf="isLoadingNewChat; else elseNewChatTemplate">
+    <mat-spinner
+      style="margin: auto; align-self: center"
+      color="primary"
+      [diameter]="30"
+    ></mat-spinner>
+  </ng-container>
+  <ng-template #elseNewChatTemplate>
+    <div *ngIf="newChatType === 'PRIVATE'">
+      <h2>Novo chat</h2>
+      <div style="margin-bottom: 12px">
+        Selecione o usuário para iniciar um chat
+      </div>
+    </div>
+    <ng-container *ngIf="isLoading; else usersTemplate">
+      <mat-spinner
+        style="margin: auto"
+        color="primary"
+        [diameter]="30"
+      ></mat-spinner>
+    </ng-container>
+    <ng-template #usersTemplate>
+      <div *ngIf="newChatType === 'PRIVATE'">
+        <div
+          style="padding-top: 12px"
+          (click)="newPrivateChat(user)"
+          *ngFor="let user of users"
+          class="user-item"
+        >
+          <div style="font-weight: 500">{{ user.name }}</div>
+          <div>{{ user.email }}</div>
+          <mat-divider></mat-divider>
+        </div>
+      </div>
+      <div style="height: 100%" *ngIf="newChatType === 'GROUP'">
+        <form class="form" [formGroup]="newGroupForm" (ngSubmit)="newGroup()">
+          <div style="display: flex; justify-content: space-between">
+            <h2>Novo grupo</h2>
+            <button
+              [disabled]="newGroupForm.invalid"
+              type="submit"
+              mat-stroked-button
+              color="primary"
+            >
+              Criar grupo
+            </button>
+          </div>
+
+          <mat-form-field style="width: 100%" appearance="outline">
+            <mat-label>Nome do grupo</mat-label>
+            <input formControlName="groupName" matInput />
+          </mat-form-field>
+
+          <span
+            style="margin-bottom: 12px"
+            *ngFor="let member of members.value; let i = index"
+          >
+            <span *ngIf="i !== 0 && i === members.value.length - 1"> e </span>
+            <span *ngIf="i !== 0 && i !== members.value.length - 1">, </span>
+            <span *ngIf="i === 0" style="font-weight: 500">Selecionados: </span>
+            {{ member.name }}
+          </span>
+          <div style="margin-bottom: 12px; margin-top: 24px">
+            Selecione os usuários do grupo.
+          </div>
+
+          <mat-selection-list #list formControlName="members">
+            <mat-list-option
+              color="primary"
+              *ngFor="let user of users"
+              [value]="user"
+            >
+              <div style="font-weight: 500">
+                {{ user.name }}
+              </div>
+              <div>{{ user.email }}</div>
+              <mat-divider></mat-divider>
+            </mat-list-option>
+          </mat-selection-list>
+        </form>
+      </div>
+    </ng-template>
+  </ng-template>
+</div>

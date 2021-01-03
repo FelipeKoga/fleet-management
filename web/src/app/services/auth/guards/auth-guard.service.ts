@@ -10,6 +10,10 @@ import { Observable } from "rxjs";
 
 import { AuthService } from "../../../services/auth/auth.service";
 
+enum AuthStack {
+  LOGIN = "/login",
+  FORGOT_PASSWORD = "/forgot-password",
+}
 @Injectable({
   providedIn: "root",
 })
@@ -30,7 +34,12 @@ export class AuthGuard implements CanActivate {
           }
           observer.next(true);
         } else {
-          this.router.navigate(["/login"]);
+          if (
+            _state.url !== AuthStack.LOGIN &&
+            _state.url !== AuthStack.FORGOT_PASSWORD
+          ) {
+            this.router.navigate(["/login"]);
+          }
           observer.next(false);
         }
 

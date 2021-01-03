@@ -1,0 +1,133 @@
+<div class="chat-container">
+  <div class="toolbar">
+    <div style="display: flex; justify-content: space-between">
+      <button (click)="backToChat()" mat-icon-button color="primary">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+    </div>
+
+    <div style="display: flex; flex-direction: column">
+      <span class="user-name" *ngIf="chat.user">Detalhes do Funcionário</span>
+      <span class="user-name" *ngIf="chat.groupName">Detalhes do Grupo</span>
+    </div>
+
+    <div *ngIf="!chat.private" style="display: flex; justify-content: flex-end">
+      <button
+        *ngIf="chat.admin === username"
+        (click)="openAddMember()"
+        mat-stroked-button
+        style="margin-right: 4px"
+        color="primary"
+      >
+        Adicionar membro
+      </button>
+      <button (click)="openExitGroup()" mat-stroked-button color="warn">
+        Sair do grupo
+      </button>
+    </div>
+  </div>
+  <ng-container *ngIf="chat.private; else elseTemplate">
+    <div style="padding: 32px">
+      <div style="display: flex; justify-content: center">
+        <img
+          style="border-radius: 50%; width: 180px; height: 180px"
+          src="https://material.angular.io/assets/img/examples/shiba2.jpg"
+        />
+      </div>
+
+      <div class="chat-details-wrapper" style="margin-top: 12px">
+        <div class="chat-details-row">
+          <mat-card>
+            <mat-card-title>{{ chat.user.name }}</mat-card-title>
+            <mat-card-subtitle>Nome completo</mat-card-subtitle>
+          </mat-card>
+          <mat-card>
+            <mat-card-title>{{ chat.user.email }}</mat-card-title>
+            <mat-card-subtitle>Email</mat-card-subtitle>
+          </mat-card>
+        </div>
+        <div class="chat-details-row">
+          <mat-card>
+            <mat-card-title>{{ chat.user.phone }}</mat-card-title>
+            <mat-card-subtitle>Telefone</mat-card-subtitle>
+          </mat-card>
+          <mat-card>
+            <mat-card-title>Cargo</mat-card-title>
+            <mat-card-subtitle>{{ chat.user.role }}</mat-card-subtitle>
+          </mat-card>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+  <ng-template #elseTemplate>
+    <div style="padding: 32px">
+      <div style="display: flex">
+        <div style="display: flex; justify-content: center">
+          <img
+            style="border-radius: 50%; width: 180px; height: 180px"
+            src="https://material.angular.io/assets/img/examples/shiba2.jpg"
+          />
+        </div>
+
+        <div class="chat-details-wrapper">
+          <div class="chat-details-row">
+            <mat-card>
+              <mat-card-subtitle>Nome do grupo</mat-card-subtitle>
+              <mat-card-title>{{ chat.groupName }}</mat-card-title>
+            </mat-card>
+            <mat-card>
+              <mat-card-subtitle>Administrador</mat-card-subtitle>
+              <mat-card-title>{{ chat.admin }}</mat-card-title>
+            </mat-card>
+          </div>
+
+          <div class="chat-details-row">
+            <mat-card>
+              <mat-card-subtitle>Número de membros</mat-card-subtitle>
+              <mat-card-title *ngIf="isLoadingMembers">
+                <mat-spinner [diameter]="15"></mat-spinner>
+              </mat-card-title>
+              <mat-card-title *ngIf="!isLoadingMembers"
+                >{{ this.members.length }}
+              </mat-card-title>
+            </mat-card>
+            <mat-card>
+              <mat-card-subtitle>Data de criação</mat-card-subtitle>
+              <mat-card-title
+                >{{ convertDate(chat.createdAt, "dd/MM/yyyy HH:mm") }}
+              </mat-card-title>
+            </mat-card>
+          </div>
+        </div>
+      </div>
+
+      <mat-card style="margin-top: 12px">
+        <mat-card-subtitle>Membros </mat-card-subtitle>
+        <ng-container *ngIf="isLoadingMembers; else elseTemplate">
+          <mat-spinner style="margin: auto" [diameter]="20"></mat-spinner>
+        </ng-container>
+        <ng-template #elseTemplate>
+          <div *ngFor="let member of members" class="member-item">
+            <div
+              style="
+                font-weight: 500;
+                display: flex;
+                justify-content: space-between;
+              "
+            >
+              <div>{{ member.name }}</div>
+              <div class="admin-badge" *ngIf="chat.admin === member.username">
+                Administrador
+              </div>
+            </div>
+            <div style="display: flex; justify-content: space-between">
+              <div style="flex-grow: 1">{{ member.email }}</div>
+              <div style="flex-grow: 1">{{ member.phone }}</div>
+              <div style="flex-grow: 1">{{ member.role }}</div>
+            </div>
+          </div>
+        </ng-template>
+      </mat-card>
+    </div>
+  </ng-template>
+</div>

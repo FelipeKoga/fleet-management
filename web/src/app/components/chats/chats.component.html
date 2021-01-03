@@ -4,11 +4,11 @@
       <span class="chat-header-text">Chats</span>
     </div>
     <div class="chat-header-actions">
-      <button color="primary" mat-button>
+      <button (click)="newPrivateChat()" color="primary" mat-button>
         <mat-icon>chat</mat-icon>
         Novo chat
       </button>
-      <button color="primary" mat-button>
+      <button (click)="newGroup()" color="primary" mat-button>
         <mat-icon>group</mat-icon>
         Novo grupo
       </button>
@@ -42,7 +42,9 @@
           >
             <div class="chat-item-wrapper">
               <div mat-card-avatar class="photo">
-                <img [src]="chat.photo" />
+                <mat-icon *ngIf="chat.private">person</mat-icon>
+                <mat-icon *ngIf="chat.groupName">group</mat-icon>
+                <!-- <img [src]="chat.photo" /> -->
               </div>
               <div class="chat-item-content">
                 <div
@@ -76,7 +78,7 @@
                     {{ chat.lastMessage.message }}
                   </div>
                   <div class="chat-item-message-date-text">
-                    {{ convertMessageDate(chat.lastMessage.createdAt) }}
+                    {{ convertDate(chat.lastMessage.createdAt, "HH:mm") }}
                   </div>
                 </div>
               </div>
@@ -88,5 +90,12 @@
   </div>
   <div *ngIf="selectedChat.id">
     <app-chat [chat]="selectedChat"></app-chat>
+  </div>
+
+  <div *ngIf="showNewChat">
+    <app-new-chat
+      [newChatType]="showNewChat"
+      (onChatCreated)="handleChatCreated($event)"
+    ></app-new-chat>
   </div>
 </div>

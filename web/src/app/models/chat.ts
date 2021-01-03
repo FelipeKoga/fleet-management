@@ -9,4 +9,5 @@ export class Chat {
   groupName?: string;
   admin?: string;
   user?: User;
+  createdAt: number;
 }

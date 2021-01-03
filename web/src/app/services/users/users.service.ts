@@ -36,7 +36,6 @@ export class UsersService extends StateService<UsersState> {
     this.http
       .get<User[]>(`${API}/company/${this.companyId}/users`)
       .subscribe((users) => {
-        console.log(users);
         this.setState({ users, isLoading: false });
       });
   }

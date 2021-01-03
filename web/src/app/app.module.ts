@@ -21,6 +21,7 @@ import { AuthGuard } from "./services/auth/guards/auth-guard.service";
 import { UsersComponent } from "./components/users/users.component";
 import { FormDialogComponent } from "./components/users/form-dialog/form-dialog.component";
 import { ChatsModule } from "./components/chats/chats.module";
+import { SharedModule } from "./shared/shared.module";
 
 @NgModule({
   declarations: [
@@ -39,6 +40,7 @@ import { ChatsModule } from "./components/chats/chats.module";
     FormsModule,
     LayoutModule,
     ChatsModule,
+    SharedModule,
     MaterialModule,
     AppRoutingModule,
     HttpClientModule,

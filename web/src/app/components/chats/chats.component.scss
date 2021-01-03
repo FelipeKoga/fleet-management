@@ -56,11 +56,10 @@
 }
 
 .chat-list-container {
-  overflow-y: hidden;
+  overflow-y: auto;
 }
 
 .chat-list-wrapper {
-  overflow-y: hidden;
   padding-left: 4px;
   padding-right: 4px;
 }

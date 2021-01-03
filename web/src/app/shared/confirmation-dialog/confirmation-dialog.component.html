@@ -1,0 +1,11 @@
+<div>
+  <h2>{{ data.title }}</h2>
+  <p>{{ data.body }}</p>
+
+  <div style="display: flex; justify-content: space-between">
+    <button (click)="cancel()" mat-stroked-button>Cancelar</button>
+    <button (click)="confirm()" mat-stroked-button color="warn">
+      {{ data.confirmationLabel }}
+    </button>
+  </div>
+</div>
