@@ -74,6 +74,15 @@ const update = async params => {
         .promise();
 };
 
+const remove = async params => {
+    return docClient
+        .delete({
+            TableName: BaseParams.TableName,
+            Key: params,
+        })
+        .promise();
+};
+
 module.exports = {
     fetchByPK,
     fetchBySK,
@@ -82,4 +91,5 @@ module.exports = {
     insert,
     update,
     getKey,
+    remove,
 };

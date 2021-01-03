@@ -1,0 +1,12 @@
+{
+    "httpMethod": "PUT",
+    "resource": "/company/{companyId}/users/{username}/group/${chatId}",
+    "pathParameters": {
+        "companyId": "1",
+        "username": "kosloski.fkoga@gmail.com",
+        "chatId": "Co_izgk3a0XscTYmN0_pe"
+    },
+    "body": {
+        "member": "fkoga@alunos.utfpr.edu.br"
+    }
+}

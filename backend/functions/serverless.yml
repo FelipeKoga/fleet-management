@@ -47,8 +47,26 @@ chat:
                   authorizerId:
                       Ref: ApiGatewayAuthorizer
         - http:
-              path: company/{companyId}/users/{username}/group/{groupId}
+              path: company/{companyId}/users/{username}/group/{chatId}
               method: PUT
+              cors: true
+              authorizer:
+                  type: COGNITO_USER_POOLS
+                  authorizerId:
+                      Ref: ApiGatewayAuthorizer
+
+        - http:
+              path: company/{companyId}/users/{username}/group/{chatId}/remove
+              method: PUT
+              cors: true
+              authorizer:
+                  type: COGNITO_USER_POOLS
+                  authorizerId:
+                      Ref: ApiGatewayAuthorizer
+
+        - http:
+              path: company/{companyId}/users/{username}/group/{chatId}
+              method: GET
               cors: true
               authorizer:
                   type: COGNITO_USER_POOLS

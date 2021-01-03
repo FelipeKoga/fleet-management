@@ -7,10 +7,17 @@ const headers = {
 
 async function handlePostMethod(resource, body, { username }) {
     const method = resource.split('/').pop();
-    if (method === 'group') return Resolver.createGroup(username, body);
+    const payload = JSON.parse(body);
+    let chat;
 
-    const { withUsername } = body;
-    return Resolver.createChat(username, withUsername);
+    if (method === 'group')
+        chat = await Resolver.createGroup(username, payload);
+    else {
+        const { withUsername } = payload;
+        chat = await Resolver.createChat(username, withUsername);
+    }
+
+    return JSON.stringify(chat);
 }
 
 async function handleGetMethod(resource, { username, chatId }) {
@@ -20,7 +27,24 @@ async function handleGetMethod(resource, { username, chatId }) {
 
     if (method === 'messages') response = await Resolver.getMessages(chatId);
 
+    if (resource.includes('group/'))
+        response = await Resolver.getGroupMembers(chatId);
+
     return JSON.stringify(response);
+}
+
+async function handlePutMethod(resource, body, { chatId }) {
+    const payload = JSON.parse(body);
+
+    if (resource.includes('group/')) {
+        const { member } = payload;
+        if (resource.includes('/remove')) {
+            return Resolver.removeMember(chatId, member);
+        }
+        return Resolver.addMember(chatId, member);
+    }
+
+    throw new Error('Method not allowed');
 }
 
 async function main({
@@ -36,6 +60,8 @@ async function main({
                 return handlePostMethod(resource, body, pathParameters);
             case 'GET':
                 return handleGetMethod(resource, pathParameters);
+            case 'PUT':
+                return handlePutMethod(resource, body, pathParameters);
             default:
                 throw new Error('Method not allowed');
         }
@@ -58,6 +84,7 @@ async function main({
 }
 
 exports.handler = async event => {
+    console.log(event);
     try {
         return {
             statusCode: 200,

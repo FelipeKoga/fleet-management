@@ -1,0 +1,9 @@
+{
+    "httpMethod": "GET",
+    "resource": "/company/{companyId}/users/{username}/group/${chatId}",
+    "pathParameters": {
+        "companyId": "1",
+        "username": "kosloski.fkoga@gmail.com",
+        "chatId": "cVQO640v_LCqSI1EtRNue"
+    }
+}

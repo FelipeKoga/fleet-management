@@ -1,5 +1,12 @@
 const { nanoid } = require('nanoid');
-const { fetchByPK, fetchBySK, getByPK, insert } = require('./query');
+const {
+    fetchByPK,
+    fetchBySK,
+    getByPK,
+    insert,
+    update,
+    remove,
+} = require('./query');
 
 async function fetchUserChats(username) {
     return fetchBySK({
@@ -56,6 +63,13 @@ async function addMember(chatId, username) {
     });
 }
 
+async function removeMember(chatId, username) {
+    await remove({
+        partitionKey: `CHAT#${chatId}`,
+        sortKey: `MEMBER#${username}`,
+    });
+}
+
 async function createChat(args) {
     const chatId = nanoid();
     await insert({
@@ -90,6 +104,19 @@ async function getChat(chatId) {
     return chat;
 }
 
+async function updateAdmin(chatId, admin) {
+    await update({
+        Key: {
+            partitionKey: `CHAT#${chatId}`,
+            sortKey: `CONFIG`,
+        },
+        UpdateExpression: 'set admin = :admin',
+        ExpressionAttributeValues: {
+            ':admin': admin,
+        },
+    });
+}
+
 module.exports = {
     fetchChatUsers,
     fetchUserChats,
@@ -98,4 +125,6 @@ module.exports = {
     getChat,
     createChat,
     addMember,
+    updateAdmin,
+    removeMember,
 };

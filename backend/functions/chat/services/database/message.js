@@ -73,17 +73,15 @@ async function viewedMessages(chatId, username) {
     });
 }
 
-async function newMessages(chatId, username, createdAt) {
+async function newMessages(chatId, username) {
     await update({
         Key: {
             partitionKey: `CHAT#${chatId}`,
             sortKey: `MEMBER#${username}`,
         },
-        UpdateExpression:
-            'set newMessages = newMessages + :nm, createdAt = :ca ',
+        UpdateExpression: 'set newMessages = newMessages + :nm',
         ExpressionAttributeValues: {
             ':nm': 1,
-            ':ca': createdAt,
         },
     });
 }
