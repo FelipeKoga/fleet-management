@@ -94,10 +94,10 @@
     <mat-divider style="margin-bottom: 8px"></mat-divider>
     <div class="messages-action-container">
       <textarea
-        matInput
         #sendInput
+        type="submit"
         class="messages-action-input"
-        (keydown.enter)="sendMessage($event.target.value)"
+        (keydown.enter)="sendMessage($event)"
         placeholder="Digite uma mensagem"
       ></textarea>
       <button mat-icon-button style="color: gray">

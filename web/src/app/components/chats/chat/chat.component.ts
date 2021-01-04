@@ -1,5 +1,6 @@
 import { ElementRef, SimpleChanges, ViewChild } from "@angular/core";
 import { Component, Input, OnInit } from "@angular/core";
+import { FormControl, FormGroup } from "@angular/forms";
 import { Observable } from "rxjs";
 import { Chat } from "src/app/models/chat";
 import { Message, MessageStatus } from "src/app/models/message";
@@ -27,9 +28,7 @@ export class ChatComponent implements OnInit {
   @Input() chat: Chat;
   public showChatDetails: boolean;
   public convertDate = convertDate;
-
   public username: string;
-
   public state$: Observable<MessagesState>;
 
   constructor(
@@ -83,9 +82,11 @@ export class ChatComponent implements OnInit {
     } catch (err) {}
   }
 
-  public sendMessage(text: string) {
+  public sendMessage(event: Event) {
+    const text = (event.target as HTMLInputElement).value;
+    event.preventDefault();
+    this.sendInput.nativeElement.value = null;
     if (!text.length) return;
-    this.sendInput.nativeElement.value = "";
     const message = new Message({
       chatId: this.chat.id,
       message: text,
