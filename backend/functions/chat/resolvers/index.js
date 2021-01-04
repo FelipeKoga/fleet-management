@@ -24,6 +24,22 @@ async function getChat(chatId, username, member) {
     };
 }
 
+async function addMessageAll(message) {
+    const users = await Database.chat.fetchChatUsers(message.chatId);
+    await Promise.all(
+        users.map(async memberUsername => {
+            await Database.message.newMessages(message.chatId, memberUsername);
+            const memberChat = await getChat(message.chatId, memberUsername);
+            await sendWebSocketMessage(memberUsername, message, 'new_message');
+            await sendWebSocketMessage(
+                memberUsername,
+                memberChat,
+                'chat_updated',
+            );
+        }),
+    );
+}
+
 async function getAllChats(username) {
     const userChatsMetadata = await Database.chat.fetchUserChats(username);
 
@@ -100,6 +116,17 @@ async function createGroup(username, { members, groupName }) {
         await Database.chat.addMember(groupId, username),
         await sendWebSocketMessage(username, chat, 'created_chat'),
     );
+
+    const user = await Database.user.getUser(username);
+    const messageResponse = await Database.message.addMessage({
+        chatId: chat.id,
+        username: 'SYSTEM',
+        message: `Grupo criado por ${user.name}`,
+        messageId: nanoid(),
+        createdAt: Date.now(),
+        status: 'SENT',
+    });
+    await addMessageAll(messageResponse);
 
     return chat;
 }
@@ -193,6 +220,7 @@ async function addMember(chatId, username) {
     }
 
     await Database.chat.addMember(chatId, username);
+
     const chatConfig = await Database.chat.getChat(chatId);
     const chat = chatConfig.private
         ? await getChat(
@@ -205,6 +233,16 @@ async function addMember(chatId, username) {
         : await getChat(chatId, username);
 
     await sendWebSocketMessage(username, chat, 'chat_updated');
+    const user = await Database.user.getUser(username);
+    const messageResponse = await Database.message.addMessage({
+        chatId,
+        username: 'SYSTEM',
+        message: `${user.name} foi adicionado do grupo`,
+        messageId: nanoid(),
+        createdAt: Date.now(),
+        status: 'SENT',
+    });
+    await addMessageAll(messageResponse);
 
     return true;
 }
@@ -218,7 +256,7 @@ async function removeMember(chatId, username) {
     const messageResponse = await Database.message.addMessage({
         chatId,
         username: 'SYSTEM',
-        message: `${user.name} foi removido do grupo.`,
+        message: `${user.name} foi removido do grupo`,
         messageId: nanoid(),
         createdAt: Date.now(),
         status: 'SENT',
@@ -229,23 +267,7 @@ async function removeMember(chatId, username) {
         await Database.chat.updateAdmin(chatId, users[0]);
     }
 
-    await Promise.all(
-        users.map(async memberUsername => {
-            await Database.message.newMessages(chatId, memberUsername);
-            const memberChat = await getChat(chatId, memberUsername);
-            await sendWebSocketMessage(
-                memberUsername,
-                messageResponse,
-                'new_message',
-            );
-            await sendWebSocketMessage(
-                memberUsername,
-                memberChat,
-                'chat_updated',
-            );
-        }),
-    );
-
+    await addMessageAll(messageResponse);
     return true;
 }
 
