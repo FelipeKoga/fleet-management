@@ -15,6 +15,7 @@
     </div>
     <div class="chat-header-filter">
       <input
+        (keydown.enter)="filterChats($event.target.value)"
         class="chat-header-filter-input"
         placeholder="Pesquisa por nome do funcionário ou grupo"
       />
@@ -22,7 +23,7 @@
     </div>
     <div class="chat-list-container">
       <div class="chat-list-wrapper">
-        <ng-container *ngIf="(state$ | async).isLoading; else elseTemplate">
+        <ng-container *ngIf="isLoadingChats; else elseTemplate">
           <mat-spinner
             style="margin: auto"
             color="primary"
@@ -37,7 +38,7 @@
                 ? 'chat-item-card-active'
                 : 'chat-item-card'
             "
-            *ngFor="let chat of (state$ | async).chats"
+            *ngFor="let chat of filteredChats ? filteredChats : chats"
             class="chat-item-card"
           >
             <div class="chat-item-wrapper">

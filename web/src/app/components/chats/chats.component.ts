@@ -16,10 +16,12 @@ import { convertDate } from "../../utils/date";
 })
 export class ChatsComponent implements OnInit {
   public chats: Chat[];
+  public filteredChats: Chat[];
   public selectedChat: Chat;
   public state$: Observable<ChatsState>;
   public username: string;
   public showNewChat: NewChatType;
+  public isLoadingChats: boolean;
   public convertDate = convertDate;
 
   constructor(
@@ -30,7 +32,10 @@ export class ChatsComponent implements OnInit {
 
   ngOnInit(): void {
     this.selectedChat = new Chat();
-    this.state$ = this.chatsService.chatsState$;
+    this.chatsService.chatsState$.subscribe((state) => {
+      this.chats = state.chats;
+      this.isLoadingChats = state.isLoading;
+    });
     this.webSocketService.messages.subscribe((response) => {
       console.log(response);
       if (
@@ -62,12 +67,21 @@ export class ChatsComponent implements OnInit {
   }
   public newPrivateChat() {
     this.selectedChat = new Chat();
-
     this.showNewChat = NewChatType.PRIVATE;
   }
 
   public handleChatCreated(chat: Chat) {
     this.selectedChat = chat;
     this.showNewChat = null;
+  }
+
+  public filterChats(text: string) {
+    this.filteredChats = this.chats.filter((chat) => {
+      if (chat.private) {
+        return chat.user.name.includes(text);
+      } else {
+        return chat.groupName.includes(text);
+      }
+    });
   }
 }
