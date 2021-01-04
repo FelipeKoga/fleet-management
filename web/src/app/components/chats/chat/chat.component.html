@@ -60,23 +60,33 @@
               </div>
             </div>
           </div>
-          <div
-            class="message-row recipient"
-            *ngIf="message.username !== username"
-          >
-            <div class="message-text">
-              <div
-                style="font-weight: 500; color: grey; font-size: 12px"
-                *ngIf="!chat.private && message.username !== username"
-              >
-                {{ message.username }}
+          <div *ngIf="message.username !== username">
+            <ng-container
+              *ngIf="message.username === 'SYSTEM'; else elseTemplate"
+            >
+              <div class="system-message">
+                <div class="system-message-text">
+                  {{ message.message }}
+                </div>
               </div>
-              <div style="margin-top: 2px">{{ message.message }}</div>
+            </ng-container>
+            <ng-template #elseTemplate>
+              <div class="message-row recipient">
+                <div class="message-text">
+                  <div
+                    style="font-weight: 500; color: grey; font-size: 12px"
+                    *ngIf="!chat.private && message.username !== username"
+                  >
+                    {{ message.username }}
+                  </div>
+                  <div style="margin-top: 2px">{{ message.message }}</div>
 
-              <div class="message-timestamp">
-                {{ convertDate(message.createdAt, "HH:mm") }}
+                  <div class="message-timestamp">
+                    {{ convertDate(message.createdAt, "HH:mm") }}
+                  </div>
+                </div>
               </div>
-            </div>
+            </ng-template>
           </div>
         </div>
       </ng-template>
