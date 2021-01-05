@@ -1,0 +1,8 @@
+{
+    "httpMethod": "POST",
+    "resource": "/files",
+    "body": {
+        "bucket": "tcc-project-assets",
+        "key": "company/1/kosloski.fkoga@gmail.com/avatar"
+    }
+}

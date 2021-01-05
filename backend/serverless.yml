@@ -76,7 +76,9 @@ functions:
     - ${file(functions/serverless.yml)}
 
 resources:
-    - ${file(dynamodb.yml)}
-    - ${file(cognito.yml)}
-    - ${file(cognito-identity-pool.yml)}
-    - ${file(outputs.yml)}
+    - ${file(resources/roles.yml)}
+    - ${file(resources/policies.yml)}
+    - ${file(resources/dynamodb.yml)}
+    - ${file(resources/cognito.yml)}
+    - ${file(resources/cognito-identity-pool.yml)}
+    - ${file(resources/outputs.yml)}

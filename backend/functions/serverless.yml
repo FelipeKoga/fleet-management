@@ -184,4 +184,21 @@ ws-post-message:
 
     environment:
         WS_URL: ${self:custom.webSocketUrl}
-        # USER_TABLE: ${self:custom.userTable}
+
+s3-file-upload:
+    handler: functions/s3-file-upload/index.handler
+    role: S3Role
+    package:
+        include:
+            - functions/s3-file-upload/*
+            - functions/s3-file-upload/*/**
+              - '!functions/s3-file-upload/node_modules/aws-sdk/**'
+    events:
+        - http:
+              path: files
+              method: POST
+              cors: true
+              authorizer:
+                  type: COGNITO_USER_POOLS
+                  authorizerId:
+                      Ref: ApiGatewayAuthorizer
