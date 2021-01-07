@@ -5,7 +5,7 @@ const lambda = new Lambda();
 const sendMessage = async (body, connectionIds, action) => {
     return lambda
         .invoke({
-            FunctionName: `${process.env.APP}-${process.env.STAGE}-ws-post-message`,
+            FunctionName: `${process.env.APP}-ws-post-message-${process.env.STAGE}`,
             Payload: JSON.stringify({
                 connectionIds,
                 data: {

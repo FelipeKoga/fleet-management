@@ -5,19 +5,23 @@ const headers = {
     'Access-Control-Allow-Credentials': true,
 };
 
-async function handlePostMethod(resource, body, { username }) {
+async function handlePostMethod(resource, body, { username, chatId }) {
     const method = resource.split('/').pop();
     const payload = JSON.parse(body);
-    let chat;
+    let response;
 
     if (method === 'group')
-        chat = await Resolver.createGroup(username, payload);
-    else {
+        response = await Resolver.createGroup(username, payload);
+    else if (resource.includes('avatar')) {
+        const { avatar } = payload;
+
+        response = await Resolver.addGroupAvatar(chatId, username, avatar);
+    } else {
         const { withUsername } = payload;
-        chat = await Resolver.createChat(username, withUsername);
+        response = await Resolver.createChat(username, withUsername);
     }
 
-    return JSON.stringify(chat);
+    return JSON.stringify(response);
 }
 
 async function handleGetMethod(resource, { username, chatId }) {

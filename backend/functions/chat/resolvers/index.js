@@ -1,6 +1,15 @@
 const { nanoid } = require('nanoid');
 const Database = require('../services/database');
 const Lambda = require('../services/lambda');
+const S3 = require('../services/s3');
+
+async function getUser(username) {
+    const user = await Database.user.getUser(username);
+    if (user.avatar) {
+        user.avatarUrl = S3.getObject(user.avatar);
+    }
+    return user;
+}
 
 async function sendWebSocketMessage(username, body, action) {
     const connectionIds = await Database.user.fetchConnectionIds(username);
@@ -13,8 +22,12 @@ async function getChat(chatId, username, member) {
         chatId,
         username,
     );
-    const chatMember = member ? await Database.user.getUser(member) : null;
+    const chatMember = member ? await getUser(member) : null;
     const lastMessage = await Database.message.getLastMessage(chatId);
+
+    if (chat.avatar) {
+        chat.avatarUrl = S3.getObject(chat.avatar);
+    }
 
     return {
         ...chat,
@@ -117,7 +130,7 @@ async function createGroup(username, { members, groupName }) {
         await sendWebSocketMessage(username, chat, 'created_chat'),
     );
 
-    const user = await Database.user.getUser(username);
+    const user = await getUser(username);
     const messageResponse = await Database.message.addMessage({
         chatId: chat.id,
         username: 'SYSTEM',
@@ -206,7 +219,7 @@ async function getGroupMembers(chatId) {
     const promises = [];
 
     chatUsers.forEach(username => {
-        promises.push(Database.user.getUser(username));
+        promises.push(getUser(username));
     });
 
     return Promise.all(promises);
@@ -233,7 +246,7 @@ async function addMember(chatId, username) {
         : await getChat(chatId, username);
 
     await sendWebSocketMessage(username, chat, 'chat_updated');
-    const user = await Database.user.getUser(username);
+    const user = await getUser(username);
     const messageResponse = await Database.message.addMessage({
         chatId,
         username: 'SYSTEM',
@@ -249,7 +262,7 @@ async function addMember(chatId, username) {
 
 async function removeMember(chatId, username) {
     const chatConfig = await Database.chat.getChat(chatId);
-    const user = await Database.user.getUser(username);
+    const user = await getUser(username);
     await Database.chat.removeMember(chatId, username);
     await sendWebSocketMessage(username, { chatId }, 'chat_removed');
 
@@ -271,6 +284,22 @@ async function removeMember(chatId, username) {
     return true;
 }
 
+async function addGroupAvatar(chatId, username, avatar) {
+    await Database.chat.updateGroupAvatar(chatId, avatar);
+    const chat = await getChat(chatId, username);
+    const users = await Database.chat.fetchChatUsers(chatId);
+
+    const promises = [];
+    users.forEach(user => {
+        promises.push(sendWebSocketMessage(user, chat, 'chat_updated'));
+    });
+
+    await Promise.all(promises);
+
+    console.log(chat);
+    return chat;
+}
+
 module.exports = {
     getAllChats,
     createChat,
@@ -281,4 +310,5 @@ module.exports = {
     getGroupMembers,
     addMember,
     removeMember,
+    addGroupAvatar,
 };
