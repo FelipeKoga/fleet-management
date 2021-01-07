@@ -2,7 +2,7 @@ const { getByPK, fetchBySK, insert, update, remove } = require('./query');
 const { removeConnectionIds } = require('./connection');
 
 const ProjectionExpression =
-    'username, #name, email, avatar, #status, #role, phone, companyId';
+    'username, #name, email, avatar, #status, #role, phone, companyId, customName';
 
 async function getUser(username, companyId) {
     return getByPK({
@@ -46,7 +46,7 @@ async function createUser(data, companyId) {
 }
 
 async function updateUser(
-    { customName, name, phone, email, role, status },
+    { customName = '', name, phone, email, role, status, avatar },
     username,
     companyId,
 ) {
@@ -56,11 +56,12 @@ async function updateUser(
             sortKey: `CONFIG#${companyId}`,
         },
         UpdateExpression:
-            'set customName = :customName, phone = :phone, email = :email, #role = :role, #status = :status, #name = :name',
+            'set customName = :customName, phone = :phone, email = :email, #role = :role, #status = :status, #name = :name, #avatar = :avatar',
         ExpressionAttributeNames: {
             '#status': 'status',
             '#role': 'role',
             '#name': 'name',
+            '#avatar': 'avatar',
         },
         ExpressionAttributeValues: {
             ':customName': customName,
@@ -69,6 +70,7 @@ async function updateUser(
             ':role': role,
             ':status': status,
             ':name': name,
+            ':avatar': avatar,
         },
     });
 }
