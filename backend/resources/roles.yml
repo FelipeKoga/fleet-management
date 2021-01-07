@@ -1,8 +1,8 @@
 Resources:
-    S3Role:
+    TccRole:
         Type: AWS::IAM::Role
         Properties:
-            RoleName: ${self:app}-s3-invoke-role-${self:custom.stage}
+            RoleName: ${self:app}-role-${self:custom.stage}
             AssumeRolePolicyDocument:
                 Version: '2012-10-17'
                 Statement:

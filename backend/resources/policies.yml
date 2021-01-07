@@ -18,4 +18,90 @@ Resources:
                       Resource:
                           - arn:aws:s3:::tcc-project-assets
             Roles:
-                - !Ref S3Role
+                - !Ref TccRole
+
+    InvokeFunctionPolicy:
+        Type: AWS::IAM::Policy
+        Properties:
+            PolicyName: ${self:app}-invoke-function-policy-${self:custom.stage}
+            PolicyDocument:
+                Statement:
+                    - Effect: Allow
+                      Action: lambda:InvokeFunction
+                      Resource:
+                          - arn:aws:lambda:us-east-1:603366505042:function:tcc-user-dev
+                          - arn:aws:lambda:us-east-1:603366505042:function:tcc-chat-dev
+                          - arn:aws:lambda:us-east-1:603366505042:function:tcc-connection-handler-dev
+                          - arn:aws:lambda:us-east-1:603366505042:function:tcc-ws-post-message-dev
+            Roles:
+                - !Ref TccRole
+    CloudWatchPolicy:
+        Type: AWS::IAM::Policy
+        Properties:
+            PolicyName: ${self:app}-cloudwatch-policy-${self:custom.stage}
+            PolicyDocument:
+                Statement:
+                    - Effect: Allow
+                      Action:
+                          - logs:CreateLogStream
+                          - logs:CreateLogGroup
+                      Resource: '*'
+                    - Effect: Allow
+                      Action: logs:PutLogEvents
+                      Resource: '*'
+            Roles:
+                - !Ref TccRole
+
+    DynamoPolicy:
+        Type: AWS::IAM::Policy
+        Properties:
+            PolicyName: ${self:app}-dynamo-policy-${self:custom.stage}
+            PolicyDocument:
+                Version: '2012-10-17'
+                Statement:
+                    - Effect: Allow
+                      Action: dynamodb:Query
+                      Resource:
+                          - arn:aws:dynamodb:us-east-1:603366505042:table/${self:app}-table-${self:custom.stage}/index/*
+                    - Effect: Allow
+                      Action:
+                          - dynamodb:Scan
+                          - dynamodb:Query
+                          - dynamodb:PutItem
+                          - dynamodb:GetItem
+                          - dynamodb:DeleteItem
+                          - dynamodb:UpdateItem
+                      Resource:
+                          - arn:aws:dynamodb:us-east-1:603366505042:table/${self:app}-table-${self:custom.stage}
+            Roles:
+                - !Ref TccRole
+
+    CognitoPolicy:
+        Type: AWS::IAM::Policy
+        Properties:
+            PolicyName: ${self:app}-cognito-policy-${self:custom.stage}
+            PolicyDocument:
+                Version: '2012-10-17'
+                Statement:
+                    - Effect: Allow
+                      Action:
+                          - cognito-idp:AdminCreateUser
+                          - cognito-idp:AdminSetUserPassword
+                          - cognito-idp:AdminDeleteUser
+                      Resource: '*'
+            Roles:
+                - !Ref TccRole
+    WebSocketPolicy:
+        Type: AWS::IAM::Policy
+        Properties:
+            PolicyName: ${self:app}-websocket-policy-${self:custom.stage}
+            PolicyDocument:
+                Version: '2012-10-17'
+                Statement:
+                    - Effect: Allow
+                      Action:
+                          - execute-api:ManageConnections
+                      Resource:
+                          - arn:aws:execute-api:*:*:*/@connections/*
+            Roles:
+                - !Ref TccRole

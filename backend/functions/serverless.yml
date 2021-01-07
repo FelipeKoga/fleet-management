@@ -1,6 +1,8 @@
 # REST handlers
 chat:
+    name: ${self:app}-chat-${self:custom.stage}
     handler: functions/chat/index.handler
+    role: TccRole
     package:
         include:
             - functions/chat/*
@@ -46,6 +48,15 @@ chat:
                   type: COGNITO_USER_POOLS
                   authorizerId:
                       Ref: ApiGatewayAuthorizer
+
+        - http:
+              path: company/{companyId}/users/{username}/group/{chatId}/avatar
+              method: POST
+              cors: true
+              authorizer:
+                  type: COGNITO_USER_POOLS
+                  authorizerId:
+                      Ref: ApiGatewayAuthorizer
         - http:
               path: company/{companyId}/users/{username}/group/{chatId}
               method: PUT
@@ -79,7 +90,7 @@ chat:
               route: open-messages
               routeResponseSelectionExpression: $default
     environment:
-        APP: ${self:service}
+        APP: ${self:app}
         STAGE: ${self:custom.stage}
         TABLE: ${self:custom.table}
 company:
@@ -89,7 +100,9 @@ company:
             - functions/company/*
             - functions/company/*/**
 user:
+    name: ${self:app}-user-${self:custom.stage}
     handler: functions/user/index.handler
+    role: TccRole
     package:
         include:
             - functions/user/*
@@ -137,13 +150,15 @@ user:
                   authorizerId:
                       Ref: ApiGatewayAuthorizer
     environment:
-        APP: ${self:service}
+        APP: ${self:app}
         STAGE: ${self:custom.stage}
         TABLE: ${self:custom.table}
 
 # Web Socket handlers
 connection-handler:
+    name: ${self:app}-connection-handler-${self:custom.stage}
     handler: functions/connection-handler/index.handler
+    role: TccRole
     package:
         include:
             - functions/connection-handler/*
@@ -158,7 +173,7 @@ connection-handler:
               routeResponseSelectionExpression: $default
     environment:
         WS_URL: ${self:custom.webSocketUrl}
-        APP: ${self:service}
+        APP: ${self:app}
         STAGE: ${self:custom.stage}
         TABLE: ${self:custom.table}
 
@@ -175,7 +190,9 @@ connection-handler:
         #     ]
 
 ws-post-message:
+    name: ${self:app}-ws-post-message-${self:custom.stage}
     handler: functions/ws-post-message/index.handler
+    role: TccRole
     package:
         include:
             - functions/ws-post-message/*
@@ -186,8 +203,9 @@ ws-post-message:
         WS_URL: ${self:custom.webSocketUrl}
 
 s3-file-upload:
+    name: ${self:app}-s3-file-upload-${self:custom.stage}
     handler: functions/s3-file-upload/index.handler
-    role: S3Role
+    role: TccRole
     package:
         include:
             - functions/s3-file-upload/*
