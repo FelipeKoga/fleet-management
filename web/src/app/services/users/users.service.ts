@@ -53,7 +53,7 @@ export class UsersService extends StateService<UsersState> {
       });
   }
 
-  public update(user: User, completed?: () => void) {
+  public update(user: User, completed?: (user: User) => void) {
     this.setState({ isLoading: true });
     this.http
       .put<User>(
@@ -70,7 +70,7 @@ export class UsersService extends StateService<UsersState> {
           }),
           isLoading: false,
         });
-        completed();
+        completed(response);
       });
   }
 

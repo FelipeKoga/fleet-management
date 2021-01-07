@@ -8,6 +8,7 @@ import { ServiceEndpoint } from "../../../stack.json";
 
 export interface AuthServiceStore {
   user?: User;
+  cognitoUser?: any;
   isLoggedIn?: boolean;
   isLoading?: boolean;
   errorCode?: string;
@@ -49,6 +50,7 @@ export class AuthService {
       this.setStoreValue({ isLoading: true });
       this.subAuthStore.next({ isLoading: true });
       const cognitoUser = await Auth.currentAuthenticatedUser();
+      this.setStoreValue({ cognitoUser });
       const token = await Auth.currentSession();
       this.authToken = token.getIdToken().getJwtToken();
       const companyId = cognitoUser.attributes["custom:companyId"];
@@ -99,6 +101,19 @@ export class AuthService {
 
   public getUser(): User {
     return this.subAuthStore.getValue().user;
+  }
+
+  public setUser(user: User) {
+    this.subAuthStore.next({ ...this.subAuthStore.value, user });
+  }
+
+  public async userChangePassword(oldPassword, password) {
+    console.log(this.subAuthStore.value.cognitoUser);
+    return Auth.changePassword(
+      this.subAuthStore.value.cognitoUser,
+      oldPassword,
+      password
+    );
   }
 
   private setStoreValue(store: AuthServiceStore) {

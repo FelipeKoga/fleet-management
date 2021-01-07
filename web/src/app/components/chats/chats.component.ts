@@ -33,6 +33,7 @@ export class ChatsComponent implements OnInit {
   ngOnInit(): void {
     this.selectedChat = new Chat();
     this.chatsService.chatsState$.subscribe((state) => {
+      console.log(state.chats);
       this.chats = state.chats;
       this.isLoadingChats = state.isLoading;
     });

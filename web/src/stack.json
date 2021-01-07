@@ -4,6 +4,6 @@
   "Region": "us-east-1",
   "IdentityPoolId": "us-east-1:37c2e9f4-7fac-4274-bd9e-747803cbbedb",
   "ServiceEndpoint": "https://2p8b6trvua.execute-api.us-east-1.amazonaws.com/dev",
-  "ServiceEndpointWebsocket": "wss://ljdjapabh7.execute-api.us-east-1.amazonaws.com/dev",
+  "ServiceEndpointWebsocket": "wss://uv017zrmwj.execute-api.us-east-1.amazonaws.com/dev",
   "ServerlessDeploymentBucketName": "tcc-backend-dev-serverlessdeploymentbucket-q730t9xeco0a"
 }

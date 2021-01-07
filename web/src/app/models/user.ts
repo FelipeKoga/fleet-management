@@ -18,6 +18,8 @@ export class User {
   status: UserStatus;
   customName: string;
   companyId: string;
+  avatar: string;
+  avatarUrl?: string;
 
   constructor({
     name = "",
@@ -28,6 +30,8 @@ export class User {
     status = UserStatus.OFFLINE,
     companyId = "",
     username = email,
+    avatar = "",
+    avatarUrl = "",
   }) {
     this.name = name;
     this.email = email;
@@ -37,5 +41,7 @@ export class User {
     this.customName = customName;
     this.username = username;
     this.companyId = companyId;
+    this.avatar = avatar;
+    this.avatarUrl = avatarUrl;
   }
 }

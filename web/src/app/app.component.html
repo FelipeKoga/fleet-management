@@ -36,10 +36,10 @@
       <div [matMenuTriggerFor]="menu" class="footer">
         <mat-divider style="margin-bottom: 8px"></mat-divider>
         <div class="user-wrapper">
-          <img class="user-photo" src="" />
+          <img class="user-photo" [src]="currentUser.avatarUrl" />
           <div class="user-details">
             <div class="user-name">{{ currentUser.name }}</div>
-            <div class="user-role">{{ currentUser.role }}</div>
+            <div class="user-role">{{ getRole(currentUser.role) }}</div>
           </div>
         </div>
       </div>
@@ -55,7 +55,11 @@
     <mat-icon>check_circle_outline</mat-icon>
     <span>Online</span>
   </button>
-  <button style="background-color: #fafafa" mat-menu-item>
+  <button
+    (click)="goToProfile()"
+    style="background-color: #fafafa"
+    mat-menu-item
+  >
     <mat-icon>person</mat-icon>
     <span>Perfil</span>
   </button>

@@ -19,10 +19,24 @@
   margin-bottom: 12px;
 }
 
-.user-photo {
+.chat-avatar {
   width: 52px;
   height: 52px;
+  background-color: #c0c0c0;
+  outline: none;
+  object-fit: cover;
   border-radius: 50%;
+  border: none;
+}
+
+.user {
+  background-position: center;
+  background-image: url("../../../../assets/default_user.png");
+}
+
+.chat-avatar .group {
+  background-position: center;
+  background-image: url("../../../../assets/default_group.png");
 }
 
 .status-wrapper {

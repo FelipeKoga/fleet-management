@@ -1,0 +1,27 @@
+@import "../../variables";
+
+mat-card {
+  margin-top: 24px;
+}
+
+.data-form-fields {
+  display: grid;
+  grid-template-columns: auto 240px auto 240px;
+}
+
+.password-form-fields {
+  display: flex;
+}
+
+mat-form-field {
+  width: 95%;
+}
+
+.icon {
+  color: $color-primary;
+  cursor: pointer;
+}
+
+.error {
+  color: $color-error;
+}

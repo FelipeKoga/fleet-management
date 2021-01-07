@@ -70,6 +70,22 @@ export class ChatsService extends StateService<ChatsState> {
       });
   }
 
+  public addGroupAvatar(
+    chatId: string,
+    avatar: string,
+    onComplete: (chat: Chat) => void
+  ) {
+    this.http
+      .post<Chat>(
+        `${API}/company/${this.user.companyId}/users/${this.user.username}/group/${chatId}/avatar`,
+        { avatar }
+      )
+      .subscribe((updatedChat) => {
+        console.log(updatedChat);
+        onComplete(updatedChat);
+      });
+  }
+
   public addOrReplaceChat(newChat: Chat) {
     const chats = [...this.state.chats];
     if (chats.find((chat) => chat.id === newChat.id)) {

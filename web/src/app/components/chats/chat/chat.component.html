@@ -1,6 +1,18 @@
 <div class="chat-container" *ngIf="!showChatDetails">
   <div class="toolbar" (click)="onShowChatDetails()">
-    <img class="user-photo" src="" />
+    <img
+      onerror="this.src='assets/default_user.png';"
+      *ngIf="chat.private"
+      class="chat-avatar"
+      [src]="chat.user.avatarUrl"
+    />
+    <img
+      onerror="this.src='assets/default_group.png';"
+      *ngIf="!chat.private"
+      class="chat-avatar"
+      [src]="chat.avatarUrl"
+    />
+
     <div style="display: flex; flex-direction: column">
       <span class="user-name" *ngIf="chat.user">{{ chat.user.name }}</span>
       <span class="user-name" *ngIf="chat.groupName">{{ chat.groupName }}</span>

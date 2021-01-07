@@ -1,0 +1,191 @@
+<div style="padding: 32px">
+  <h1>Perfil do Funcionário</h1>
+  <mat-card>
+    <div style="display: flex; justify-content: center">
+      <div
+        style="
+          position: absolute;
+          top: 0;
+          left: 0;
+          padding: 8px;
+          font-size: 16px;
+          display: flex;
+          flex-direction: column;
+        "
+      >
+        <span style="font-size: 12px">Usuário</span>
+        <span style="font-weight: 500">{{ user.username }}</span>
+
+        <span style="font-size: 12px; margin-top: 4px">Cargo</span>
+        <span style="font-weight: 500">{{ getRole(user.role) }}</span>
+      </div>
+      <div style="position: relative">
+        <img
+          style="
+            border-radius: 50%;
+            width: 180px;
+            height: 180px;
+            object-fit: cover;
+          "
+          [src]="user.avatarUrl"
+        />
+        <input
+          type="file"
+          style="display: none"
+          #file
+          (change)="fileChange($event)"
+        />
+
+        <button
+          [disabled]="isLoadingAvatar"
+          for="input-file-id"
+          mat-mini-fab
+          (click)="file.click()"
+          style="position: absolute; bottom: 0; right: 0"
+          color="primary"
+        >
+          <ng-container *ngIf="isLoadingAvatar; else elseTemplate">
+            <mat-spinner [diameter]="20"></mat-spinner>
+          </ng-container>
+          <ng-template #elseTemplate>
+            <mat-icon>attach_file</mat-icon>
+          </ng-template>
+        </button>
+      </div>
+    </div>
+    <form [formGroup]="dataFormGroup" (ngSubmit)="updateUser()">
+      <div
+        style="
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+        "
+      >
+        <span style="font-size: 18px; font-weight: 500">Dados pessoais</span>
+
+        <button
+          [disabled]="dataFormGroup.invalid || isLoadingDataForm"
+          type="submit"
+          mat-button
+          color="primary"
+          style="display: flex; justify-content: space-between"
+        >
+          <mat-spinner *ngIf="isLoadingDataForm" [diameter]="30"></mat-spinner>
+          <span *ngIf="!isLoadingDataForm">Salvar</span>
+        </button>
+      </div>
+      <div class="data-form-fields">
+        <mat-form-field appearance="outline">
+          <mat-label>Nome</mat-label>
+          <input formControlName="name" matInput />
+          <mat-error>Campo é obrigatório.</mat-error>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Nome de exibição</mat-label>
+          <input formControlName="customName" matInput />
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Email</mat-label>
+          <input formControlName="email" matInput />
+          <mat-error>Campo é obrigatório.</mat-error>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Telefone</mat-label>
+          <input formControlName="phone" matInput />
+
+          <mat-error>Campo é obrigatório.</mat-error>
+        </mat-form-field>
+      </div>
+    </form>
+  </mat-card>
+  <mat-card>
+    <form [formGroup]="passwordFormGroup" (ngSubmit)="changePassword()">
+      <div
+        style="
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+        "
+      >
+        <span style="font-size: 18px; font-weight: 500">Senha</span>
+        <button
+          [disabled]="passwordFormGroup.invalid || isLoadingPasswordForm"
+          type="submit"
+          mat-button
+          color="primary"
+        >
+          <mat-spinner
+            *ngIf="isLoadingPasswordForm"
+            [diameter]="30"
+          ></mat-spinner>
+          <span *ngIf="!isLoadingPasswordForm">Salvar</span>
+        </button>
+      </div>
+      <div class="password-form-fields">
+        <mat-form-field appearance="outline">
+          <mat-label>Senha atual</mat-label>
+          <input
+            [type]="hiddenPasswordInputs[0] ? 'password' : 'text'"
+            type="password"
+            formControlName="oldPassword"
+            matInput
+          />
+          <mat-icon
+            (click)="hiddenPasswordInputs[0] = !hiddenPasswordInputs[0]"
+            [ngClass]="
+              oldPassword.invalid && oldPassword.touched ? 'error' : 'icon'
+            "
+            matSuffix
+            >{{
+              hiddenPasswordInputs[0] ? "visibility_off" : "visibility"
+            }}</mat-icon
+          >
+          <mat-error>Campo é obrigatório.</mat-error>
+        </mat-form-field>
+        <mat-form-field
+          style="margin-left: 12px; margin-right: 12px"
+          appearance="outline"
+        >
+          <mat-label>Nova senha</mat-label>
+          <input
+            [type]="hiddenPasswordInputs[1] ? 'password' : 'text'"
+            type="password"
+            formControlName="password"
+            matInput
+          />
+          <mat-icon
+            (click)="hiddenPasswordInputs[1] = !hiddenPasswordInputs[1]"
+            [ngClass]="password.invalid && password.touched ? 'error' : 'icon'"
+            matSuffix
+            >{{
+              hiddenPasswordInputs[0] ? "visibility_off" : "visibility"
+            }}</mat-icon
+          >
+          <mat-error>Campo é obrigatório.</mat-error>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Confirmar nova senha</mat-label>
+          <input
+            [type]="hiddenPasswordInputs[2] ? 'password' : 'text'"
+            type="password"
+            formControlName="confirmPassword"
+            matInput
+          />
+          <mat-icon
+            (click)="hiddenPasswordInputs[2] = !hiddenPasswordInputs[2]"
+            [ngClass]="
+              confirmPassword.invalid && confirmPassword.touched
+                ? 'error'
+                : 'icon'
+            "
+            matSuffix
+            >{{
+              hiddenPasswordInputs[0] ? "visibility_off" : "visibility"
+            }}</mat-icon
+          >
+          <mat-error>Campo é obrigatório.</mat-error>
+        </mat-form-field>
+      </div>
+    </form>
+  </mat-card>
+</div>

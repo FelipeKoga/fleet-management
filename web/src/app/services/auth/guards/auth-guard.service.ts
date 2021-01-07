@@ -34,6 +34,7 @@ export class AuthGuard implements CanActivate {
           }
           observer.next(true);
         } else {
+          console.log(_state);
           if (
             _state.url !== AuthStack.LOGIN &&
             _state.url !== AuthStack.FORGOT_PASSWORD

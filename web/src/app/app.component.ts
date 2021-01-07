@@ -3,6 +3,7 @@ import { Router } from "@angular/router";
 import { User } from "./models/user";
 import { AuthService } from "./services/auth/auth.service";
 import { WebsocketService } from "./services/websocket/websocket.service";
+import { roles } from "./utils/role";
 
 @Component({
   selector: "app-root",
@@ -16,7 +17,8 @@ export class AppComponent implements OnInit {
 
   constructor(
     private authService: AuthService,
-    private webSocketService: WebsocketService
+    private webSocketService: WebsocketService,
+    private router: Router
   ) {}
 
   async ngOnInit() {
@@ -25,6 +27,7 @@ export class AppComponent implements OnInit {
     this.authService.authStore().subscribe((store) => {
       if (store.isLoggedIn) {
         this.currentUser = store.user;
+        console.log(this.currentUser);
         this.webSocketService.connect();
       }
       this.isAppLoading = false;
@@ -34,10 +37,18 @@ export class AppComponent implements OnInit {
       // }
     });
   }
+
+  public goToProfile() {
+    this.router.navigate(["/profile"]);
+  }
+
   public async signOut() {
     await this.authService.signOut();
   }
 
+  public getRole(role: string) {
+    return roles[role];
+  }
   @HostBinding("class")
   get theme() {
     return "theme-light";

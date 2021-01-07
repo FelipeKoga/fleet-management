@@ -42,10 +42,17 @@
             class="chat-item-card"
           >
             <div class="chat-item-wrapper">
-              <div mat-card-avatar class="photo">
-                <mat-icon *ngIf="chat.private">person</mat-icon>
-                <mat-icon *ngIf="chat.groupName">group</mat-icon>
-                <!-- <img [src]="chat.photo" /> -->
+              <div mat-card-avatar class="user-photo">
+                <img
+                  *ngIf="chat.private"
+                  onerror="this.src='assets/default_user.png';"
+                  [src]="chat.user.avatarUrl"
+                />
+                <img
+                  *ngIf="!chat.private"
+                  onerror="this.src='assets/default_group.png';"
+                  [src]="chat.avatarUrl"
+                />
               </div>
               <div class="chat-item-content">
                 <div
