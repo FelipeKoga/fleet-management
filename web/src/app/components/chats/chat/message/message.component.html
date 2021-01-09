@@ -3,32 +3,47 @@
   <div class="message-container">
     <ng-container *ngIf="message.hasAudio; else elseTemplate">
       <div>
+        <div style="display: flex">
+          <div
+            style="
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              justify-content: center;
+            "
+          >
+            <button
+              (click)="play()"
+              *ngIf="!state?.playing"
+              color="accent"
+              mat-icon-button
+              [disabled]="message.status === 'PROCESSING_AUDIO'"
+            >
+              <mat-icon>play_arrow</mat-icon>
+            </button>
+            <mat-spinner
+              *ngIf="message.status === 'PROCESSING_AUDIO'"
+              [diameter]="15"
+            ></mat-spinner>
+          </div>
+          <button
+            (click)="pause()"
+            *ngIf="state?.playing"
+            color="accent"
+            mat-icon-button
+          >
+            <mat-icon>pause</mat-icon>
+          </button>
+          <mat-slider
+            min="0"
+            [max]="state?.duration"
+            step="1"
+            [value]="state?.currentTime"
+            (input)="onSliderChangeEnd($event)"
+            [disabled]="state?.error"
+          ></mat-slider>
+        </div>
 
-        <button
-          (click)="play()"
-          *ngIf="!state?.playing"
-          color="accent"
-          mat-icon-button
-          [disabled]="message.status === 'PROCESSING_AUDIO'"
-        >
-          <mat-icon>play_arrow</mat-icon>
-        </button>
-        <button
-          (click)="pause()"
-          *ngIf="state?.playing"
-          color="accent"
-          mat-icon-button
-        >
-          <mat-icon>pause</mat-icon>
-        </button>
-        <mat-slider
-          min="0"
-          [max]="state?.duration"
-          step="1"
-          [value]="state?.currentTime"
-          (input)="onSliderChangeEnd($event)"
-          [disabled]="state?.error"
-        ></mat-slider>
         <div style="display: flex; justify-content: space-between">
           <div class="message-timestamp">
             <ng-container
@@ -45,6 +60,12 @@
           </div>
           <div class="message-timestamp">
             {{ convertTimestamp(message.createdAt, "HH:mm") }}
+            <ng-container *ngIf="message.status === 'SENT'; else elseTemplate">
+              <mat-icon class="message-status">check</mat-icon>
+            </ng-container>
+            <ng-template #elseTemplate>
+              <mat-icon class="message-status">query_builder</mat-icon>
+            </ng-template>
           </div>
         </div>
       </div>
