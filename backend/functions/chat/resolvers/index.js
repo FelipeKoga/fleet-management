@@ -25,6 +25,10 @@ async function getChat(chatId, username, member) {
     const chatMember = member ? await getUser(member) : null;
     const lastMessage = await Database.message.getLastMessage(chatId);
 
+    if (lastMessage && lastMessage.hasAudio) {
+        lastMessage.message = S3.getObject(lastMessage.message);
+    }
+
     if (chat.avatar) {
         chat.avatarUrl = S3.getObject(chat.avatar);
     }
@@ -144,7 +148,14 @@ async function createGroup(username, { members, groupName }) {
     return chat;
 }
 
-async function addMessage({ chatId, username, message, createdAt, messageId }) {
+async function addMessage({
+    chatId,
+    username,
+    message,
+    createdAt,
+    messageId,
+    hasAudio,
+}) {
     const messageResponse = await Database.message.addMessage({
         chatId,
         username,
@@ -152,7 +163,12 @@ async function addMessage({ chatId, username, message, createdAt, messageId }) {
         messageId,
         createdAt,
         status: 'SENT',
+        hasAudio,
     });
+
+    if (hasAudio) {
+        messageResponse.message = S3.getObject(messageResponse.message);
+    }
 
     const chatConfig = await Database.chat.getChat(chatId);
 
@@ -194,7 +210,15 @@ async function addMessage({ chatId, username, message, createdAt, messageId }) {
 }
 
 async function getMessages(chatId) {
-    return Database.message.fetchMessages(chatId);
+    const messages = await Database.message.fetchMessages(chatId);
+    return messages.map(message => {
+        const item = { ...message };
+        if (item.hasAudio) {
+            item.message = S3.getObject(message.message);
+        }
+
+        return item;
+    });
 }
 
 async function viewedMessages({ chatId, username }) {
@@ -284,6 +308,21 @@ async function removeMember(chatId, username) {
     return true;
 }
 
+async function updateGroup(chatId, username, { groupName, admin }) {
+    await Database.chat.updateGroup(chatId, { groupName, admin });
+    const chat = await getChat(chatId, username);
+
+    const users = await Database.chat.fetchChatUsers(chatId);
+
+    const promises = [];
+    users.forEach(user => {
+        promises.push(sendWebSocketMessage(user, chat, 'chat_updated'));
+    });
+
+    await Promise.all(promises);
+    return chat;
+}
+
 async function addGroupAvatar(chatId, username, avatar) {
     await Database.chat.updateGroupAvatar(chatId, avatar);
     const chat = await getChat(chatId, username);
@@ -295,8 +334,6 @@ async function addGroupAvatar(chatId, username, avatar) {
     });
 
     await Promise.all(promises);
-
-    console.log(chat);
     return chat;
 }
 
@@ -311,4 +348,5 @@ module.exports = {
     addMember,
     removeMember,
     addGroupAvatar,
+    updateGroup,
 };
