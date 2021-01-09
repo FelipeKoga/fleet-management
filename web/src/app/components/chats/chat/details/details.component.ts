@@ -25,8 +25,8 @@ export class DetailsComponent implements OnInit {
   public isLoadingMembers: boolean;
   public user: User;
   public convertDate = convertDate;
-
   public members: User[] = [];
+
   constructor(
     private chatsService: ChatsService,
     private dialog: MatDialog,
@@ -136,6 +136,8 @@ export class DetailsComponent implements OnInit {
         });
       });
   }
+
+  public updateGroup() {}
 
   public getRole(role: string) {
     return roles[role];

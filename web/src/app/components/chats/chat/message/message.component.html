@@ -1,0 +1,141 @@
+<!--  Current user message layout -->
+<div class="message-row sender" *ngIf="message.username === user.username">
+  <div class="message-container">
+    <ng-container *ngIf="message.hasAudio; else elseTemplate">
+      <div>
+
+        <button
+          (click)="play()"
+          *ngIf="!state?.playing"
+          color="accent"
+          mat-icon-button
+          [disabled]="message.status === 'PROCESSING_AUDIO'"
+        >
+          <mat-icon>play_arrow</mat-icon>
+        </button>
+        <button
+          (click)="pause()"
+          *ngIf="state?.playing"
+          color="accent"
+          mat-icon-button
+        >
+          <mat-icon>pause</mat-icon>
+        </button>
+        <mat-slider
+          min="0"
+          [max]="state?.duration"
+          step="1"
+          [value]="state?.currentTime"
+          (input)="onSliderChangeEnd($event)"
+          [disabled]="state?.error"
+        ></mat-slider>
+        <div style="display: flex; justify-content: space-between">
+          <div class="message-timestamp">
+            <ng-container
+              *ngIf="
+                state?.readableCurrentTime && state?.playing;
+                else elseTemplate
+              "
+            >
+              {{ state?.readableCurrentTime }}
+            </ng-container>
+            <ng-template #elseTemplate>
+              {{ state?.readableDuration }}
+            </ng-template>
+          </div>
+          <div class="message-timestamp">
+            {{ convertTimestamp(message.createdAt, "HH:mm") }}
+          </div>
+        </div>
+      </div>
+    </ng-container>
+    <ng-template #elseTemplate>
+      {{ message.message }}
+      <div class="message-timestamp">
+        {{ convertTimestamp(message.createdAt, "HH:mm") }}
+        <ng-container *ngIf="message.status === 'SENT'; else elseTemplate">
+          <mat-icon class="message-status">check</mat-icon>
+        </ng-container>
+        <ng-template #elseTemplate>
+          <mat-icon class="message-status">query_builder</mat-icon>
+        </ng-template>
+      </div>
+    </ng-template>
+  </div>
+</div>
+
+<div *ngIf="message.username !== user.username">
+  <ng-container *ngIf="message.username === 'SYSTEM'; else elseTemplate">
+    <div class="system-message">
+      <div class="system-message-text">
+        {{ message.message }}
+      </div>
+    </div>
+  </ng-container>
+  <ng-template #elseTemplate>
+    <div class="message-row recipient">
+      <div class="message-container">
+        <div
+          style="font-weight: 500; color: grey; font-size: 12px"
+          *ngIf="!chat.private && message.username !== user.username"
+        >
+          {{ message.username }}
+        </div>
+        <ng-container *ngIf="message.hasAudio; else elseTemplate">
+          <div>
+            <button
+              (click)="play()"
+              *ngIf="!state?.playing"
+              color="accent"
+              mat-icon-button
+              [disabled]="message.status === 'PROCESSING_AUDIO'"
+            >
+              <mat-icon>play_arrow</mat-icon>
+            </button>
+            <button
+              (click)="pause()"
+              *ngIf="state?.playing"
+              color="accent"
+              mat-icon-button
+            >
+              <mat-icon>pause</mat-icon>
+            </button>
+            <mat-slider
+              min="0"
+              [max]="state?.duration"
+              step="1"
+              [value]="state?.currentTime"
+              (input)="onSliderChangeEnd($event)"
+              [disabled]="state?.error"
+            ></mat-slider>
+            <div style="display: flex; justify-content: space-between">
+              <div class="message-timestamp">
+                <ng-container
+                  *ngIf="
+                    state?.readableCurrentTime && state?.playing;
+                    else elseTemplate
+                  "
+                >
+                  {{ state?.readableCurrentTime }}
+                </ng-container>
+                <ng-template #elseTemplate>
+                  {{ state?.readableDuration }}
+                </ng-template>
+              </div>
+              <div class="message-timestamp">
+                {{ convertTimestamp(message.createdAt, "HH:mm") }}
+              </div>
+            </div>
+          </div>
+        </ng-container>
+        <ng-template #elseTemplate>
+          <div style="margin-top: 2px">{{ message.message }}</div>
+
+          <div class="message-timestamp">
+            {{ convertTimestamp(message.createdAt, "HH:mm") }}
+          </div>
+        </ng-template>
+      </div>
+    </div>
+  </ng-template>
+</div>

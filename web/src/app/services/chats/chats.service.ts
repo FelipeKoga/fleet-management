@@ -81,7 +81,6 @@ export class ChatsService extends StateService<ChatsState> {
         { avatar }
       )
       .subscribe((updatedChat) => {
-        console.log(updatedChat);
         onComplete(updatedChat);
       });
   }
@@ -123,9 +122,19 @@ export class ChatsService extends StateService<ChatsState> {
     );
   }
 
+  public updateGroup(
+    chatId: string,
+    body: { groupName: string; admin: string }
+  ) {
+    return this.http.put<Chat>(
+      `${API}/company/${this.user.companyId}/users/${this.user.username}/group/${chatId}`,
+      body
+    );
+  }
+
   public addMember(chatId: string, member: string) {
     return this.http.put<boolean>(
-      `${API}/company/${this.user.companyId}/users/${this.user.username}/group/${chatId}`,
+      `${API}/company/${this.user.companyId}/users/${this.user.username}/group/${chatId}/add`,
       { member, chatId }
     );
   }

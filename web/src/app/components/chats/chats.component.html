@@ -82,8 +82,15 @@
                         >
                       </ng-template>
                     </div>
-
-                    {{ chat.lastMessage.message }}
+                    <ng-container
+                      *ngIf="chat.lastMessage.hasAudio; else elseTemplate"
+                    >
+                      <mat-icon class="message-status">mic</mat-icon>
+                      Áudio
+                    </ng-container>
+                    <ng-template #elseTemplate>
+                      {{ chat.lastMessage.message }}
+                    </ng-template>
                   </div>
                   <div class="chat-item-message-date-text">
                     {{ convertDate(chat.lastMessage.createdAt, "HH:mm") }}

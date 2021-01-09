@@ -33,12 +33,10 @@ export class ChatsComponent implements OnInit {
   ngOnInit(): void {
     this.selectedChat = new Chat();
     this.chatsService.chatsState$.subscribe((state) => {
-      console.log(state.chats);
       this.chats = state.chats;
       this.isLoadingChats = state.isLoading;
     });
     this.webSocketService.messages.subscribe((response) => {
-      console.log(response);
       if (
         response.action === Actions.CHAT_UPDATED ||
         response.action === Actions.CHAT_CREATED
