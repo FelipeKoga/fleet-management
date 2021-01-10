@@ -129,6 +129,21 @@ async function updateGroupAvatar(chatId, avatar) {
         },
     });
 }
+
+async function updateGroup(chatId, { admin, groupName }) {
+    await update({
+        Key: {
+            partitionKey: `CHAT#${chatId}`,
+            sortKey: `CONFIG`,
+        },
+        UpdateExpression: 'set admin = :admin, groupName = :groupName',
+        ExpressionAttributeValues: {
+            ':admin': admin,
+            ':groupName': groupName,
+        },
+    });
+}
+
 module.exports = {
     fetchChatUsers,
     fetchUserChats,
@@ -140,4 +155,5 @@ module.exports = {
     updateAdmin,
     removeMember,
     updateGroupAvatar,
+    updateGroup,
 };

@@ -37,18 +37,28 @@ async function handleGetMethod(resource, { username, chatId }) {
     return JSON.stringify(response);
 }
 
-async function handlePutMethod(resource, body, { chatId }) {
+async function handlePutMethod(resource, body, { chatId, username }) {
     const payload = JSON.parse(body);
+    let response;
 
     if (resource.includes('group/')) {
         const { member } = payload;
         if (resource.includes('/remove')) {
-            return Resolver.removeMember(chatId, member);
+            response = await Resolver.removeMember(chatId, member);
         }
-        return Resolver.addMember(chatId, member);
+
+        if (resource.includes('/add')) {
+            response = await Resolver.addMember(chatId, member);
+        }
+
+        response = await Resolver.updateGroup(chatId, username, payload);
     }
 
-    throw new Error('Method not allowed');
+    if (!response) {
+        throw new Error('Method not allowed');
+    }
+
+    return JSON.stringify(response);
 }
 
 async function main({
