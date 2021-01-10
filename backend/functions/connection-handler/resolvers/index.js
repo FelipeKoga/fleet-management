@@ -1,4 +1,5 @@
 const { Database, Lambda } = require('../services');
+const { getObject } = require('../services/s3');
 
 async function postMessage(user, action) {
     const connectionIds = await Database.fetchCompanyConnectionIDs(
@@ -8,17 +9,18 @@ async function postMessage(user, action) {
 }
 
 async function addConnection(connectionId, username) {
-    const user = await Database.getUser(username);
-
     await Database.insertConnectionId({
         username,
         connectionId,
     });
-
+    const user = await Database.getUser(username);
     if (user.status === 'OFFLINE') {
         await Database.updateStatus(username, user.companyId, 'ONLINE');
         user.status = 'ONLINE';
-        await postMessage(user, 'connected');
+        if (user.avatar) {
+            user.avatarUrl = getObject(user.avatar);
+        }
+        await postMessage(user, 'user_connected');
     }
 }
 
@@ -26,6 +28,10 @@ async function deleteConnection(connectionId) {
     const username = await Database.getUsernameByConnectionId(connectionId);
     await Database.deleteConnectionId(username, connectionId);
     const user = await Database.getUser(username);
+
+    if (user.avatar) {
+        user.avatarUrl = getObject(user.avatar);
+    }
 
     if (user.status === 'ONLINE') {
         const hasConnectionActive = await Database.getUserConnectionId(
@@ -35,7 +41,7 @@ async function deleteConnection(connectionId) {
             user.status = 'OFFLINE';
             await Database.updateStatus(username, user.companyId, 'OFFLINE');
 
-            await postMessage(user, 'disconnected');
+            await postMessage(user, 'user_disconnected');
         }
     }
 }

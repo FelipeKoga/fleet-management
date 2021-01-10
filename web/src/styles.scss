@@ -156,3 +156,21 @@ ul {
   background-color: $color-info;
   color: white;
 }
+
+.status {
+  width: 8px;
+  height: 8px;
+  position: absolute;
+  border: 2px solid white;
+  border-radius: 50%;
+  bottom: 0;
+  right: 0;
+}
+
+.online {
+  background-color: #32cd32;
+}
+
+.offline {
+  background-color: lightgray;
+}
