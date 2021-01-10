@@ -5,6 +5,7 @@ const {
     getByPK,
     insert,
     remove,
+    update,
 } = require('./query');
 
 async function fetchCompanyConnectionIDs(companyId) {
@@ -36,6 +37,17 @@ async function fetchCompanyConnectionIDs(companyId) {
     return allConnectionIds;
 }
 
+async function getUserConnectionId(username) {
+    return fetchByPK({
+        ExpressionAttributeValues: {
+            ':sk': `CONNECTION#`,
+            ':pk': `USER#${username}`,
+        },
+        ProjectionExpression: 'connectionId',
+        Limit: 1,
+    });
+}
+
 async function getUsernameByConnectionId(connectionId) {
     const user = await getBySK({
         ExpressionAttributeValues: {
@@ -65,6 +77,22 @@ async function getUser(username) {
     });
 }
 
+async function updateStatus(username, companyId, status) {
+    return update({
+        Key: {
+            partitionKey: `USER#${username}`,
+            sortKey: `CONFIG#${companyId}`,
+        },
+        UpdateExpression: 'set #status = :status',
+        ExpressionAttributeNames: {
+            '#status': 'status',
+        },
+        ExpressionAttributeValues: {
+            ':status': status,
+        },
+    });
+}
+
 async function insertConnectionId({ username, connectionId }) {
     await insert({
         partitionKey: `USER#${username}`,
@@ -88,4 +116,6 @@ module.exports = {
     insertConnectionId,
     deleteConnectionId,
     getUsernameByConnectionId,
+    updateStatus,
+    getUserConnectionId,
 };
