@@ -80,39 +80,17 @@
   padding-bottom: 12px;
 }
 
-.user-photo {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: #c0c0c0;
-
-  margin-right: 4px;
-  outline: none;
-  cursor: pointer;
+.user-photo-wrapper {
   position: relative;
-  > img {
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    object-fit: cover;
-  }
-  &:after {
-    background-color: #32cd32;
-    width: auto;
-    height: 8px;
-    padding: 0 4px;
-    position: absolute;
-    bottom: 0px;
-    right: 0px;
-    border-radius: 12px;
-    border: 2px solid white;
-    text-align: right;
-    font-size: 13px;
-    font-weight: bold;
-    color: var(--white);
-    content: "";
-    display: inline;
-  }
+  width: 40px;
+  height: 40px;
+}
+
+.user-photo {
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
 }
 
 .chat-item-content {

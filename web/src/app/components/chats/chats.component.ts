@@ -36,7 +36,20 @@ export class ChatsComponent implements OnInit {
       this.chats = state.chats;
       this.isLoadingChats = state.isLoading;
     });
+
     this.webSocketService.messages.subscribe((response) => {
+      if (
+        response.action === Actions.USER_CONNECTED ||
+        response.action === Actions.USER_DISCONNECTED
+      ) {
+        this.chatsService.replaceUserChat(response.body);
+        if (this.selectedChat.user) {
+          if (this.selectedChat.user.username === response.body.username) {
+            this.selectedChat.user = response.body;
+          }
+        }
+      }
+
       if (
         response.action === Actions.CHAT_UPDATED ||
         response.action === Actions.CHAT_CREATED

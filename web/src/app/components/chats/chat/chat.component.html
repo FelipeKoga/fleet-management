@@ -19,10 +19,9 @@
 
       <div *ngIf="chat.private" class="status-wrapper">
         <span
+          style="position: relative"
           [ngClass]="
-            chat.user.status === 'ONLINE'
-              ? 'user-status online'
-              : 'user-status offline'
+            chat.user.status === 'ONLINE' ? 'status online' : 'status offline'
           "
         ></span>
         <span class="status-text">

@@ -85,6 +85,36 @@ export class ChatsService extends StateService<ChatsState> {
       });
   }
 
+  public getChatMembers(chatId: string) {
+    return this.http.get<User[]>(
+      `${API}/company/${this.user.companyId}/users/${this.user.username}/group/${chatId}`
+    );
+  }
+
+  public updateGroup(
+    chatId: string,
+    body: { groupName: string; admin: string }
+  ) {
+    return this.http.put<Chat>(
+      `${API}/company/${this.user.companyId}/users/${this.user.username}/group/${chatId}`,
+      body
+    );
+  }
+
+  public addMember(chatId: string, member: string) {
+    return this.http.put<boolean>(
+      `${API}/company/${this.user.companyId}/users/${this.user.username}/group/${chatId}/add`,
+      { member, chatId }
+    );
+  }
+
+  public removeMember(chatId: string, member: string) {
+    return this.http.put<boolean>(
+      `${API}/company/${this.user.companyId}/users/${this.user.username}/group/${chatId}/remove`,
+      { member, chatId }
+    );
+  }
+
   public addOrReplaceChat(newChat: Chat) {
     const chats = [...this.state.chats];
     if (chats.find((chat) => chat.id === newChat.id)) {
@@ -116,34 +146,20 @@ export class ChatsService extends StateService<ChatsState> {
     });
   }
 
-  public getChatMembers(chatId: string) {
-    return this.http.get<User[]>(
-      `${API}/company/${this.user.companyId}/users/${this.user.username}/group/${chatId}`
-    );
-  }
+  public replaceUserChat(user: User) {
+    this.setState({
+      ...this.state,
+      chats: this.state.chats.map((chat) => {
+        if (chat.private && chat.user.username === user.username) {
+          return {
+            ...chat,
+            user,
+          };
+        }
 
-  public updateGroup(
-    chatId: string,
-    body: { groupName: string; admin: string }
-  ) {
-    return this.http.put<Chat>(
-      `${API}/company/${this.user.companyId}/users/${this.user.username}/group/${chatId}`,
-      body
-    );
-  }
-
-  public addMember(chatId: string, member: string) {
-    return this.http.put<boolean>(
-      `${API}/company/${this.user.companyId}/users/${this.user.username}/group/${chatId}/add`,
-      { member, chatId }
-    );
-  }
-
-  public removeMember(chatId: string, member: string) {
-    return this.http.put<boolean>(
-      `${API}/company/${this.user.companyId}/users/${this.user.username}/group/${chatId}/remove`,
-      { member, chatId }
-    );
+        return chat;
+      }),
+    });
   }
 
   private sort(c1: Chat, c2: Chat) {

@@ -42,18 +42,28 @@
             class="chat-item-card"
           >
             <div class="chat-item-wrapper">
-              <div mat-card-avatar class="user-photo">
+              <div *ngIf="chat.private" class="user-photo-wrapper">
                 <img
                   *ngIf="chat.private"
+                  class="user-photo"
                   onerror="this.src='assets/default_user.png';"
                   [src]="chat.user.avatarUrl"
                 />
-                <img
-                  *ngIf="!chat.private"
-                  onerror="this.src='assets/default_group.png';"
-                  [src]="chat.avatarUrl"
-                />
+                <div
+                  [ngClass]="
+                    chat.user.status === 'ONLINE'
+                      ? 'status online'
+                      : 'status offline'
+                  "
+                ></div>
               </div>
+
+              <img
+                *ngIf="!chat.private"
+                class="user-photo"
+                onerror="this.src='assets/default_group.png';"
+                [src]="chat.avatarUrl"
+              />
               <div class="chat-item-content">
                 <div
                   class="chat-item-name"

@@ -1,8 +1,11 @@
 import { Component, HostBinding, OnInit } from "@angular/core";
 import { Router } from "@angular/router";
-import { User } from "./models/user";
+import { User, UserStatus } from "./models/user";
 import { AuthService } from "./services/auth/auth.service";
-import { WebsocketService } from "./services/websocket/websocket.service";
+import {
+  Actions,
+  WebsocketService,
+} from "./services/websocket/websocket.service";
 import { roles } from "./utils/role";
 
 @Component({
@@ -27,7 +30,16 @@ export class AppComponent implements OnInit {
     this.authService.authStore().subscribe((store) => {
       if (store.isLoggedIn) {
         this.currentUser = store.user;
+        this.currentUser.status = UserStatus.ONLINE;
         this.webSocketService.connect();
+        this.webSocketService.messages.subscribe((message) => {
+          if (message.action === Actions.USER_CONNECTED) {
+            if (message.body.username === this.currentUser.username) {
+              this.authService.setUser(this.currentUser);
+              this.currentUser = message.body;
+            }
+          }
+        });
       }
       this.isAppLoading = false;
       this.isLoggedIn = store.isLoggedIn;

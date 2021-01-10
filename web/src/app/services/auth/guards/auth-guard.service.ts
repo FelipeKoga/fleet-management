@@ -30,6 +30,7 @@ export class AuthGuard implements CanActivate {
 
         if (authStore.isLoggedIn) {
           if (_state.url === "/login") {
+            console.log("rediret map");
             this.router.navigate(["/map"]);
           }
           observer.next(true);
