@@ -27,23 +27,15 @@ export class AppComponent implements OnInit {
     this.authService.authStore().subscribe((store) => {
       if (store.isLoggedIn) {
         this.currentUser = store.user;
-        console.log(this.currentUser);
         this.webSocketService.connect();
       }
       this.isAppLoading = false;
       this.isLoggedIn = store.isLoggedIn;
-      // if (!store.isLoggedIn && !store.isLoading) {
-      //   this.router.navigate(["/login"]);
-      // }
     });
   }
 
   public goToProfile() {
     this.router.navigate(["/profile"]);
-  }
-
-  public async signOut() {
-    await this.authService.signOut();
   }
 
   public getRole(role: string) {

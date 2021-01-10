@@ -68,6 +68,7 @@ export class ProfileComponent implements OnInit {
 
   fileChange(file) {
     this.file = file.target.files[0];
+    if (!this.file) return;
     this.isLoadingAvatar = true;
     const key = `company/${this.user.companyId}/user/${this.user.username}/avatar.jpg`;
     this.http
@@ -146,6 +147,10 @@ export class ProfileComponent implements OnInit {
 
   public getRole(role: string) {
     return roles[role];
+  }
+
+  public signOut() {
+    this.authService.signOut();
   }
 
   get oldPassword() {

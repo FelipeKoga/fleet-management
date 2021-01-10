@@ -33,7 +33,7 @@
           <span>Funcionários</span>
         </li>
       </ul>
-      <div [matMenuTriggerFor]="menu" class="footer">
+      <div (click)="goToProfile()" class="footer">
         <mat-divider style="margin-bottom: 8px"></mat-divider>
         <div class="user-wrapper">
           <img class="user-photo" [src]="currentUser.avatarUrl" />
@@ -49,12 +49,8 @@
     </div>
   </div>
 </ng-template>
-
+<!--
 <mat-menu #menu="matMenu">
-  <button style="background-color: #fafafa; color: #32cd32" mat-menu-item>
-    <mat-icon>check_circle_outline</mat-icon>
-    <span>Online</span>
-  </button>
   <button
     (click)="goToProfile()"
     style="background-color: #fafafa"
@@ -71,4 +67,4 @@
     <mat-icon>power_settings_new</mat-icon>
     <span>Sair</span>
   </button>
-</mat-menu>
+</mat-menu> -->
