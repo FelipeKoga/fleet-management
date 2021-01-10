@@ -1,5 +1,11 @@
 import { HttpClient } from "@angular/common/http";
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
+import {
+  FormBuilder,
+  FormControl,
+  FormGroup,
+  Validators,
+} from "@angular/forms";
 import { MatDialog } from "@angular/material/dialog";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { Chat } from "src/app/models/chat";
@@ -19,6 +25,8 @@ import { AddMemberComponent } from "../add-member/add-member.component";
 export class DetailsComponent implements OnInit {
   @Output() onBackToChat: EventEmitter<boolean> = new EventEmitter();
   @Input() chat: Chat;
+  public editGroupName: boolean;
+  public editAdmin: boolean;
 
   public isLoadingAvatar: boolean;
   public file: File;
@@ -27,22 +35,47 @@ export class DetailsComponent implements OnInit {
   public convertDate = convertDate;
   public members: User[] = [];
 
+  public groupNameForm: FormGroup;
+  public loadingForm: boolean;
+  public administratorForm: FormGroup;
+
   constructor(
     private chatsService: ChatsService,
     private dialog: MatDialog,
     private authService: AuthService,
     private http: HttpClient,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private formBuilder: FormBuilder
   ) {}
 
   ngOnInit(): void {
     this.members = [];
     this.user = this.authService.getUser();
+
+    if (!this.chat.private) {
+      this.groupNameForm = this.formBuilder.group({
+        groupName: [this.chat.groupName, Validators.required],
+      });
+
+      this.administratorForm = this.formBuilder.group({
+        admin: [this.chat.admin, Validators.required],
+      });
+    }
+
     if (!this.chat.private) {
       this.isLoadingMembers = true;
       this.chatsService.getChatMembers(this.chat.id).subscribe((members) => {
         this.isLoadingMembers = false;
         this.members = members;
+
+        if (!this.chat.private) {
+          this.members.find((member) => this.chat.admin === member.username);
+          this.administratorForm
+            .get("admin")
+            .setValue(
+              this.members.find((member) => this.chat.admin === member.username)
+            );
+        }
       });
     }
   }
@@ -137,12 +170,42 @@ export class DetailsComponent implements OnInit {
       });
   }
 
-  public updateGroup() {}
-
   public getRole(role: string) {
     return roles[role];
   }
   public backToChat() {
     this.onBackToChat.emit(true);
+  }
+
+  public onChangeAdministrador() {
+    console.log("change");
+    const { admin } = this.administratorForm.value;
+    console.log(admin);
+    this.updateGroup(this.chat.groupName, admin.username);
+  }
+
+  public onChangeGroupName() {
+    const { groupName } = this.groupNameForm.value;
+    this.loadingForm = true;
+    this.updateGroup(groupName, this.chat.admin);
+  }
+
+  private updateGroup(groupName: string, admin: string) {
+    this.loadingForm = true;
+
+    this.chatsService
+      .updateGroup(this.chat.id, {
+        groupName,
+        admin,
+      })
+      .subscribe((updatedChat) => {
+        this.loadingForm = false;
+        this.editGroupName = false;
+        this.chat = updatedChat;
+        this.snackBar.open("Grupo atualizado com sucesso!", null, {
+          duration: 2000,
+          panelClass: ["snackbar-success"],
+        });
+      });
   }
 }

@@ -106,12 +106,115 @@
         <div class="chat-details-wrapper">
           <div class="chat-details-row">
             <mat-card>
-              <mat-card-subtitle>Nome do grupo</mat-card-subtitle>
-              <mat-card-title>{{ chat.groupName }}</mat-card-title>
+              <form
+                [formGroup]="groupNameForm"
+                (ngSubmit)="onChangeGroupName()"
+              >
+                <div
+                  style="
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                  "
+                >
+                  <mat-card-subtitle>Nome do grupo</mat-card-subtitle>
+
+                  <button
+                    *ngIf="editGroupName"
+                    [disabled]="groupNameForm.invalid || loadingForm"
+                    mat-icon-button
+                    (click)="editGroupName = true"
+                    color="primary"
+                    style="
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                    "
+                  >
+                    <mat-spinner
+                      *ngIf="loadingForm"
+                      [diameter]="20"
+                    ></mat-spinner>
+                    <mat-icon *ngIf="!loadingForm" style="font-size: 20px"
+                      >check</mat-icon
+                    >
+                  </button>
+
+                  <button
+                    *ngIf="!editGroupName"
+                    mat-icon-button
+                    (click)="editGroupName = true"
+                  >
+                    <mat-icon style="font-size: 20px">create</mat-icon>
+                  </button>
+                </div>
+                <mat-form-field style="width: 100%">
+                  <input
+                    [readonly]="!editGroupName"
+                    matInput
+                    type="text"
+                    formControlName="groupName"
+                  />
+                </mat-form-field>
+              </form>
             </mat-card>
             <mat-card>
-              <mat-card-subtitle>Administrador</mat-card-subtitle>
-              <mat-card-title>{{ chat.admin }}</mat-card-title>
+              <form
+                [formGroup]="administratorForm"
+                (ngSubmit)="onChangeAdministrador()"
+              >
+                <div
+                  style="
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                  "
+                >
+                  <mat-card-subtitle>Administrador</mat-card-subtitle>
+                  <button
+                    *ngIf="editAdmin"
+                    [disabled]="administratorForm.invalid || loadingForm"
+                    mat-icon-button
+                    type="submit"
+                    (click)="editAdmin = false"
+                    color="primary"
+                    style="
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                    "
+                  >
+                    <mat-spinner
+                      *ngIf="loadingForm"
+                      [diameter]="20"
+                    ></mat-spinner>
+                    <mat-icon *ngIf="!loadingForm" style="font-size: 20px"
+                      >check</mat-icon
+                    >
+                  </button>
+
+                  <button
+                    *ngIf="!editAdmin && user.username === chat.admin"
+                    mat-icon-button
+                    (click)="editAdmin = true"
+                  >
+                    <mat-icon style="font-size: 20px">create</mat-icon>
+                  </button>
+                </div>
+                <mat-form-field style="width: 100%">
+                  <mat-select [disabled]="!editAdmin" formControlName="admin">
+                    <mat-option *ngFor="let member of members" [value]="member">
+                      {{ member.name }}
+                    </mat-option>
+                  </mat-select>
+                  <!-- <input
+                    [readonly]="!editAdmin"
+                    matInput
+                    type="text"
+                    formControlName="admin"
+                  /> -->
+                </mat-form-field>
+              </form>
             </mat-card>
           </div>
 
