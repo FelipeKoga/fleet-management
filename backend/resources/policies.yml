@@ -88,6 +88,7 @@ Resources:
                           - cognito-idp:AdminCreateUser
                           - cognito-idp:AdminSetUserPassword
                           - cognito-idp:AdminDeleteUser
+                          - cognito-idp:AdminUserGlobalSignOut
                       Resource: '*'
             Roles:
                 - !Ref TccRole
@@ -103,5 +104,21 @@ Resources:
                           - execute-api:ManageConnections
                       Resource:
                           - arn:aws:execute-api:*:*:*/@connections/*
+            Roles:
+                - !Ref TccRole
+
+    SESPolicy:
+        Type: AWS::IAM::Policy
+        Properties:
+            PolicyName: ${self:app}-ses-policy-${self:custom.stage}
+            PolicyDocument:
+                Version: '2012-10-17'
+                Statement:
+                    - Effect: Allow
+                      Action:
+                          - ses:SendEmail
+                          - ses:SendRawEmail
+                          - ses:VerifyEmailIdentity
+                      Resource: '*'
             Roles:
                 - !Ref TccRole

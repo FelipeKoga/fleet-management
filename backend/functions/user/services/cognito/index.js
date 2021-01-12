@@ -42,7 +42,13 @@ async function create({ email, password, name }, companyId) {
 }
 
 async function remove(username) {
-    return cognitoIdentityServiceProvider
+    await cognitoIdentityServiceProvider
+        .adminUserGlobalSignOut({
+            Username: username,
+            UserPoolId: POOL_ID,
+        })
+        .promise();
+    await cognitoIdentityServiceProvider
         .adminDeleteUser({
             UserPoolId: POOL_ID,
             Username: username,

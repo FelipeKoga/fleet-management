@@ -1,5 +1,5 @@
-const { getObject } = require('../../connection-handler/services/s3');
-const { Cognito, Database, Lambda, S3 } = require('../services');
+const { Cognito, Database, Lambda, S3, Email } = require('../services');
+const { getObject } = require('../services/s3');
 
 const generateRandomString = length => {
     const characters =
@@ -44,6 +44,8 @@ async function create(data, companyId) {
     await Cognito.create(newUser, companyId);
     await Database.user.createUser(newUser, companyId);
     const user = await get(newUser.email, companyId);
+    const message = `Prezado(a) ${user.name}, seu usuário foi criado. Para logar, use as seguintes credenciais: <br><br><b>Usuário:</b> ${user.username}<br><b>Senha:</b> ${password}`;
+    await Email.sendEmail(user.email, 'Seu usuário foi criado!', message);
     await postMessage(user, 'user_created');
     return user;
 }
@@ -65,6 +67,8 @@ async function remove(username, companyId) {
     await Cognito.remove(username);
     await Database.user.removeUser(username, companyId);
     await postMessage(user, 'user_removed');
+    const message = `Prezado(a) ${user.name}, seu usuário foi removido por um administrador.`;
+    await Email.sendEmail(user.email, 'Seu usuário foi removido.', message);
     return true;
 }
 
