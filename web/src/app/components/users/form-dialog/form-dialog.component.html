@@ -6,7 +6,7 @@
   </h2>
   <ng-container *ngIf="data.type === 'DELETE'; else elseTemplate">
     <p style="font-size: 16px; flex: 1">
-      Você tem certeza que deseja excluir o usuário {{ data.user.name }}
+      Você tem certeza que deseja excluir o usuário {{ data.user.name }}?
     </p>
     <mat-dialog-actions align="end">
       <button [disabled]="isLoading" mat-button mat-dialog-close>

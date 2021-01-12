@@ -37,7 +37,11 @@
         <mat-divider style="margin-bottom: 8px"></mat-divider>
         <div class="user-wrapper">
           <div class="user-photo-wrapper">
-            <img class="user-photo" [src]="currentUser.avatarUrl" />
+            <img
+              onerror="this.src='assets/default_user.png';"
+              class="user-photo"
+              [src]="currentUser.avatarUrl"
+            />
             <div
               [ngClass]="
                 currentUser.status === 'ONLINE'
