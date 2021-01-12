@@ -90,9 +90,9 @@ export class ChatsComponent implements OnInit {
   public filterChats(text: string) {
     this.filteredChats = this.chats.filter((chat) => {
       if (chat.private) {
-        return chat.user.name.includes(text);
+        return chat.user.name.toLowerCase().includes(text.toLowerCase());
       } else {
-        return chat.groupName.includes(text);
+        return chat.groupName.toLowerCase().includes(text.toLowerCase());
       }
     });
   }

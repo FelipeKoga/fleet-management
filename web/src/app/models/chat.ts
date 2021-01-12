@@ -10,4 +10,6 @@ export class Chat {
   admin?: string;
   user?: User;
   createdAt: number;
+  avatar?: string;
+  avatarUrl?: string;
 }
