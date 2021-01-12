@@ -45,13 +45,11 @@ async function handlePutMethod(resource, body, { chatId, username }) {
         const { member } = payload;
         if (resource.includes('/remove')) {
             response = await Resolver.removeMember(chatId, member);
-        }
-
-        if (resource.includes('/add')) {
+        } else if (resource.includes('/add')) {
             response = await Resolver.addMember(chatId, member);
+        } else {
+            response = await Resolver.updateGroup(chatId, username, payload);
         }
-
-        response = await Resolver.updateGroup(chatId, username, payload);
     }
 
     if (!response) {

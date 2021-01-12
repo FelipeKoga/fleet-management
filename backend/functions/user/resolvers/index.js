@@ -1,3 +1,4 @@
+const { getObject } = require('../../connection-handler/services/s3');
 const { Cognito, Database, Lambda, S3 } = require('../services');
 
 const generateRandomString = length => {
@@ -48,6 +49,11 @@ async function create(data, companyId) {
 }
 
 async function update(data, username, companyId) {
+    const payload = { ...data };
+    if (payload.avatar) {
+        payload.avatarUrl = getObject(data.avatar);
+    }
+
     await Database.user.updateUser(data, username, companyId);
     const user = await get(username, companyId);
     await postMessage(user, 'user_updated');
