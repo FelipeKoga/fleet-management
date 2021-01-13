@@ -1,0 +1,13 @@
+{
+    "httpMethod": "POST",
+    "resource": "/company/{companyId}/users/{username}/location",
+
+    "pathParameters": {
+        "companyId": "1",
+        "username": "kosloski.fkoga@gmail.com"
+    },
+    "body": {
+        "latitude": -24.1069931,
+        "longitude": -51.3214141
+    }
+}

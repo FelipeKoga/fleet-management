@@ -7,32 +7,56 @@ import { ForgotPasswordComponent } from "./components/auth/forgot-password/forgo
 import { UsersComponent } from "./components/users/users.component";
 import { ChatsComponent } from "./components/chats/chats.component";
 import { ProfileComponent } from "./components/profile/profile.component";
+import { NotFoundComponent } from "./components/not-found/not-found.component";
+import { UserRole } from "./models/user";
 
 const routes: Routes = [
   {
     path: "",
+    redirectTo: "map",
+    pathMatch: "full",
+  },
+  { path: "login", component: LoginComponent },
+  { path: "forgot-password", component: ForgotPasswordComponent },
+  {
+    path: "map",
     component: MapComponent,
+    data: {
+      roles: [UserRole.ADMIN, UserRole.EMPLOYEEE, UserRole.OPERATOR],
+    },
     canActivate: [AuthGuard],
   },
-  { path: "map", component: MapComponent, canActivate: [AuthGuard] },
-  { path: "login", component: LoginComponent },
   {
     path: "profile",
     component: ProfileComponent,
+    data: {
+      roles: [UserRole.ADMIN, UserRole.EMPLOYEEE, UserRole.OPERATOR],
+    },
     canActivate: [AuthGuard],
   },
-  { path: "forgot-password", component: ForgotPasswordComponent },
-  { path: "chats", component: ChatsComponent, canActivate: [AuthGuard] },
+  {
+    path: "chats",
+    component: ChatsComponent,
+    data: {
+      roles: [UserRole.ADMIN, UserRole.EMPLOYEEE, UserRole.OPERATOR],
+    },
+    canActivate: [AuthGuard],
+  },
   {
     path: "users",
     component: UsersComponent,
+    data: {
+      roles: [UserRole.ADMIN, UserRole.OPERATOR],
+    },
     canActivate: [AuthGuard],
   },
 
   {
     path: "**",
-    component: MapComponent,
-
+    component: NotFoundComponent,
+    data: {
+      roles: [UserRole.ADMIN, UserRole.EMPLOYEEE, UserRole.OPERATOR],
+    },
     canActivate: [AuthGuard],
   },
 ];

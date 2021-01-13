@@ -2,11 +2,17 @@
   <h2 mat-dialog-title>
     <span *ngIf="data.type === 'INSERT'">Criação de usuário</span>
     <span *ngIf="data.type === 'UPDATE'">Atualização de usuário</span>
-    <span *ngIf="data.type === 'DELETE'">Exclusão de usuário</span>
+
+    <span *ngIf="data.type === 'DISABLE'">Desablitar usuário</span>
+    <span *ngIf="data.type === 'ENABLE'">Habilitar usuário</span>
   </h2>
-  <ng-container *ngIf="data.type === 'DELETE'; else elseTemplate">
+  <ng-container
+    *ngIf="data.type !== 'INSERT' && data.type !== 'UPDATE'; else elseTemplate"
+  >
     <p style="font-size: 16px; flex: 1">
-      Você tem certeza que deseja excluir o usuário {{ data.user.name }}?
+      Você tem certeza que deseja
+      {{ data.type === "DISABLE" ? "desabilitar" : "habilitar" }} o usuário
+      {{ data.user.name }}?
     </p>
     <mat-dialog-actions align="end">
       <button [disabled]="isLoading" mat-button mat-dialog-close>
@@ -15,7 +21,7 @@
       <button
         [disabled]="(state$ | async).isLoading"
         color="warn"
-        (click)="delete()"
+        (click)="changeUserStatus()"
         mat-stroked-button
       >
         <ng-container *ngIf="(state$ | async).isLoading; else elseTemplate">
@@ -43,6 +49,16 @@
         <mat-label>Telefone</mat-label>
         <input formControlName="phone" matInput />
       </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Cargo</mat-label>
+
+        <mat-select formControlName="role">
+          <mat-option *ngFor="let role of userRoles" [value]="role">
+            {{ translateRole(role) }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
       <mat-dialog-actions align="end">
         <button
           [disabled]="(state$ | async).isLoading"

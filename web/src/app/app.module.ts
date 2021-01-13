@@ -22,7 +22,8 @@ import { UsersComponent } from "./components/users/users.component";
 import { FormDialogComponent } from "./components/users/form-dialog/form-dialog.component";
 import { ChatsModule } from "./components/chats/chats.module";
 import { SharedModule } from "./shared/shared.module";
-import { ProfileComponent } from './components/profile/profile.component';
+import { ProfileComponent } from "./components/profile/profile.component";
+import { NotFoundComponent } from "./components/not-found/not-found.component";
 
 @NgModule({
   declarations: [
@@ -34,6 +35,7 @@ import { ProfileComponent } from './components/profile/profile.component';
     UsersComponent,
     FormDialogComponent,
     ProfileComponent,
+    NotFoundComponent,
   ],
   imports: [
     BrowserModule,

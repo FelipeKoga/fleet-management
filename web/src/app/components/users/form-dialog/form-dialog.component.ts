@@ -3,13 +3,15 @@ import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { Observable } from "rxjs";
-import { User } from "src/app/models/user";
+import { User, UserStatus } from "src/app/models/user";
 import { UsersService, UsersState } from "src/app/services/users/users.service";
+import { roles } from "src/app/utils/role";
 
 export enum FormType {
   INSERT = "INSERT",
   UPDATE = "UPDATE",
-  DELETE = "DELETE",
+  DISABLE = "DISABLE",
+  ENABLE = "ENABLE",
 }
 
 interface FormDialogData {
@@ -26,10 +28,11 @@ export class FormDialogComponent implements OnInit {
   private form: FormGroup;
   private user: User = new User({});
   public state$: Observable<UsersState>;
+  public userRoles: string[] = ["ADMIN", "OPERATOR", "EMPLOYEE"];
 
   constructor(
-    public dialogRef: MatDialogRef<FormDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: FormDialogData,
+    public dialogRef: MatDialogRef<FormDialogComponent>,
     private usersService: UsersService,
     private formBuilder: FormBuilder,
     private snackBar: MatSnackBar
@@ -40,6 +43,7 @@ export class FormDialogComponent implements OnInit {
       name: ["", Validators.required],
       email: ["", Validators.required],
       phone: ["", Validators.required],
+      role: ["", Validators.required],
     });
   }
 
@@ -51,6 +55,7 @@ export class FormDialogComponent implements OnInit {
         name: user.name,
         email: user.email,
         phone: user.phone,
+        role: user.role,
       });
     }
   }
@@ -74,11 +79,21 @@ export class FormDialogComponent implements OnInit {
     }
   }
 
-  public delete() {
-    this.usersService.delete(this.user.username, () => {
-      this.dialogRef.close();
-      this.showSuccess("Usuário excluído com sucesso!");
-    });
+  public changeUserStatus() {
+    if (this.data.type === FormType.ENABLE) {
+      this.usersService.update(
+        { ...this.user, status: UserStatus.OFFLINE },
+        () => {
+          this.dialogRef.close();
+          this.showSuccess("Usuário habilitado com sucesso!");
+        }
+      );
+    } else {
+      this.usersService.disable(this.user.username, () => {
+        this.dialogRef.close();
+        this.showSuccess("Usuário desabilitado com sucesso!");
+      });
+    }
   }
 
   private showSuccess(message: string) {
@@ -88,6 +103,10 @@ export class FormDialogComponent implements OnInit {
       horizontalPosition: "right",
       verticalPosition: "bottom",
     });
+  }
+
+  public translateRole(role: string) {
+    return roles[role];
   }
 
   get name() {

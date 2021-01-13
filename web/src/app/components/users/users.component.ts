@@ -10,6 +10,7 @@ import { MatPaginator } from "@angular/material/paginator";
 import { MatTableDataSource } from "@angular/material/table";
 import { Observable } from "rxjs";
 import { User } from "src/app/models/user";
+import { AuthService } from "src/app/services/auth/auth.service";
 import { UsersService, UsersState } from "src/app/services/users/users.service";
 import {
   FormDialogComponent,
@@ -26,16 +27,24 @@ export class UsersComponent implements OnInit, AfterViewInit {
   public selectedUser: User;
   public state$: Observable<UsersState>;
   public dataSource = new MatTableDataSource<User>([]);
+  public user: User;
   @ViewChild(MatPaginator) paginator: MatPaginator;
 
-  constructor(private usersService: UsersService, private dialog: MatDialog) {
+  constructor(
+    private usersService: UsersService,
+    private dialog: MatDialog,
+    private authService: AuthService
+  ) {
     this.state$ = usersService.usersState$;
     this.dataSource.paginator = this.paginator;
   }
 
   ngOnInit() {
+    this.user = this.authService.getUser();
     this.usersService.usersState$.subscribe((state) => {
-      this.dataSource.data = state.users;
+      this.dataSource.data = state.users.filter(
+        (user) => user.username !== this.user.username
+      );
     });
 
     this.usersService.fetch();
@@ -48,15 +57,19 @@ export class UsersComponent implements OnInit, AfterViewInit {
   public openInsert() {
     this.openDialog(FormType.INSERT);
   }
-
-  public openUpdate() {
+  public openUpdate(user: User) {
+    this.selectedUser = user;
     this.openDialog(FormType.UPDATE);
-    this.selectedUser = null;
   }
 
-  public openDelete() {
-    this.openDialog(FormType.DELETE);
-    this.selectedUser = null;
+  public openEnable(user: User) {
+    this.selectedUser = user;
+    this.openDialog(FormType.ENABLE);
+  }
+
+  public openDisable(user: User) {
+    this.selectedUser = user;
+    this.openDialog(FormType.DISABLE);
   }
 
   public applyFilter(event: Event) {
@@ -72,5 +85,6 @@ export class UsersComponent implements OnInit, AfterViewInit {
         user: this.selectedUser,
       },
     });
+    this.selectedUser = null;
   }
 }

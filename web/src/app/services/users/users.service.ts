@@ -74,20 +74,28 @@ export class UsersService extends StateService<UsersState> {
       });
   }
 
-  public delete(username: string, completed?: () => void) {
+  public disable(username: string, completed?: () => void) {
     this.setState({ isLoading: true });
     return this.http
-      .delete<boolean>(`${API}/company/${this.companyId}/users/${username}`)
-      .subscribe((isDeleted) => {
-        if (isDeleted) {
-          completed();
-          this.setState({
-            users: this.state.users.filter(
-              (user) => user.username !== username
-            ),
-            isLoading: false,
-          });
-        }
+      .put<User>(
+        `${API}/company/${this.companyId}/users/${username}/disable`,
+        {}
+      )
+      .subscribe((updatedUser) => {
+        completed();
+        this.setState({
+          users: this.replaceUser(updatedUser),
+          isLoading: false,
+        });
       });
+  }
+
+  private replaceUser(newUser: User) {
+    return this.state.users.map((item) => {
+      if (item.username === newUser.username) {
+        return newUser;
+      }
+      return item;
+    });
   }
 }

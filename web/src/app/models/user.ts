@@ -1,6 +1,7 @@
 export enum UserStatus {
   ONLINE = "ONLINE",
   OFFLINE = "OFFLINE",
+  DISABLED = "DISABLED",
 }
 
 export enum UserRole {
