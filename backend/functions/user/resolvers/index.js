@@ -31,11 +31,26 @@ async function get(username, companyId) {
     if (user.avatar) {
         user.avatarUrl = S3.getObject(user.avatar);
     }
+
+    user.location = await Database.location.getLastLocation(username);
+
     return user;
 }
 
 async function list(companyId) {
-    return Database.user.fetchUsers(companyId);
+    const users = await Database.user.fetchUsers(companyId);
+
+    return Promise.all(
+        users.map(async user => {
+            return {
+                ...user,
+                avatarUrl: user.avatar ? S3.getObject(user.avatar) : undefined,
+                location: await Database.location.getLastLocation(
+                    user.username,
+                ),
+            };
+        }),
+    );
 }
 
 async function create(data, companyId) {
@@ -51,24 +66,37 @@ async function create(data, companyId) {
 }
 
 async function update(data, username, companyId) {
+    const user = await get(username, companyId);
+    if (user.status === 'DISABLED') {
+        await Cognito.enable(username);
+    }
     const payload = { ...data };
     if (payload.avatar) {
         payload.avatarUrl = getObject(data.avatar);
     }
 
-    await Database.user.updateUser(data, username, companyId);
-    const user = await get(username, companyId);
+    await Database.user.updateUser(payload, username, companyId);
     await postMessage(user, 'user_updated');
-    return user;
+    return { ...user, ...payload };
 }
 
-async function remove(username, companyId) {
+async function disable(username, companyId) {
     const user = await get(username, companyId);
-    await Cognito.remove(username);
-    await Database.user.removeUser(username, companyId);
-    await postMessage(user, 'user_removed');
-    const message = `Prezado(a) ${user.name}, seu usuário foi removido por um administrador.`;
-    await Email.sendEmail(user.email, 'Seu usuário foi removido.', message);
+    await Cognito.disable(username);
+    await Database.user.disableUser(username, companyId);
+    await postMessage(user, 'user_disabled');
+    const message = `Prezado(a) ${user.name}, seu usuário foi desabilitado por um administrador.`;
+    await Email.sendEmail(user.email, 'Seu usuário foi desabilitado.', message);
+    return true;
+}
+
+async function addLocation(companyId, username, args) {
+    await Database.location.addLocation(username, {
+        ...args,
+        lastUpdate: Date.now(),
+    });
+    const user = await get(username, companyId);
+    await postMessage(user, 'user_new_location');
     return true;
 }
 
@@ -77,5 +105,6 @@ module.exports = {
     list,
     create,
     update,
-    remove,
+    disable,
+    addLocation,
 };

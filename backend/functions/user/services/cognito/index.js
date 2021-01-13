@@ -41,7 +41,16 @@ async function create({ email, password, name }, companyId) {
         .promise();
 }
 
-async function remove(username) {
+async function enable(username) {
+    await cognitoIdentityServiceProvider
+        .adminEnableUser({
+            Username: username,
+            UserPoolId: POOL_ID,
+        })
+        .promise();
+}
+
+async function disable(username) {
     await cognitoIdentityServiceProvider
         .adminUserGlobalSignOut({
             Username: username,
@@ -49,14 +58,15 @@ async function remove(username) {
         })
         .promise();
     await cognitoIdentityServiceProvider
-        .adminDeleteUser({
-            UserPoolId: POOL_ID,
+        .adminDisableUser({
             Username: username,
+            UserPoolId: POOL_ID,
         })
         .promise();
 }
 
 module.exports = {
     create,
-    remove,
+    disable,
+    enable,
 };

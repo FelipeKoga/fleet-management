@@ -152,8 +152,8 @@ user:
                   authorizerId:
                       Ref: ApiGatewayAuthorizer
         - http:
-              path: company/{companyId}/users/{username}
-              method: DELETE
+              path: company/{companyId}/users/{username}/disable
+              method: PUT
               cors: true
               authorizer:
                   type: COGNITO_USER_POOLS

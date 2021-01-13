@@ -5,17 +5,23 @@ const headers = {
     'Access-Control-Allow-Credentials': true,
 };
 
-async function main(method, { username, companyId }, body) {
+async function main(method, resource, { username, companyId }, body) {
     switch (method) {
         case 'GET':
             if (username) return Resolvers.get(username, companyId);
             return Resolvers.list(companyId);
         case 'POST':
+            if (resource.includes('/location')) {
+                return Resolvers.addLocation(companyId, username, body);
+            }
             return Resolvers.create(body, companyId);
         case 'PUT':
+            if (resource.includes('/disable')) {
+                return Resolvers.disable(username, companyId);
+            }
+
             return Resolvers.update(body, username, companyId);
-        case 'DELETE':
-            return Resolvers.remove(username, companyId);
+
         default:
             throw new Error('Method not allowed');
     }
@@ -23,7 +29,7 @@ async function main(method, { username, companyId }, body) {
 
 exports.handler = async event => {
     console.log(event);
-    const { body, pathParameters, httpMethod } = event;
+    const { body, pathParameters, httpMethod, resource } = event;
 
     try {
         const response = {
@@ -31,6 +37,7 @@ exports.handler = async event => {
             body: JSON.stringify(
                 await main(
                     httpMethod,
+                    resource,
                     pathParameters,
                     typeof body === 'string' ? JSON.parse(body) : body,
                 ),

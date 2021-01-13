@@ -89,6 +89,8 @@ Resources:
                           - cognito-idp:AdminSetUserPassword
                           - cognito-idp:AdminDeleteUser
                           - cognito-idp:AdminUserGlobalSignOut
+                          - cognito-idp:AdminDisableUser
+                          - cognito-idp:AdminEnableUser
                       Resource: '*'
             Roles:
                 - !Ref TccRole

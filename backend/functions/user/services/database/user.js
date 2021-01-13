@@ -1,4 +1,4 @@
-const { getByPK, fetchBySK, insert, update, remove } = require('./query');
+const { getByPK, fetchBySK, insert, update } = require('./query');
 const { removeConnectionIds } = require('./connection');
 
 const ProjectionExpression =
@@ -75,11 +75,20 @@ async function updateUser(
     });
 }
 
-async function removeUser(username, companyId) {
+async function disableUser(username, companyId) {
     await removeConnectionIds(username);
-    await remove({
-        partitionKey: `USER#${username}`,
-        sortKey: `CONFIG#${companyId}`,
+    return update({
+        Key: {
+            partitionKey: `USER#${username}`,
+            sortKey: `CONFIG#${companyId}`,
+        },
+        UpdateExpression: 'set #status = :status',
+        ExpressionAttributeNames: {
+            '#status': 'status',
+        },
+        ExpressionAttributeValues: {
+            ':status': 'DISABLED',
+        },
     });
 }
 
@@ -88,5 +97,5 @@ module.exports = {
     fetchUsers,
     createUser,
     updateUser,
-    removeUser,
+    disableUser,
 };
