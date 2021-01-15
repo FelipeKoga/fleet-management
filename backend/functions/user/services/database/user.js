@@ -2,7 +2,7 @@ const { getByPK, fetchBySK, insert, update } = require('./query');
 const { removeConnectionIds } = require('./connection');
 
 const ProjectionExpression =
-    'username, #name, email, avatar, #status, #role, phone, companyId, customName';
+    'username, #name, email, avatar, #status, #role, phone, companyId, customName, locationUpdate';
 
 async function getUser(username, companyId) {
     return getByPK({
@@ -38,6 +38,7 @@ async function createUser(data, companyId) {
     const { password, ...user } = data;
     await insert({
         ...user,
+        locationUpdate: 10,
         partitionKey: `USER#${data.email}`,
         username: data.email,
         sortKey: `CONFIG#${companyId}`,
@@ -46,7 +47,16 @@ async function createUser(data, companyId) {
 }
 
 async function updateUser(
-    { customName = '', name, phone, email, role, status, avatar },
+    {
+        customName = '',
+        name,
+        phone,
+        email,
+        role,
+        status,
+        avatar,
+        locationUpdate = 10,
+    },
     username,
     companyId,
 ) {
@@ -56,7 +66,7 @@ async function updateUser(
             sortKey: `CONFIG#${companyId}`,
         },
         UpdateExpression:
-            'set customName = :customName, phone = :phone, email = :email, #role = :role, #status = :status, #name = :name, #avatar = :avatar',
+            'set customName = :customName, phone = :phone, email = :email, #role = :role, #status = :status, #name = :name, #avatar = :avatar, locationUpdate = :locationUpdate',
         ExpressionAttributeNames: {
             '#status': 'status',
             '#role': 'role',
@@ -71,6 +81,7 @@ async function updateUser(
             ':status': status,
             ':name': name,
             ':avatar': avatar,
+            ':locationUpdate': locationUpdate,
         },
     });
 }
