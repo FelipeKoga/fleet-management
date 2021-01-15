@@ -9,6 +9,7 @@ import {
 } from "src/app/services/websocket/websocket.service";
 import { NewChatType } from "./new-chat/new-chat.component";
 import { convertDate } from "../../utils/date";
+import { ActivatedRoute } from "@angular/router";
 @Component({
   selector: "app-chats",
   templateUrl: "./chats.component.html",
@@ -27,12 +28,23 @@ export class ChatsComponent implements OnInit {
   constructor(
     private chatsService: ChatsService,
     private webSocketService: WebsocketService,
-    private authService: AuthService
+    private authService: AuthService,
+    private activatedRoute: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
+    const withUsername = this.activatedRoute.snapshot.paramMap.get("username");
+    console.log(withUsername);
+
     this.selectedChat = new Chat();
     this.chatsService.chatsState$.subscribe((state) => {
+      if (withUsername) {
+        this.selectedChat = state.chats.find(
+          (chat) => chat.user && chat.user.username === withUsername
+        );
+        console.log(this.selectedChat);
+      }
+
       this.chats = state.chats;
       this.isLoadingChats = state.isLoading;
     });

@@ -1,3 +1,5 @@
+import { Location } from "./location";
+
 export enum UserStatus {
   ONLINE = "ONLINE",
   OFFLINE = "OFFLINE",
@@ -21,6 +23,8 @@ export class User {
   companyId: string;
   avatar: string;
   avatarUrl?: string;
+  location?: Location;
+  locationUpdate: number;
 
   constructor({
     name = "",
@@ -33,6 +37,8 @@ export class User {
     username = email,
     avatar = "",
     avatarUrl = "",
+    location = null,
+    locationUpdate = 0,
   }) {
     this.name = name;
     this.email = email;
@@ -44,5 +50,7 @@ export class User {
     this.companyId = companyId;
     this.avatar = avatar;
     this.avatarUrl = avatarUrl;
+    this.location = location;
+    this.locationUpdate = locationUpdate;
   }
 }

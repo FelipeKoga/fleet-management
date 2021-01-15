@@ -83,19 +83,21 @@ export class UsersService extends StateService<UsersState> {
       )
       .subscribe((updatedUser) => {
         completed();
-        this.setState({
-          users: this.replaceUser(updatedUser),
-          isLoading: false,
-        });
+        this.replaceUser(updatedUser);
       });
   }
 
-  private replaceUser(newUser: User) {
-    return this.state.users.map((item) => {
-      if (item.username === newUser.username) {
-        return newUser;
-      }
-      return item;
+  public replaceUser(newUser: User) {
+    this.setState({
+      ...this.state,
+      users: this.state.users.map((item) => {
+        if (item.username === newUser.username) {
+          console.log("show!");
+          return newUser;
+        }
+        return item;
+      }),
+      isLoading: false,
     });
   }
 }

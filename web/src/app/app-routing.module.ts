@@ -43,6 +43,14 @@ const routes: Routes = [
     canActivate: [AuthGuard],
   },
   {
+    path: "chats/:username",
+    component: ChatsComponent,
+    data: {
+      roles: [UserRole.ADMIN, UserRole.EMPLOYEEE, UserRole.OPERATOR],
+    },
+    canActivate: [AuthGuard],
+  },
+  {
     path: "users",
     component: UsersComponent,
     data: {

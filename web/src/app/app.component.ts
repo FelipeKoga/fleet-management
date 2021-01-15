@@ -31,6 +31,7 @@ export class AppComponent implements OnInit {
       if (store.isLoggedIn) {
         this.currentUser = store.user;
         this.currentUser.status = UserStatus.ONLINE;
+        console.log("CONNECT!");
         this.webSocketService.connect();
         this.webSocketService.messages.subscribe((message) => {
           if (message.action === Actions.USER_CONNECTED) {

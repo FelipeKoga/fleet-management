@@ -1,94 +1,164 @@
-import { Component, OnInit, ViewChild } from "@angular/core";
-import { AgmMap } from "@agm/core";
-import { silverMap } from "./constants";
-import { CoreService } from "src/app/services/core/core.service";
-import { Observable } from "rxjs";
-import { trigger, transition, style, animate } from "@angular/animations";
-import { ContactsService } from "src/app/services/core/contacts.service";
-
+import { Component, OnInit } from "@angular/core";
+import { UsersService } from "src/app/services/users/users.service";
+import { User, UserStatus } from "src/app/models/user";
+import { AuthService } from "src/app/services/auth/auth.service";
+import {
+  Actions,
+  WebsocketService,
+} from "src/app/services/websocket/websocket.service";
+import { FormControl, Validators } from "@angular/forms";
+import { Message, MessageStatus } from "src/app/models/message";
+import { MatSnackBar } from "@angular/material/snack-bar";
+import { Router } from "@angular/router";
+declare var google: any;
 @Component({
   selector: "app-map",
-  animations: [
-    trigger("enterAnimation", [
-      transition(":enter", [
-        // :enter is alias to 'void => *'
-        style({ opacity: 0 }),
-        animate(100, style({ opacity: 1 })),
-      ]),
-      transition(":leave", [
-        // :leave is alias to '* => void'
-        animate(100, style({ opacity: 0 })),
-      ]),
-    ]),
-  ],
   templateUrl: "./map.component.html",
   styleUrls: ["./map.component.scss"],
 })
 export class MapComponent implements OnInit {
-  public mapStyle: Array<any>;
-  public showUserDetails: boolean = false;
-  private contacts = [];
-  infoWindowOpened = null;
-  previousInfoWindow = null;
-  latitude = -25.4242909;
-  longitude = -50.1640366;
+  private currentUserLocation: { latitude: number; longitude: number };
 
-  markers = [];
+  public currentUser: User;
+  public users: User[];
+  public activeUsers: User[];
+  public selectedUser: User;
+  public infoWindowOpened = null;
+  public previousInfoWindow = null;
+  public markers = [];
+  public currentFocus: { latitude: number; longitude: number };
+  public messageFormControl: FormControl;
 
   constructor(
-    private coreService: CoreService,
-    private contactsService: ContactsService
-  ) {
-    this.contacts = this.contactsService.getContacts();
-    this.contacts.forEach((contact) => {
-      this.markers.push({
-        lat: +contact.latitude,
-        lng: +contact.longitude,
-        uuid: 1,
-        label: contact.name,
-        icon: {
-          url: contact.photo,
-          scaledSize: { height: 35, width: 35 },
-        },
-      });
-    });
-  }
-
-  close_window() {
-    if (this.previousInfoWindow != null) {
-      this.previousInfoWindow.close();
-    }
-  }
+    private usersService: UsersService,
+    private authService: AuthService,
+    private webSocketService: WebsocketService,
+    private snackBar: MatSnackBar
+  ) {}
 
   ngOnInit() {
-    console.log("PAO");
-    setTimeout(() => {
-      console.log("ENTREI");
-      const contact = {
-        name: "Usuário 6",
-        latitude: -25.6966422,
-        longitude: -48.4858606,
-        photo: `https://ui-avatars.com/api/?rounded=true&name=usuario+6&background=2c4ebd&color=fff`,
+    this.messageFormControl = new FormControl("");
+
+    this.selectedUser = new User({});
+    navigator.geolocation.getCurrentPosition((resp) => {
+      this.currentUserLocation = {
+        latitude: resp.coords.latitude,
+        longitude: resp.coords.longitude,
       };
-      this.markers.push({
-        lat: +contact.latitude,
-        lng: +contact.longitude,
-        uuid: 1,
-        icon: {
-          url: contact.photo,
-          scaledSize: { height: 35, width: 35 },
-        },
-      });
-    }, 3000);
+      this.currentFocus = this.currentUserLocation;
+    });
+
+    this.currentUser = this.authService.getUser();
+    this.usersService.usersState$.subscribe((state) => {
+      this.users = state.users
+        .filter(
+          (user) =>
+            user.username !== this.currentUser.username &&
+            user.status !== UserStatus.DISABLED
+        )
+        .sort((a) => {
+          if (a.status === UserStatus.ONLINE) return -1;
+          return 1;
+        });
+      this.getActiveUsers();
+      if (this.users.length) {
+        this.markers = [];
+        this.users.forEach((user) => {
+          if (user.location) {
+            this.markers.push({
+              latitude: +user.location.latitude,
+              longitude: +user.location.longitude,
+              icon: {
+                url: user.avatarUrl
+                  ? user.avatarUrl
+                  : this.getAvatar(user.name),
+              },
+              user,
+            });
+          }
+        });
+      }
+    });
+
+    this.webSocketService.messages.subscribe((response) => {
+      console.log(response);
+      if (
+        response.action === Actions.USER_CONNECTED ||
+        response.action === Actions.USER_DISCONNECTED ||
+        response.action === Actions.USER_NEW_LOCATION
+      ) {
+        this.usersService.replaceUser(response.body);
+      }
+    });
+
+    this.usersService.fetch();
   }
 
-  selectMarker(event, marker, infoWindow) {
+  public userClicked(user: User) {
+    this.currentFocus = this.currentUserLocation;
+    this.currentFocus = {
+      latitude: user.location.latitude,
+      longitude: user.location.longitude,
+    };
+  }
+
+  public selectMarker(_, marker, infoWindow) {
+    this.messageFormControl.reset();
+
+    this.selectedUser = marker.user;
     if (this.previousInfoWindow == null) this.previousInfoWindow = infoWindow;
     else {
       this.infoWindowOpened = infoWindow;
       this.previousInfoWindow.close();
     }
+
     this.previousInfoWindow = infoWindow;
-    // this.showUserDetails = !this.showUserDetails;
+
+    const that = this;
+    const location = { lat: marker.latitude, lng: marker.longitude };
+    const geocoder = new google.maps.Geocoder();
+    geocoder.geocode({ location }, function (results) {
+      if (results[0]) {
+        that.selectedUser.location.address = results[0].formatted_address;
+      } else {
+        console.log("No results found");
+      }
+    });
+  }
+
+  public sendMessage() {
+    if (!this.messageFormControl.value) return;
+
+    const message = new Message({
+      chatId: null,
+      message: this.messageFormControl.value,
+      status: MessageStatus.PENDING,
+      username: this.currentUser.username,
+      recipient: this.selectedUser.username,
+    });
+
+    this.webSocketService.sendMessage({
+      action: Actions.SEND_MESSAGE,
+      body: message,
+    });
+
+    this.snackBar.open("Mensagem enviada!", null, {
+      duration: 2000,
+      panelClass: ["snackbar-success"],
+      horizontalPosition: "right",
+      verticalPosition: "bottom",
+    });
+
+    this.messageFormControl.reset();
+  }
+
+  public getAvatar(name: string) {
+    return `https://ui-avatars.com/api/?rounded=true&name=${name}`;
+  }
+
+  public getActiveUsers() {
+    this.activeUsers = this.users.filter((user) => {
+      return user.status === UserStatus.ONLINE && user.locationUpdate !== 0;
+    });
   }
 }

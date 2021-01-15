@@ -16,6 +16,8 @@ export enum Actions {
 
   USER_CONNECTED = "user_connected",
   USER_DISCONNECTED = "user_disconnected",
+
+  USER_NEW_LOCATION = "user_new_location",
 }
 
 interface WebSocketPayload {

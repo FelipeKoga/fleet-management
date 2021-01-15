@@ -27,12 +27,14 @@
         "
       >
         <div style="margin-bottom: 6px; display: flex; flex-direction: column">
-          <span style="font-size: 28px; color: blue">200</span
+          <span style="font-size: 28px; color: blue">{{ users.length }}</span
           ><span style="color: grey; font-size: 14px">funcionários</span>
         </div>
         <div style="margin-bottom: 6px; display: flex; flex-direction: column">
-          <span style="font-size: 28px; color: blue">20</span
-          ><span style="color: grey; font-size: 14px">veículos ativos</span>
+          <span style="font-size: 28px; color: blue">{{
+            activeUsers.length
+          }}</span
+          ><span style="color: grey; font-size: 14px">ativos</span>
         </div>
       </div>
       <div style="display: flex">
@@ -62,16 +64,29 @@
       </div>
 
       <div style="overflow-y: auto; padding-left: 4px; padding-right: 4px">
-        <mat-card *ngFor="let contact of contacts" class="card-employee">
+        <mat-card
+          (click)="userClicked(user)"
+          *ngFor="let user of users"
+          class="card-employee"
+        >
           <div style="display: flex; width: 100%; padding-bottom: 12px">
-            <div mat-card-avatar class="photo">
-              <img class="userPhoto" [src]="contact.photo" />
+            <div class="user-photo-wrapper">
+              <img
+                onerror="this.src='assets/default_user.png';"
+                class="user-photo"
+                [src]="user.avatarUrl || getAvatar(user.name)"
+              />
+              <div
+                [ngClass]="
+                  user.status === 'ONLINE' ? 'status online' : 'status offline'
+                "
+              ></div>
             </div>
-            <div style="flex-direction: column; width: 100%; margin-left: 4px">
+            <div style="flex-direction: column; width: 100%; margin-left: 8px">
               <div
                 style="font-weight: 500; font-size: 16px; margin-bottom: 4px"
               >
-                {{ contact.name }}
+                {{ user.name }}
               </div>
               <div
                 style="
@@ -83,18 +98,20 @@
                   align-items: center;
                 "
               >
-                <ng-container
-                  *ngIf="contact.update === 'Desabilitado'; else elseTemplate"
-                >
+                <ng-container *ngIf="!user.locationUpdate; else elseTemplate">
                   <mat-icon
                     style="
                       text-align: center;
                       margin-right: 6px;
                       color: #666666;
+                      display: flex;
+                      justify-content: center;
+                      font-size: 20px;
+                      align-items: center;
                     "
                     >location_off</mat-icon
                   >
-                  {{ contact.update }}
+                  Desabilitado
                 </ng-container>
                 <ng-template #elseTemplate>
                   <mat-icon
@@ -102,65 +119,34 @@
                       text-align: center;
                       margin-right: 6px;
                       color: #666666;
+                      display: flex;
+                      justify-content: center;
+                      font-size: 20px;
+                      align-items: center;
                     "
                     >update</mat-icon
                   >
-                  {{ contact.update }}
+                  <span *ngIf="user.locationUpdate">
+                    {{ user.locationUpdate }} segundos
+                  </span>
                 </ng-template>
               </div>
             </div>
           </div>
         </mat-card>
-        <mat-card *ngFor="let contact of contacts" class="card-employee">
-          <mat-card-header style="position: relative">
-            <div mat-card-avatar class="photo">
-              <img class="userPhoto" [src]="contact.photo" />
-            </div>
-
-            <mat-card-title
-              style="
-                display: flex;
-                width: 100%;
-                align-items: center;
-                font-size: 14px;
-              "
-            >
-              {{ contact.name }}
-            </mat-card-title>
-            <mat-card-subtitle
-              style="
-                font-size: 12px;
-                align-items: center;
-                width: 100%;
-                display: flex;
-              "
-            >
-              <ng-container
-                *ngIf="contact.update === 'Desabilitado'; else elseTemplate"
-              >
-                <mat-icon style="font-size: 22px">location_off</mat-icon>
-                {{ contact.update }}
-              </ng-container>
-              <ng-template #elseTemplate>
-                <mat-icon style="font-size: 22px">update</mat-icon>
-                {{ contact.update }}
-              </ng-template>
-            </mat-card-subtitle>
-          </mat-card-header>
-        </mat-card>
       </div>
     </div>
-    <div class="map-container" style="position: relative">
-      <!-- <agm-map
+    <div class="map-container" *ngIf="currentFocus" style="position: relative">
+      <agm-map
         class="map"
         [fullscreenControl]="true"
-        [latitude]="latitude"
-        [longitude]="longitude"
+        [latitude]="currentFocus.latitude"
+        [longitude]="currentFocus.longitude"
         [styles]="mapStyle"
         [maxZoom]="0"
-        [zoom]="8"
+        [zoom]="16"
         (mapClick)="mapClicked($event.coords.lat, $event.coords.lng)"
-        style="position: relative;"
+        style="position: relative"
       >
         <mat-icon
           aria-hidden="false"
@@ -169,64 +155,101 @@
           class="toggle-button controls button"
           >search</mat-icon
         >
-        <agm-marker
+
+        <agm-overlay
           *ngFor="let marker of markers"
-          [latitude]="marker.lat"
-          [longitude]="marker.lng"
+          [latitude]="marker.latitude"
+          [longitude]="marker.longitude"
           [markerDraggable]="false"
-          [scaleControl]="true"
           contextmenu="#menu"
-          [iconUrl]="marker.icon"
           (markerClick)="selectMarker($event, marker, infoWindow)"
         >
+          <div class="user-photo-wrapper">
+            <img
+              onerror="this.src='assets/default_user.png';"
+              class="user-photo"
+              [src]="marker.icon.url"
+            />
+          </div>
           <agm-info-window #infoWindow>
-            <div style="width: 350px;">
-              <h3>
-                <div mat-card-avatar class="photo">
+            <div style="width: 450px">
+              <div
+                style="
+                  margin-bottom: 12px;
+                  display: flex;
+                  justify-content: space-between;
+                "
+              >
+                <div class="user-photo-wrapper">
                   <img
-                    class="userPhoto"
-                    src="https://ui-avatars.com/api/?rounded=true&name=usuario+4&background=bf360c&color=fff"
+                    onerror="this.src='assets/default_user.png';"
+                    class="user-photo"
+                    [src]="selectedUser.avatarUrl"
                   />
                 </div>
-              </h3>
-              <p><span style="font-weight: 500;">Nome:</span> Usuário 4</p>
+              </div>
+
               <p>
-                <span style="font-weight: 500;">E-mail:</span>
-                usuario4@email.com
+                <span style="font-weight: 500">Nome: </span
+                >{{ selectedUser.name }}
               </p>
               <p>
-                <span style="font-weight: 500;">Telefone:</span> 42999991093
+                <span style="font-weight: 500">E-mail: </span>
+                {{ selectedUser.email }}
               </p>
               <p>
-                <span style="font-weight: 500;"> Última localização:</span> Rua
-                barão do cerro azul, 385. Ponta Grossa
+                <span style="font-weight: 500">Telefone: </span>
+                {{ selectedUser.phone }}
               </p>
-              <p>
-                <span style="font-weight: 500;"
-                  >Intervalo de atualizações:</span
+              <p *ngIf="selectedUser.location">
+                <span style="font-weight: 500"> Última localização: </span>
+                <span *ngIf="selectedUser.location.address">{{
+                  selectedUser.location.address
+                }}</span>
+                <span *ngIf="!selectedUser.location.address"
+                  >carregando...</span
                 >
-                1 minuto
+              </p>
+              <p>
+                <span style="font-weight: 500"
+                  >Intervalo de atualizações:
+                </span>
+                <ng-container
+                  *ngIf="selectedUser.status === 'OFFLINE'; else elseTemplate"
+                >
+                  Desabilitado
+                </ng-container>
+                <ng-template #elseTemplate>
+                  <span *ngIf="selectedUser.locationUpdate">{{
+                    selectedUser.locationUpdate
+                  }}</span>
+                  <span *ngIf="!selectedUser.locationUpdate">Desabilitado</span>
+                </ng-template>
               </p>
               <div
-                style="display: flex; align-items: center;"
+                style="display: flex; align-items: center"
                 class="marker-window-actions"
               >
-                <mat-form-field style="width: 100%;">
-                  <input matInput placeholder="Digite uma mensagem" />
+                <mat-form-field style="width: 100%">
+                  <input
+                    [formControl]="messageFormControl"
+                    matInput
+                    placeholder="Digite uma mensagem"
+                  />
                 </mat-form-field>
                 <button
-                  style="margin-left: 4px;"
+                  style="margin-left: 4px"
                   mat-icon-button
                   color="primary"
-                  aria-label="Example icon button with a menu icon"
+                  (click)="sendMessage()"
                 >
-                  <mat-icon>mic</mat-icon>
+                  <mat-icon>send</mat-icon>
                 </button>
               </div>
             </div>
           </agm-info-window>
-        </agm-marker>
-      </agm-map> -->
+        </agm-overlay>
+      </agm-map>
 
       <button
         style="
@@ -252,22 +275,3 @@
     </div>
   </div>
 </div>
-
-<mat-menu #menu="matMenu">
-  <button style="background-color: #fafafa; color: #32cd32" mat-menu-item>
-    <mat-icon>check_circle_outline</mat-icon>
-    <span>Online</span>
-  </button>
-  <button style="background-color: #fafafa" mat-menu-item>
-    <mat-icon>person</mat-icon>
-    <span>Perfil</span>
-  </button>
-  <button style="background-color: #fafafa" mat-menu-item>
-    <mat-icon>notifications_off</mat-icon>
-    <span>Desabilitar notificações</span>
-  </button>
-  <button style="background-color: #fafafa" mat-menu-item>
-    <mat-icon>power_settings_new</mat-icon>
-    <span>Sair</span>
-  </button>
-</mat-menu>

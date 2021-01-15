@@ -13,6 +13,7 @@ export class Message {
   username: string;
   status: MessageStatus;
   hasAudio?: boolean;
+  recipient?: string;
 
   constructor({
     chatId,
@@ -21,6 +22,7 @@ export class Message {
     status,
     hasAudio,
     messageId = nanoid(),
+    recipient = "",
   }: Omit<Message, "createdAt">) {
     this.chatId = chatId;
     this.message = message;
@@ -29,5 +31,6 @@ export class Message {
     this.createdAt = +new Date();
     this.hasAudio = hasAudio;
     this.messageId = messageId;
+    this.recipient = recipient;
   }
 }
