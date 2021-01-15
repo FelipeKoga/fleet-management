@@ -20,6 +20,7 @@ async function addConnection(connectionId, username) {
         if (user.avatar) {
             user.avatarUrl = getObject(user.avatar);
         }
+        user.location = await Database.getLastLocation(username);
         await postMessage(user, 'user_connected');
     }
 }

@@ -73,7 +73,7 @@ async function getUser(username) {
             '#name': 'name',
         },
         ProjectionExpression:
-            'username, #name, email, avatar, #status, #role, phone, companyId',
+            'username, #name, email, avatar, #status, #role, phone, companyId, locationUpdate',
     });
 }
 
@@ -110,6 +110,19 @@ async function deleteConnectionId(username, connectionId) {
     return true;
 }
 
+async function getLastLocation(username) {
+    return getByPK({
+        ExpressionAttributeValues: {
+            ':pk': `USER#${username}`,
+            ':sk': `LOCATION#`,
+        },
+
+        ProjectionExpression: 'latitude, longitude, lastUpdate',
+        Limit: 1,
+        ScanIndexForward: false,
+    });
+}
+
 module.exports = {
     fetchCompanyConnectionIDs,
     getUser,
@@ -118,4 +131,5 @@ module.exports = {
     getUsernameByConnectionId,
     updateStatus,
     getUserConnectionId,
+    getLastLocation,
 };
