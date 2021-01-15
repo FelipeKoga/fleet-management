@@ -155,9 +155,16 @@ async function addMessage({
     createdAt,
     messageId,
     hasAudio,
+    recipient,
 }) {
+    let id = chatId;
+    if (!chatId && recipient) {
+        const chat = await createChat(username, recipient);
+        id = chat.id;
+    }
+
     const messageResponse = await Database.message.addMessage({
-        chatId,
+        chatId: id,
         username,
         message,
         messageId,
@@ -170,27 +177,27 @@ async function addMessage({
         messageResponse.message = S3.getObject(messageResponse.message);
     }
 
-    const chatConfig = await Database.chat.getChat(chatId);
+    const chatConfig = await Database.chat.getChat(id);
 
-    const users = await Database.chat.fetchChatUsers(chatId);
+    const users = await Database.chat.fetchChatUsers(id);
     const chatUsers = users.filter(u => u !== username);
 
     const currentUserChat = chatConfig.private
         ? await getChat(
-              chatId,
+              id,
               username,
               chatConfig.private
                   .split(':')
                   .filter(member => member !== username),
           )
-        : await getChat(chatId, username);
+        : await getChat(id, username);
 
     await Promise.all(
         chatUsers.map(async memberUsername => {
-            await Database.message.newMessages(chatId, memberUsername);
+            await Database.message.newMessages(id, memberUsername);
             const memberChat = chatConfig.private
-                ? await getChat(chatId, memberUsername, username)
-                : await getChat(chatId, memberUsername);
+                ? await getChat(id, memberUsername, username)
+                : await getChat(id, memberUsername);
 
             await sendWebSocketMessage(
                 memberUsername,
