@@ -4,10 +4,10 @@
 
     "pathParameters": {
         "companyId": "1",
-        "username": "kosloski.fkoga@gmail.com"
+        "username": "fkoga@alunos.utfpr.edu.br"
     },
     "body": {
-        "latitude": -24.1069931,
-        "longitude": -51.3214141
+        "latitude": -25.4211437,
+        "longitude": -49.9951742
     }
 }
