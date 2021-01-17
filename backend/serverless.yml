@@ -8,15 +8,28 @@ provider:
     versionFunctions: false
     region: us-east-1
     websocketApiRouteSelectionExpression: $request.body.action
+
 plugins:
     - serverless-stack-output
+    - serverless-finch
     - aws-amplify-serverless-plugin
+
+package:
+    individually: true
+    include:
+        - '!*'
+        - '!*/**'
+
 custom:
     stage: ${opt:stage, self:provider.stage}
     amplify:
         - filename: ../app/app/src/main/res/raw/awsconfiguration.json
           type: native
           appClient: CognitoUserPoolClient
+
+    client:
+        bucketName: tcc-frontend
+        distributionFolder: ../web/dist/web
 
     table: ${self:app}-table-${self:custom.stage}
     output:
@@ -39,11 +52,7 @@ custom:
           - '.amazonaws.com/'
           - ${opt:stage, self:provider.stage}
           - '/'
-package:
-    individually: true
-    include:
-        - '!*'
-        - '!*/**'
+
 functions:
     - ${file(functions/serverless.yml)}
 
