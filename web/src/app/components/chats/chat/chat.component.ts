@@ -12,6 +12,7 @@ import {
   MessagesService,
   MessagesState,
 } from "src/app/services/messages/messages.service";
+import { PttService } from "src/app/services/ptt/ptt.service";
 import {
   Actions,
   WebsocketService,
@@ -37,12 +38,16 @@ export class ChatComponent implements OnInit {
   public user: User = new User({});
   public state$: Observable<MessagesState>;
   public recordingAudio: boolean;
+  public recordingPTT: boolean;
+
   private mediaRecorder;
+
   constructor(
     private messagesService: MessagesService,
     private webSocketService: WebsocketService,
     private authService: AuthService,
-    private http: HttpClient
+    private http: HttpClient,
+    private pttService: PttService
   ) {}
 
   ngOnInit(): void {
@@ -149,7 +154,7 @@ export class ChatComponent implements OnInit {
   }
 
   private uploadAudio(blob: Blob) {
-    const key = `company/${this.user.companyId}/chat/${
+    const key = `company/${this.user.companyId}/chat/${this.chat.id}/${
       this.user.username
     }/audios/${nanoid()}.wav`;
 
@@ -196,5 +201,18 @@ export class ChatComponent implements OnInit {
 
   public handleBackToChat() {
     this.showChatDetails = false;
+  }
+
+  public startRecordingPTT() {
+    this.recordingPTT = true;
+    this.pttService.start(this.chat.id, this.chat.user.username, (blob) => {
+      console.log(blob);
+      this.uploadAudio(blob);
+    });
+  }
+
+  public stopRecordingPTT() {
+    this.recordingPTT = false;
+    this.pttService.stop();
   }
 }

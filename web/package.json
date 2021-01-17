@@ -4,6 +4,8 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
+    "start-server": "http-server dist/web",
+    "prod": "lt --port 8080",
     "build": "ng build",
     "test": "ng test",
     "lint": "ng lint",

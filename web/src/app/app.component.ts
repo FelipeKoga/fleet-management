@@ -1,11 +1,14 @@
 import { Component, HostBinding, OnInit } from "@angular/core";
+import { MatSnackBar } from "@angular/material/snack-bar";
 import { Router } from "@angular/router";
 import { User, UserStatus } from "./models/user";
 import { AuthService } from "./services/auth/auth.service";
+import { PttService } from "./services/ptt/ptt.service";
 import {
   Actions,
   WebsocketService,
 } from "./services/websocket/websocket.service";
+import { PttSnackbarComponent } from "./shared/ptt-snackbar/ptt-snackbar.component";
 import { roles } from "./utils/role";
 
 @Component({
@@ -21,7 +24,9 @@ export class AppComponent implements OnInit {
   constructor(
     private authService: AuthService,
     private webSocketService: WebsocketService,
-    private router: Router
+    private pttService: PttService,
+    private router: Router,
+    private snackbar: MatSnackBar
   ) {}
 
   async ngOnInit() {
@@ -31,7 +36,6 @@ export class AppComponent implements OnInit {
       if (store.isLoggedIn) {
         this.currentUser = store.user;
         this.currentUser.status = UserStatus.ONLINE;
-        console.log("CONNECT!");
         this.webSocketService.connect();
         this.webSocketService.messages.subscribe((message) => {
           if (message.action === Actions.USER_CONNECTED) {
@@ -39,6 +43,26 @@ export class AppComponent implements OnInit {
               this.authService.setUser(this.currentUser);
               this.currentUser = message.body;
             }
+          }
+
+          if (message.action === Actions.STARTED_PUSH_TO_TALK) {
+            this.snackbar.openFromComponent(PttSnackbarComponent, {
+              data: new User({ name: "Koga" }),
+              horizontalPosition: "end",
+              panelClass: ["snackbar-primary"],
+            });
+          }
+
+          if (message.action === Actions.RECEIVED_PUSH_TO_TALK) {
+            this.pttService.playAudio(
+              message.body.chatId,
+              message.body.inputData,
+              message.body.length
+            );
+          }
+
+          if (message.action === Actions.STOPPED_PUSH_TO_TALK) {
+            this.snackbar.dismiss();
           }
         });
       }

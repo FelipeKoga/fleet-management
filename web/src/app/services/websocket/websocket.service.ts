@@ -18,6 +18,14 @@ export enum Actions {
   USER_DISCONNECTED = "user_disconnected",
 
   USER_NEW_LOCATION = "user_new_location",
+
+  START_PUSH_TO_TALK = "START_PUSH_TO_TALK",
+  STOP_PUSH_TO_TALK = "STOP_PUSH_TO_TALK",
+  PUSH_TO_TALK = "push-to-talk",
+
+  STARTED_PUSH_TO_TALK = "STARTED_PUSH_TO_TALK",
+  STOPPED_PUSH_TO_TALK = "STOPPED_PUSH_TO_TALK",
+  RECEIVED_PUSH_TO_TALK = "RECEIVED_PUSH_TO_TALK",
 }
 
 interface WebSocketPayload {
