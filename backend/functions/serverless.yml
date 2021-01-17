@@ -230,3 +230,21 @@ s3-file-upload:
                   type: COGNITO_USER_POOLS
                   authorizerId:
                       Ref: ApiGatewayAuthorizer
+
+ptt:
+    name: ${self:app}-ptt-${self:custom.stage}
+    handler: functions/ptt/index.handler
+    role: TccRole
+    package:
+        include:
+            - functions/ptt/*
+            - functions/ptt/*/**
+              - '!functions/ptt/node_modules/aws-sdk/**'
+    events:
+        - websocket:
+              route: push-to-talk
+              routeResponseSelectionExpression: $default
+    environment:
+        APP: ${self:app}
+        STAGE: ${self:custom.stage}
+        TABLE: ${self:custom.table}
