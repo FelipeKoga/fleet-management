@@ -1,3 +1,5 @@
+@import "../../../variables";
+
 .chat-container {
   padding-left: 16px;
   margin-bottom: 4px;
@@ -128,4 +130,27 @@
 
 textarea {
   resize: none;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 $color-primary;
+  }
+
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 10px rgba(0, 0, 0, 0);
+  }
+
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(0, 0, 0, 0);
+  }
+}
+.push-to-talk-button:active {
+  box-shadow: 0 0 0 0 $color-primary;
+  transform: scale(1);
+  animation: pulse 2s infinite;
+  color: $color-primary;
 }

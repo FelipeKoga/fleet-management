@@ -67,21 +67,16 @@
         (keydown.enter)="sendMessage($event)"
         placeholder="Digite uma mensagem"
       ></textarea>
+
       <button
-        *ngIf="!recordingPTT"
-        (click)="startRecordingPTT()"
+        *ngIf="!(receiving$ | async)"
+        (mouseleave)="stopRecordingPTT()"
+        (mouseup)="stopRecordingPTT()"
+        (mousedown)="startRecordingPTT()"
+        class="push-to-talk-button"
         mat-icon-button
-        style="color: gray"
       >
         <mat-icon>speaker_phone</mat-icon>
-      </button>
-      <button
-        *ngIf="recordingPTT"
-        (click)="stopRecordingPTT()"
-        mat-icon-button
-        style="color: gray"
-      >
-        <mat-icon>stop</mat-icon>
       </button>
 
       <button

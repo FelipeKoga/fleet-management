@@ -6,11 +6,18 @@ import { ChatComponent } from "./chat/chat.component";
 import { ChatsComponent } from "./chats.component";
 import { NewChatComponent } from "./new-chat/new-chat.component";
 import { DetailsComponent } from "./chat/details/details.component";
-import { AddMemberComponent } from './chat/add-member/add-member.component';
-import { MessageComponent } from './chat/message/message.component';
+import { AddMemberComponent } from "./chat/add-member/add-member.component";
+import { MessageComponent } from "./chat/message/message.component";
+import { LazyLoadImageModule } from "ng-lazyload-image";
 
 @NgModule({
-  imports: [BrowserModule, ReactiveFormsModule, FormsModule, MaterialModule],
+  imports: [
+    BrowserModule,
+    ReactiveFormsModule,
+    FormsModule,
+    MaterialModule,
+    LazyLoadImageModule,
+  ],
   declarations: [
     ChatsComponent,
     ChatComponent,

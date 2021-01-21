@@ -46,16 +46,17 @@ export class AppComponent implements OnInit {
           }
 
           if (message.action === Actions.STARTED_PUSH_TO_TALK) {
+            this.pttService.startReceivingPushToTalk(message.body.chatId);
             this.snackbar.openFromComponent(PttSnackbarComponent, {
               data: new User({ name: "Koga" }),
-              horizontalPosition: "end",
+              horizontalPosition: "right",
+              verticalPosition: "top",
               panelClass: ["snackbar-primary"],
             });
           }
 
           if (message.action === Actions.RECEIVED_PUSH_TO_TALK) {
             this.pttService.playAudio(
-              message.body.chatId,
               message.body.inputData,
               message.body.length
             );
@@ -63,6 +64,7 @@ export class AppComponent implements OnInit {
 
           if (message.action === Actions.STOPPED_PUSH_TO_TALK) {
             this.snackbar.dismiss();
+            this.pttService.stopReceivingPushToTalk();
           }
         });
       }

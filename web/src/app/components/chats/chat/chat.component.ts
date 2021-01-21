@@ -8,6 +8,7 @@ import { Chat } from "src/app/models/chat";
 import { Message, MessageStatus } from "src/app/models/message";
 import { User, UserStatus } from "src/app/models/user";
 import { AuthService } from "src/app/services/auth/auth.service";
+import { ChatsService } from "src/app/services/chats/chats.service";
 import {
   MessagesService,
   MessagesState,
@@ -37,6 +38,8 @@ export class ChatComponent implements OnInit {
   public convertDate = convertDate;
   public user: User = new User({});
   public state$: Observable<MessagesState>;
+  public receiving$: Observable<boolean>;
+
   public recordingAudio: boolean;
   public recordingPTT: boolean;
 
@@ -50,17 +53,20 @@ export class ChatComponent implements OnInit {
     private pttService: PttService
   ) {}
 
-  ngOnInit(): void {
+  ngOnInit() {
     this.user = this.authService.getUser();
     this.state$ = this.messagesService.messageState$;
+    this.receiving$ = this.pttService.receiving$;
 
     this.webSocketService.messages.subscribe((response) => {
       if (
         response.action === Actions.MESSAGE_SENT ||
         response.action === Actions.MESSAGE_RECEIVED
       ) {
-        this.viewedMessages();
-        this.messagesService.addOrReplaceMessage(response.body);
+        if (response.body.chatId === this.chat.id) {
+          this.viewedMessages();
+          this.messagesService.addOrReplaceMessage(response.body);
+        }
       }
     });
 
@@ -204,8 +210,9 @@ export class ChatComponent implements OnInit {
   }
 
   public startRecordingPTT() {
+    console.log("opa!@");
     this.recordingPTT = true;
-    this.pttService.start(this.chat.id, this.chat.user.username, (blob) => {
+    this.pttService.start(this.chat.id, this.user, (blob) => {
       console.log(blob);
       this.uploadAudio(blob);
     });

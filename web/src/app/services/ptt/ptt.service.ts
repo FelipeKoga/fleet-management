@@ -36,12 +36,8 @@ export class PttService {
     this.context = new AudioContext({ sampleRate: 8000 });
   }
 
-  public async start(
-    chatId: string,
-    username: string,
-    onStop: (blob: Blob) => void
-  ) {
-    this.user = new User({ username });
+  public async start(chatId: string, user: User, onStop: (blob: Blob) => void) {
+    this.user = user;
     this.chatId = chatId;
     this.recording$.next(true);
     this.webSocketService.sendMessage({
@@ -99,16 +95,13 @@ export class PttService {
     });
   }
 
-  public playAudio(chatId: string, audioBufferString, length: number) {
-    if (this.busy(chatId)) return;
+  public playAudio(audioBufferString: string, length: number) {
     const parsedAudioBuffer = audioBufferString
       .split(",")
       .map((value: string) => +value);
 
     const buf = this.context.createBuffer(1, length, 8000);
-    buf.getChannelData(0).set(new Float32Array(parsedAudioBuffer));
-
-    // buf.copyToChannel(new Float32Array(parsedAudioBuffer), 0);
+    buf.copyToChannel(new Float32Array(parsedAudioBuffer), 0);
     const player = this.context.createBufferSource();
     player.buffer = buf;
     player.connect(this.context.destination);
@@ -116,7 +109,8 @@ export class PttService {
   }
 
   public busy(chatId: string) {
-    return this.chatId !== chatId && this.receiving$.value;
+    console.log(this.chatId !== chatId && this.receiving$.value);
+    return this.chatId && this.chatId !== chatId && this.receiving$.value;
   }
 
   public uploadAudio(blob: Blob) {
@@ -157,5 +151,16 @@ export class PttService {
       const audioBlob = new Blob(audioChunks);
       onStop(audioBlob);
     });
+  }
+
+  public startReceivingPushToTalk(chatId: string) {
+    if (this.busy(chatId)) return;
+
+    this.chatId = chatId;
+    this.receiving$.next(true);
+  }
+
+  public stopReceivingPushToTalk() {
+    this.receiving$.next(false);
   }
 }
