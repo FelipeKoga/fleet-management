@@ -1,49 +1,20 @@
-const DynamoDB = require('aws-sdk/clients/dynamodb');
 const { sendMessage } = require('./invoke');
+const { fetchConnectionIds, fetchChatUsers } = require('./database');
 
-const docClient = new DynamoDB.DocumentClient();
-const BaseParams = {
-    TableName: process.env.TABLE,
-    KeyConditionExpression: 'partitionKey = :pk and begins_with(sortKey, :sk)',
-};
-const getKey = key => {
-    return key.split('#').pop();
-};
-const formatResponse = (items, mapKey = true) => {
-    return items.map(item => {
-        const { partitionKey, sortKey, ...data } = item;
-        return {
-            id: mapKey ? getKey(partitionKey) : undefined,
-            sortKey: mapKey ? getKey(sortKey) : undefined,
-            ...data,
-        };
-    });
-};
+const merge = array => array.reduce((a, b) => a.concat(b), []);
+async function getChatUsers(chatId, username) {
+    const chatUsers = await fetchChatUsers(chatId);
 
-const fetchByPK = async (params, mapKey) => {
-    const { Items } = await docClient
-        .query({
-            ...BaseParams,
-            ...params,
-        })
-        .promise();
+    const promises = [];
+    chatUsers
+        .filter(chatUser => chatUser !== username)
+        .forEach(chatUser => {
+            promises.push(fetchConnectionIds(chatUser));
+        });
 
-    return formatResponse(Items, mapKey);
-};
+    const connectionIdsArrays = await Promise.all(promises);
 
-async function fetchConnectionIds(username) {
-    const connectionIds = await fetchByPK(
-        {
-            ExpressionAttributeValues: {
-                ':pk': `USER#${username}`,
-                ':sk': 'CONNECTION#',
-            },
-            ProjectionExpression: 'connectionId',
-        },
-        false,
-    );
-
-    return connectionIds.map(res => res.connectionId);
+    return merge(connectionIdsArrays);
 }
 
 exports.handler = async event => {
@@ -57,8 +28,10 @@ exports.handler = async event => {
         outputData,
         length,
     } = payload.body;
-    const connectionids = await fetchConnectionIds(username);
 
+    const connectionIds = await getChatUsers(chatId, username);
+
+    console.log(connectionIds);
     let body;
     let action;
     if (type === 'START_PUSH_TO_TALK') {
@@ -85,7 +58,7 @@ exports.handler = async event => {
         };
     }
 
-    await sendMessage(body, connectionids, action);
+    await sendMessage(body, connectionIds, action);
 
     return {
         statusCode: 200,
