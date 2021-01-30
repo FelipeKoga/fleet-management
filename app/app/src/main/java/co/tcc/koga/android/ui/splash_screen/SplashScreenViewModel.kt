@@ -35,36 +35,16 @@ class SplashScreenViewModel @Inject constructor(private val repository: ClientRe
 
 
     private fun getUser() {
+
         val disposable = repository.getCurrentUser().subscribe(
             {
                 _isLogged.value = true
             },
             {
+                println("Error")
                 println(it)
             },
         )
         compositeDisposable.add(disposable)
     }
-
-//    fun initCurrentUser(): LiveData<Resource<UserEntity>> =
-//        repository.getCurrentUser().map {
-//            println(it.status)
-//            when (it.status) {
-//                Resource.Status.LOADING -> {
-//                    Resource.loading(null)
-//                }
-//                Resource.Status.SUCCESS -> {
-//                    repository.initWebSocket()
-//                    Resource.success(it.data)
-//                }
-//                Resource.Status.ERROR -> {
-//                    _appStatus.value = false
-//                    Resource.error(it.message!!, null)
-//                }
-//                Resource.Status.LOCAL -> {
-//                    Resource.localData(it.data)
-//                }
-//            }
-//        }.asLiveData(viewModelScope.coroutineContext)
-
 }

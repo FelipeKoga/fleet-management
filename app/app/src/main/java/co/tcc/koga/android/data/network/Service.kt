@@ -18,7 +18,9 @@ interface Service {
     ): Flow<ApiResponse<List<UserEntity>>>
 
     @GET("user/{username}")
-    fun getCurrentUser(@Path("username") username: String): Observable<UserEntity>
+    fun getCurrentUser(
+        @Path("username") username: String
+    ): Observable<UserEntity>
 
     @GET("company/{companyId}/users/{username}/chats")
     fun getChats(

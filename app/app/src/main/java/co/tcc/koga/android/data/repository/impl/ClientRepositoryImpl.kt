@@ -1,6 +1,7 @@
 package co.tcc.koga.android.data.repository.impl
 
 import android.content.Context
+import co.tcc.koga.android.data.database.AppDatabase
 import co.tcc.koga.android.data.database.dao.UserDAO
 import co.tcc.koga.android.data.database.entity.UserEntity
 import co.tcc.koga.android.data.network.Client
@@ -8,6 +9,7 @@ import co.tcc.koga.android.data.network.Service
 import co.tcc.koga.android.data.network.Socket
 import co.tcc.koga.android.data.repository.ClientRepository
 import com.amazonaws.mobile.auth.core.internal.util.ThreadUtils
+import com.amazonaws.services.cognitoidentityprovider.model.InvalidParameterException
 import com.amazonaws.services.cognitoidentityprovider.model.NotAuthorizedException
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -18,6 +20,7 @@ class ClientRepositoryImpl @Inject constructor(
     val context: Context,
     private val userDao: UserDAO,
     private val service: Service,
+    private val appDatabase: AppDatabase
 ) :
     ClientRepository {
 
@@ -47,7 +50,10 @@ class ClientRepositoryImpl @Inject constructor(
     }
 
     private fun getUserNetwork(): Observable<UserEntity> {
-        return service.getCurrentUser(Client.getInstance().username()).subscribeOn(Schedulers.newThread())
+        return service.getCurrentUser(
+            Client.getInstance().username(),
+        )
+            .subscribeOn(Schedulers.newThread())
             .doOnNext { user ->
                 userDao.setCurrentUser(user)
                 Client.getInstance().currentUser = user
@@ -68,8 +74,8 @@ class ClientRepositoryImpl @Inject constructor(
         error: () -> Unit
     ) {
 
-        Client.getInstance().signIn(username, password, loggedIn, fun(e) {
-            println(e)
+        Client.getInstance().signIn(username, password, fun() {
+        }, fun(e) {
             if (e is NotAuthorizedException) {
                 unauthorized()
             } else {
@@ -78,9 +84,32 @@ class ClientRepositoryImpl @Inject constructor(
         })
     }
 
+    override fun sendCode(username: String, onSuccess: () -> Unit, onError: () -> Unit) {
+        Client.getInstance().sendCode(username, onSuccess, fun(_) {
+            onError()
+        })
+
+    }
+
+    override fun confirmChangePassword(
+        password: String,
+        code: String,
+        onSuccess: () -> Unit,
+        notLongEnough: () -> Unit,
+        onError: () -> Unit
+    ) {
+        Client.getInstance().confirmChangePassword(password, code, onSuccess, fun(e) {
+            if (e is InvalidParameterException) {
+                notLongEnough()
+            } else {
+                onError()
+            }
+        })
+    }
+
     override suspend fun signOut() {
-//        Thread { appDatabase.clearAllTables() }.start()
-        Socket.closeConnection()
+        Thread { appDatabase.clearAllTables() }.start()
+//        Socket.closeConnection()
         Client.getInstance().signOut()
     }
 

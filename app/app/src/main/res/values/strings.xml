@@ -16,5 +16,15 @@
     <string name="required">Campo obrigatório.</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="password_recover">Recuperação de senha</string>
+    <string name="confirm_new_password">Recuperação de senha</string>
+
+    <string name="recoverPasswordInfo">Informe seu usuário para prosseguir.</string>
+    <string name="confirmNewPasswordInfo">Informe os dados abaixo para trocar de senha.</string>
+    <string name="differentPasswords">As senhas estão diferentes.</string>
+
+    <string name="Avançar">Avançar</string>
+    <string name="change">Trocar</string>
+    <string name="sendCodeError">Não foi possível enviar o código</string>
 
 </resources>

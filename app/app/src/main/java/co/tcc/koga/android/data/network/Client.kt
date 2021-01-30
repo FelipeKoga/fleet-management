@@ -1,14 +1,13 @@
 package co.tcc.koga.android.data.network
 
 import android.content.Context
-import android.content.res.Resources
 import co.tcc.koga.android.data.database.entity.UserEntity
 import com.amazonaws.mobile.client.AWSMobileClient
 import com.amazonaws.mobile.client.Callback
 import com.amazonaws.mobile.client.UserState
 import com.amazonaws.mobile.client.UserStateDetails
+import com.amazonaws.mobile.client.results.ForgotPasswordResult
 import com.amazonaws.mobile.client.results.SignInResult
-import com.amazonaws.services.cognitoidentityprovider.model.NotAuthorizedException
 import java.lang.Exception
 
 class Client {
@@ -25,12 +24,15 @@ class Client {
                     println(result?.userState)
                     when (result?.userState) {
                         UserState.SIGNED_OUT -> onInitSuccess(false)
-                        UserState.SIGNED_IN -> onInitSuccess(true)
+                        UserState.SIGNED_IN -> {
+                            onInitSuccess(true)
+                        }
                         else -> onInitError()
                     }
                 }
 
                 override fun onError(e: Exception?) {
+                    println(e)
                     onInitError()
                 }
 
@@ -49,20 +51,15 @@ class Client {
             null,
             object : Callback<SignInResult> {
                 override fun onResult(result: SignInResult?) {
-                    println(result?.signInState)
                     onSignInSuccess()
                 }
 
                 override fun onError(e: Exception?) {
-                    println(e is NotAuthorizedException)
+                    println(e)
                     onSignInError(e)
                 }
 
             })
-    }
-
-    fun isSignIn(): Boolean {
-        return AWSMobileClient.getInstance().isSignedIn
     }
 
     fun signOut() {
@@ -72,6 +69,44 @@ class Client {
     fun username(): String {
         return AWSMobileClient.getInstance().username
     }
+
+    fun sendCode(
+        username: String,
+        onSendCodeSuccess: () -> Unit,
+        onSendCodeError: (e: Exception?) -> Unit
+    ) {
+        AWSMobileClient.getInstance()
+            .forgotPassword(username, object : Callback<ForgotPasswordResult> {
+                override fun onResult(result: ForgotPasswordResult?) {
+                    onSendCodeSuccess()
+                }
+
+                override fun onError(e: Exception?) {
+                    onSendCodeError(e)
+                }
+
+            })
+    }
+
+    fun confirmChangePassword(
+        password: String,
+        code: String,
+        onChangePasswordSuccess: () -> Unit,
+        onChangePasswordError: (exception: Exception?) -> Unit
+    ) {
+        AWSMobileClient.getInstance()
+            .confirmForgotPassword(password, code, object : Callback<ForgotPasswordResult> {
+                override fun onResult(result: ForgotPasswordResult?) {
+                    onChangePasswordSuccess()
+                }
+
+                override fun onError(e: Exception?) {
+                    onChangePasswordError(e)
+                }
+
+            })
+    }
+
 
     companion object {
         private lateinit var instance: Client

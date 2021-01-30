@@ -43,8 +43,6 @@ class NetworkModule {
     @Singleton
     @Provides
     fun providesHttpClient(): OkHttpClient {
-    println("PROVIDES")
-
         return OkHttpClient
             .Builder()
             .connectTimeout(5, TimeUnit.SECONDS)

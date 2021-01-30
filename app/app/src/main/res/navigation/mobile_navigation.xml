@@ -11,6 +11,7 @@
         android:label="@string/title_notifications"
         tools:layout="@layout/profile_fragment" >
         <action
+
             android:id="@+id/action_profileFragment_to_settingsFragment"
             app:destination="@id/settingsFragment" />
     </fragment>
@@ -35,6 +36,11 @@
         android:id="@+id/settingsFragment"
         android:name="co.tcc.koga.android.ui.settings.SettingsFragment"
         android:label="SettingsFragment" >
+        <action
+            app:popUpToInclusive="true"
+            app:popUpTo="@id/settingsFragment"
+            android:id="@+id/action_settingsFragment_to_loginFragment"
+            app:destination="@id/loginFragment" />
     </fragment>
     <fragment
         android:id="@+id/newGroupFragment"
@@ -86,6 +92,9 @@
             app:popUpTo="@id/loginFragment"
             android:id="@+id/action_loginFragment_to_chatsFragment"
             app:destination="@id/chatsFragment" />
+        <action
+            android:id="@+id/action_loginFragment_to_forgotPasswordFragment"
+            app:destination="@id/forgotPasswordFragment" />
     </fragment>
     <fragment
         android:id="@+id/newChatFragment"
@@ -97,5 +106,26 @@
         <action
             android:id="@+id/action_newChatFragment_to_newGroupFragment"
             app:destination="@id/newGroupFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/forgotPasswordFragment"
+        android:name="co.tcc.koga.android.ui.auth.forgot_password.ForgotPasswordFragment"
+        android:label="ForgotPasswordFragment" >
+        <action
+            android:id="@+id/action_forgotPasswordFragment_to_confirmForgotPasswordFragment"
+            app:destination="@id/confirmForgotPasswordFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/confirmForgotPasswordFragment"
+        android:name="co.tcc.koga.android.ui.auth.confirm_forgot_password.ConfirmForgotPasswordFragment"
+        android:label="ConfirmForgotPasswordFragment" >
+        <argument
+            android:name="username"
+            app:argType="string" />
+        <action
+            app:popUpToInclusive="true"
+            app:popUpTo="@id/confirmForgotPasswordFragment"
+            android:id="@+id/action_confirmForgotPasswordFragment_to_chatsFragment"
+            app:destination="@id/chatsFragment" />
     </fragment>
 </navigation>

@@ -8,7 +8,7 @@ async function getUser(username, companyId) {
     return getByPK({
         ExpressionAttributeValues: {
             ':pk': `USER#${username}`,
-            ':sk': `CONFIG#${companyId}`,
+            ':sk': `CONFIG#${companyId || ''}`,
         },
         ExpressionAttributeNames: {
             '#status': 'status',

@@ -6,6 +6,7 @@ import co.tcc.koga.android.R
 import co.tcc.koga.android.data.repository.ClientRepository
 import co.tcc.koga.android.utils.AUTH_STATUS
 import com.amazonaws.mobile.auth.core.internal.util.ThreadUtils.runOnUiThread
+import io.reactivex.disposables.CompositeDisposable
 import kotlinx.coroutines.launch
 import java.io.Serializable
 import java.lang.Exception
@@ -24,11 +25,18 @@ class LoginViewModel @Inject constructor(
 
     private val _authenticationStatus = MutableLiveData<AUTH_STATUS>()
     private val _isLoading = MutableLiveData(false)
+    private val compositeDisposable: CompositeDisposable = CompositeDisposable()
 
     val formFields = LoginForm()
     val authenticationStatus: LiveData<AUTH_STATUS> get() = _authenticationStatus
     val isLoading: LiveData<Boolean> get() = _isLoading
     val formErrors = MutableLiveData<MutableMap<String, String>>(mutableMapOf())
+
+    override fun onCleared() {
+        super.onCleared()
+        compositeDisposable.dispose()
+    }
+
 
     private fun isFormValid(): Boolean {
         val errors = mutableMapOf<String, String>()
@@ -67,10 +75,12 @@ class LoginViewModel @Inject constructor(
         })
     }
 
+
     private fun getUser() = viewModelScope.launch {
         try {
-            val user = repository.getCurrentUser()
-            println(user)
+            compositeDisposable.add(repository.getCurrentUser().subscribe {
+                _authenticationStatus.value = AUTH_STATUS.LOGGED_IN
+            })
         } catch (e: Exception) {
             println(e)
         }

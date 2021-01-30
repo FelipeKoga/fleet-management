@@ -120,6 +120,14 @@ user:
             - '!functions/user/node_modules/aws-sdk/**'
     events:
         - http:
+              path: user/{username}
+              method: GET
+              cors: true
+              authorizer:
+                  type: COGNITO_USER_POOLS
+                  authorizerId:
+                      Ref: ApiGatewayAuthorizer
+        - http:
               path: company/{companyId}/users
               method: GET
               cors: true
