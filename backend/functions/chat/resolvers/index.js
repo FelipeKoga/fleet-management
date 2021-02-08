@@ -22,7 +22,8 @@ async function getChat(chatId, username, member) {
         chatId,
         username,
     );
-    const chatMember = member ? await getUser(member) : null;
+
+    chat.user = member ? await getUser(member) : null;
     const lastMessage = await Database.message.getLastMessage(chatId);
 
     if (lastMessage && lastMessage.hasAudio) {
@@ -33,11 +34,21 @@ async function getChat(chatId, username, member) {
         chat.avatarUrl = S3.getObject(chat.avatar);
     }
 
+    if (!chat.private) {
+        const users = await Database.chat.fetchChatUsers(chatId);
+        const promises = [];
+
+        users
+            .filter(user => user !== username)
+            .forEach(user => promises.push(Database.user.getUser(user)));
+
+        chat.members = await Promise.all(promises);
+    }
+
     return {
         ...chat,
         newMessages,
         lastMessage: lastMessage || null,
-        user: chatMember,
     };
 }
 
@@ -51,7 +62,7 @@ async function addMessageAll(message) {
             await sendWebSocketMessage(
                 memberUsername,
                 memberChat,
-                'chat_updated',
+                'CHAT_UPDATED',
             );
         }),
     );
@@ -60,11 +71,13 @@ async function addMessageAll(message) {
 async function getAllChats(username) {
     const userChatsMetadata = await Database.chat.fetchUserChats(username);
 
+    console.log(userChatsMetadata);
     const chats = await Promise.all(
         userChatsMetadata.map(async ({ id }) => {
             return Database.chat.getChat(id);
         }),
     );
+    console.log(chats);
 
     const response = await Promise.all(
         chats.map(async chat => {
@@ -84,7 +97,10 @@ async function getAllChats(username) {
 
             if (a.lastMessage && !b.lastMessage) return -1;
 
-            return b.lastMessage.createdAt - a.lastMessage.createdAt;
+            return (
+                new Date(b.lastMessage.createdAt) -
+                new Date(a.lastMessage.createdAt)
+            );
         });
 }
 
@@ -111,7 +127,7 @@ async function createChat(username, withUsername) {
     await sendWebSocketMessage(
         withUsername,
         await getChat(chatId, withUsername, username),
-        'created_chat',
+        'CREATED_CHAT',
     );
     return chat;
 }
@@ -128,10 +144,10 @@ async function createGroup(username, { members, groupName }) {
     await Promise.all(
         members.map(async member => {
             await Database.chat.addMember(groupId, member);
-            await sendWebSocketMessage(member, chat, 'created_chat');
+            await sendWebSocketMessage(member, chat, 'CREATED_CHAT');
         }),
         await Database.chat.addMember(groupId, username),
-        await sendWebSocketMessage(username, chat, 'created_chat'),
+        await sendWebSocketMessage(username, chat, 'CREATED_CHAT'),
     );
 
     const user = await getUser(username);
@@ -157,26 +173,32 @@ async function addMessage({
     hasAudio,
     recipient,
 }) {
+    console.log('=========== SEND MESSAGE');
+    console.log(recipient);
     let id = chatId;
     if (!chatId && recipient) {
         const chat = await createChat(username, recipient);
         id = chat.id;
     }
 
+    console.log(id);
+
     const messageResponse = await Database.message.addMessage({
         chatId: id,
         username,
         message,
         messageId,
-        createdAt,
+        createdAt: +createdAt,
         status: 'SENT',
         hasAudio,
     });
 
+    console.log('====================== ADD MESSAGE');
+    console.log(messageResponse);
+
     if (hasAudio) {
         messageResponse.message = S3.getObject(messageResponse.message);
     }
-
     const chatConfig = await Database.chat.getChat(id);
 
     const users = await Database.chat.fetchChatUsers(id);
@@ -202,17 +224,17 @@ async function addMessage({
             await sendWebSocketMessage(
                 memberUsername,
                 messageResponse,
-                'new_message',
+                'NEW_MESSAGE',
             );
             await sendWebSocketMessage(
                 memberUsername,
                 memberChat,
-                'chat_updated',
+                'CHAT_UPDATED',
             );
         }),
 
-        sendWebSocketMessage(username, messageResponse, 'message_sent'),
-        sendWebSocketMessage(username, currentUserChat, 'chat_updated'),
+        sendWebSocketMessage(username, messageResponse, 'MESSAGE_SENT'),
+        sendWebSocketMessage(username, currentUserChat, 'CHAT_UPDATED'),
     );
 }
 
@@ -241,7 +263,7 @@ async function viewedMessages({ chatId, username }) {
           )
         : await getChat(chatId, username);
 
-    await sendWebSocketMessage(username, chat, 'chat_updated');
+    await sendWebSocketMessage(username, chat, 'CHAT_UPDATED');
 }
 
 async function getGroupMembers(chatId) {
@@ -295,7 +317,7 @@ async function removeMember(chatId, username) {
     const chatConfig = await Database.chat.getChat(chatId);
     const user = await getUser(username);
     await Database.chat.removeMember(chatId, username);
-    await sendWebSocketMessage(username, { chatId }, 'chat_removed');
+    await sendWebSocketMessage(username, { chatId }, 'CHAT_REMOVED');
 
     const messageResponse = await Database.message.addMessage({
         chatId,
@@ -323,7 +345,7 @@ async function updateGroup(chatId, username, { groupName, admin }) {
 
     const promises = [];
     users.forEach(user => {
-        promises.push(sendWebSocketMessage(user, chat, 'chat_updated'));
+        promises.push(sendWebSocketMessage(user, chat, 'CHAT_UPDATED'));
     });
 
     await Promise.all(promises);
@@ -337,7 +359,7 @@ async function addGroupAvatar(chatId, username, avatar) {
 
     const promises = [];
     users.forEach(user => {
-        promises.push(sendWebSocketMessage(user, chat, 'chat_updated'));
+        promises.push(sendWebSocketMessage(user, chat, 'CHAT_UPDATED'));
     });
 
     await Promise.all(promises);
