@@ -5,23 +5,23 @@ import { ServiceEndpointWebsocket } from "../../../stack.json";
 import { AuthService } from "../auth/auth.service";
 
 export enum Actions {
-  CHAT_UPDATED = "chat_updated",
-  CHAT_CREATED = "created_chat",
-  CHAT_REMOVED = "chat_removed",
+  CHAT_UPDATED = "CHAT_UPDATED",
+  CHAT_CREATED = "CHAT_CREATED",
+  CHAT_REMOVED = "CHAT_REMOVED",
 
-  SEND_MESSAGE = "send-message",
-  MESSAGE_RECEIVED = "new_message",
-  MESSAGE_SENT = "message_sent",
-  VIEWED_MESSAGES = "open-messages",
+  SEND_MESSAGE = "SEND_MESSAGE",
+  MESSAGE_RECEIVED = "NEW_MESSAGE",
+  MESSAGE_SENT = "MESSAGE_SENT",
+  VIEWED_MESSAGES = "OPEN_MESSAGES",
 
-  USER_CONNECTED = "user_connected",
-  USER_DISCONNECTED = "user_disconnected",
+  USER_CONNECTED = "USER_CONNECTED",
+  USER_DISCONNECTED = "USER_DISCONNECTED",
 
-  USER_NEW_LOCATION = "user_new_location",
+  USER_NEW_LOCATION = "USER_NEW_LOCATION",
 
   START_PUSH_TO_TALK = "START_PUSH_TO_TALK",
   STOP_PUSH_TO_TALK = "STOP_PUSH_TO_TALK",
-  PUSH_TO_TALK = "push-to-talk",
+  PUSH_TO_TALK = "PUSH_TO_TALK",
 
   STARTED_PUSH_TO_TALK = "STARTED_PUSH_TO_TALK",
   STOPPED_PUSH_TO_TALK = "STOPPED_PUSH_TO_TALK",
@@ -49,7 +49,7 @@ export class WebsocketService {
       this.socket$ = this.getNewWebSocket();
       this.socket$.subscribe(
         (response) => {
-          const data = response.data as WebSocketPayload;
+          const data = response as WebSocketPayload;
           if (data) {
             this.messages$.next(data);
           }
