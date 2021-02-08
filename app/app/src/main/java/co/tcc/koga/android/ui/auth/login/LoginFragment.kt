@@ -10,7 +10,7 @@ import android.view.inputmethod.EditorInfo
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
-import co.tcc.koga.android.MainActivity
+import co.tcc.koga.android.ui.MainActivity
 import co.tcc.koga.android.R
 import co.tcc.koga.android.databinding.LoginFragmentBinding
 import co.tcc.koga.android.utils.AUTH_STATUS
@@ -73,7 +73,7 @@ class LoginFragment : Fragment(R.layout.login_fragment) {
             when (authenticationStatus) {
                 AUTH_STATUS.LOGGED_IN -> {
                     findNavController().navigate(
-                        R.id.action_loginFragment_to_chatsFragment,
+                        LoginFragmentDirections.actionLoginFragmentToChatsFragment(),
                     )
                 }
 
@@ -97,7 +97,7 @@ class LoginFragment : Fragment(R.layout.login_fragment) {
         })
     }
 
-    fun goToForgotPassword() {
+    private fun goToForgotPassword() {
         findNavController().navigate(R.id.action_loginFragment_to_forgotPasswordFragment)
     }
 

@@ -1,18 +1,17 @@
 package co.tcc.koga.android.ui.chats
 
 import androidx.lifecycle.*
-import co.tcc.koga.android.data.Resource
 import co.tcc.koga.android.data.database.entity.ChatEntity
-import co.tcc.koga.android.data.database.entity.MessageEntity
+import co.tcc.koga.android.data.network.socket.ChatActions
+import co.tcc.koga.android.data.network.socket.UserActions
 import co.tcc.koga.android.data.repository.ChatsRepository
-import co.tcc.koga.android.data.repository.MessageRepository
+import co.tcc.koga.android.data.repository.ClientRepository
 import io.reactivex.disposables.CompositeDisposable
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class ChatsViewModel @Inject constructor(
     val repository: ChatsRepository,
+    private val clientRepository: ClientRepository,
 ) : ViewModel() {
     private val _chats = MutableLiveData<List<ChatEntity>>()
     private val _loadingChats = MutableLiveData(false)
@@ -27,31 +26,44 @@ class ChatsViewModel @Inject constructor(
     }
 
     fun getAllChats() {
-        compositeDisposable.add(repository.getChats().subscribe({ chats ->
-            println("RECEIVED CHATS:")
-            println(chats)
-            _chats.postValue(chats)
-        }, { error ->
-            println(error)
-        }))
+        if (_chats.value === null) {
+            _loadingChats.postValue(true)
+            compositeDisposable.add(repository.getChats().subscribe({ chats ->
+                _loadingChats.postValue(false)
+                _chats.postValue(chats)
+            }, { error ->
+                println(error)
+            }))
+        }
+
     }
 
-
-    fun messageReceived(): LiveData<MessageEntity> {
-        return repository.messageReceived()
+    fun getUserAvatar(): String? {
+        return clientRepository.user().avatarUrl
     }
 
-    fun messageSent(): LiveData<MessageEntity> {
-        return repository.messageSent()
-    }
+    fun observeChatUpdates() {
+        repository.observeChatUpdates()
+        compositeDisposable.add(repository.observeChatUpdates().subscribe { update ->
+            if (update.action === ChatActions.CHAT_UPDATED) {
+                repository.updateChat(update.body)
+            }
 
-    fun handleNewMessage(messageEntity: MessageEntity, received: Boolean) = viewModelScope.launch {
-        val chat = repository.updateChat(messageEntity, received)
-        _chats.postValue(chats.value?.map {
-            if (it.chatId === messageEntity.chatId) chat
-            else it
         })
     }
 
+    fun observeUserUpdates() {
+        repository.observeChatUpdates()
+        compositeDisposable.add(repository.observeUserUpdates().subscribe { update ->
+            if (update.action === UserActions.USER_CONNECTED || update.action === UserActions.USER_DISCONNECTED) {
+                val chat =
+                    chats.value?.find { chat -> chat.user?.username == update.body.username }
+                if (chat !== null) {
+                    chat.user = update.body
+                    repository.updateChat(chat)
+                }
 
+            }
+        })
+    }
 }

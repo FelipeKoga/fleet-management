@@ -6,6 +6,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import co.tcc.koga.android.R
 import co.tcc.koga.android.data.repository.ClientRepository
+import co.tcc.koga.android.ui.auth.ForgotPasswordStatus
+import co.tcc.koga.android.ui.auth.RecoverPasswordForm
 import javax.inject.Inject
 
 class ForgotPasswordViewModel @Inject constructor(

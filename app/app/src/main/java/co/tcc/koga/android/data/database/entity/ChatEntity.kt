@@ -8,14 +8,14 @@ import kotlinx.android.parcel.Parcelize
 @Entity(tableName = "chat")
 data class ChatEntity(
     @PrimaryKey
-    val chatId: String,
-    val groupName: String?,
-    val avatar: String?,
-    val createdAt: String?,
-    val admin: String?,
-    val isPrivate: Boolean,
-    val members: List<UserEntity>?,
-    val user: UserEntity?,
-    val newMessages: Long,
-    val lastMessage: MessageEntity? = null
-) : Parcelable
+    var id: String,
+    var newMessages: Long = 0L,
+    var groupName: String? = "",
+    var avatar: String? = "",
+    var createdAt: String? = "",
+    var admin: String? = "",
+    var user: UserEntity? = null,
+    var members: List<UserEntity>? = null,
+    var lastMessage: MessageEntity? = null
+) : Parcelable {
+}

@@ -1,6 +1,7 @@
 package co.tcc.koga.android.ui.di
 
 import androidx.lifecycle.ViewModel
+import co.tcc.koga.android.ui.MainViewModel
 import co.tcc.koga.android.di.ViewModelKey
 import co.tcc.koga.android.ui.auth.confirm_forgot_password.ConfirmForgotPasswordViewModel
 import co.tcc.koga.android.ui.auth.forgot_password.ForgotPasswordViewModel
@@ -63,5 +64,9 @@ interface MainModule {
     @ViewModelKey(ConfirmForgotPasswordViewModel::class)
     fun bindConfirmForgotPasswordModel(viewModel: ConfirmForgotPasswordViewModel): ViewModel
 
+    @Binds
+    @IntoMap
+    @ViewModelKey(MainViewModel::class)
+    fun bindMainViewModel(viewModel: MainViewModel): ViewModel
 
 }

@@ -1,8 +1,8 @@
 <resources>
 
-    <style  name="MainTheme"   parent="Theme.MaterialComponents.Light.NoActionBar">
+    <style  name="MainTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
         <item name="colorPrimary">#2c4ebd</item>
-        <item name="colorPrimaryDark">#2c4ebd</item>
+        <item name="colorPrimaryDark">#00278c</item>
         <item name="actionsColor">#1a237e</item>
         <item name="backgroundColor">#fff</item>
         <item name="cardBackgroundColor">#fafafa</item>
@@ -16,7 +16,9 @@
         <item name="colorControlHighlight">#1a237e</item>
         <item name="android:progressBackgroundTint">#d1d1d1</item>
         <item name="android:progressTint">#1a237e</item>
-        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightStatusBar">true</item>
+
+
 
     </style>
 
@@ -28,7 +30,6 @@
     </style>
 
     <style name="SplashScreenTheme" parent="MainTheme">
-        <item name="colorPrimaryDark">#2c4ebd</item>
     </style>
 
     <style name="Widget.App.Button.OutlinedButton.IconOnly" parent="Widget.MaterialComponents.Button.OutlinedButton">

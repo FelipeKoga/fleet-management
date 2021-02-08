@@ -10,9 +10,10 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
-import co.tcc.koga.android.MainActivity
+import co.tcc.koga.android.ui.MainActivity
 import co.tcc.koga.android.R
 import co.tcc.koga.android.databinding.ForgotPasswordFragmentBinding
+import co.tcc.koga.android.ui.auth.ForgotPasswordStatus
 import javax.inject.Inject
 
 

@@ -35,14 +35,12 @@ class SplashScreenViewModel @Inject constructor(private val repository: ClientRe
 
 
     private fun getUser() {
-
         val disposable = repository.getCurrentUser().subscribe(
             {
                 _isLogged.value = true
             },
             {
-                println("Error")
-                println(it)
+
             },
         )
         compositeDisposable.add(disposable)

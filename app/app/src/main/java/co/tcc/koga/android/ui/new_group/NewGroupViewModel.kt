@@ -2,11 +2,9 @@ package co.tcc.koga.android.ui.new_group
 
 import androidx.lifecycle.*
 import co.tcc.koga.android.data.database.entity.ChatEntity
-import co.tcc.koga.android.data.database.entity.UserEntity
-import co.tcc.koga.android.data.network.Client
 import co.tcc.koga.android.data.repository.ChatsRepository
 import co.tcc.koga.android.data.repository.UserRepository
-import co.tcc.koga.android.domain.User
+import co.tcc.koga.android.dto.UserDTO
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -17,11 +15,11 @@ class NewGroupViewModel @Inject constructor(
 ) :
     ViewModel() {
     private val _chatCreated = MutableLiveData<ChatEntity>()
-    private val _users = MutableLiveData<List<User>>()
-    private val _selectedUsers = MutableLiveData<List<User>>()
+    private val _users = MutableLiveData<List<UserDTO>>()
+    private val _selectedUsers = MutableLiveData<List<UserDTO>>()
 
-    val users: LiveData<List<User>> get() = _users
-    val selectedUsers: LiveData<List<User>> get() = _selectedUsers
+    val users: LiveData<List<UserDTO>> get() = _users
+    val selectedUsers: LiveData<List<UserDTO>> get() = _selectedUsers
     val chatCreated: LiveData<ChatEntity> get() = _chatCreated
 
     fun createChat(
@@ -45,23 +43,22 @@ class NewGroupViewModel @Inject constructor(
 
     }
 
-    fun handleSelectedUser(user: User) {
-        println(user)
+    fun handleSelectedUser(user: UserDTO) {
         val users = _selectedUsers.value?.toMutableList()
-        if (user.isSelected) {
-            if (users.isNullOrEmpty()) {
-                _selectedUsers.postValue(listOf(user))
-            } else {
-                users.add(user)
-                _selectedUsers.postValue(users)
-            }
-        } else {
-            if (users.isNullOrEmpty()) _selectedUsers.postValue(listOf())
-            else
-                _selectedUsers.postValue(users.filter {
-                    it.username !== user.username
-                })
-        }
+//        if (user.isSelected) {
+//            if (users.isNullOrEmpty()) {
+//                _selectedUsers.postValue(listOf(user))
+//            } else {
+//                users.add(user)
+//                _selectedUsers.postValue(users)
+//            }
+//        } else {
+//            if (users.isNullOrEmpty()) _selectedUsers.postValue(listOf())
+//            else
+//                _selectedUsers.postValue(users.filter {
+//                    it.username !== user.username
+//                })
+//        }
 
         _users.postValue(_users.value?.map { if (user.username === it.username) user else it })
     }

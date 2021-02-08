@@ -4,10 +4,10 @@ import android.content.Context
 import co.tcc.koga.android.data.database.AppDatabase
 import co.tcc.koga.android.data.database.dao.UserDAO
 import co.tcc.koga.android.data.database.entity.UserEntity
-import co.tcc.koga.android.data.network.Client
-import co.tcc.koga.android.data.network.Service
-import co.tcc.koga.android.data.network.Socket
+import co.tcc.koga.android.data.network.aws.Client
+import co.tcc.koga.android.data.network.retrofit.Service
 import co.tcc.koga.android.data.repository.ClientRepository
+import co.tcc.koga.android.utils.AUTH_STATUS
 import com.amazonaws.mobile.auth.core.internal.util.ThreadUtils
 import com.amazonaws.services.cognitoidentityprovider.model.InvalidParameterException
 import com.amazonaws.services.cognitoidentityprovider.model.NotAuthorizedException
@@ -20,7 +20,7 @@ class ClientRepositoryImpl @Inject constructor(
     val context: Context,
     private val userDao: UserDAO,
     private val service: Service,
-    private val appDatabase: AppDatabase
+    private val appDatabase: AppDatabase,
 ) :
     ClientRepository {
 
@@ -57,7 +57,7 @@ class ClientRepositoryImpl @Inject constructor(
             .doOnNext { user ->
                 userDao.setCurrentUser(user)
                 Client.getInstance().currentUser = user
-            }.subscribeOn(Schedulers.newThread())
+            }.subscribeOn(Schedulers.computation())
 
     }
 
@@ -74,8 +74,7 @@ class ClientRepositoryImpl @Inject constructor(
         error: () -> Unit
     ) {
 
-        Client.getInstance().signIn(username, password, fun() {
-        }, fun(e) {
+        Client.getInstance().signIn(username, password, loggedIn, fun(e) {
             if (e is NotAuthorizedException) {
                 unauthorized()
             } else {
@@ -107,14 +106,18 @@ class ClientRepositoryImpl @Inject constructor(
         })
     }
 
+    override fun observeAuthStatus(): Observable<AUTH_STATUS> {
+        return Client.getInstance().authStatus()
+    }
+
+
     override suspend fun signOut() {
         Thread { appDatabase.clearAllTables() }.start()
-//        Socket.closeConnection()
         Client.getInstance().signOut()
     }
 
-    override fun initWebSocket() {
-        Socket.initWebSocket()
+    override fun user(): UserEntity {
+        return Client.getInstance().currentUser
     }
 
 }

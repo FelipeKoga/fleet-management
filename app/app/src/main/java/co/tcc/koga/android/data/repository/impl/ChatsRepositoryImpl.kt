@@ -1,44 +1,30 @@
 package co.tcc.koga.android.data.repository.impl
 
-import androidx.lifecycle.LiveData
-import co.tcc.koga.android.data.Resource
 import co.tcc.koga.android.data.database.dao.ChatDAO
-import co.tcc.koga.android.data.database.dao.MessageDAO
 import co.tcc.koga.android.data.database.entity.ChatEntity
 import co.tcc.koga.android.data.database.entity.MessageEntity
 import co.tcc.koga.android.data.database.entity.UserEntity
-import co.tcc.koga.android.data.network.Client
-import co.tcc.koga.android.data.network.Service
-import co.tcc.koga.android.data.network.Socket
+import co.tcc.koga.android.data.network.aws.Client
+import co.tcc.koga.android.data.network.retrofit.Service
 import co.tcc.koga.android.data.network.payload.NewChatPayload
 import co.tcc.koga.android.data.network.payload.OpenChatPayload
-import co.tcc.koga.android.data.network.payload.WebSocketPayload
-import co.tcc.koga.android.data.networkBoundResource
+import co.tcc.koga.android.data.network.socket.*
 import co.tcc.koga.android.data.repository.ChatsRepository
-import co.tcc.koga.android.domain.User
-import com.google.gson.Gson
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.subscribeOn
 import javax.inject.Inject
-import kotlin.reflect.jvm.internal.impl.load.kotlin.JvmType
 
 
 class ChatsRepositoryImpl @Inject constructor(
     private val service: Service,
     private val chatDao: ChatDAO,
-    private val messageDAO: MessageDAO
+    private val webSocketService: WebSocketService
 ) : ChatsRepository {
 
 
     private fun getChatsDatabase(): Observable<List<ChatEntity>> {
-        return chatDao.getAll()
-            .subscribeOn(Schedulers.computation())
+        return chatDao.getAll().subscribeOn(Schedulers.computation())
     }
 
     private fun getChatsNetwork(): Observable<List<ChatEntity>> {
@@ -55,7 +41,6 @@ class ChatsRepositoryImpl @Inject constructor(
 
     }
 
-
     override suspend fun createChat(
         member_username: String,
     ): ChatEntity {
@@ -71,51 +56,44 @@ class ChatsRepositoryImpl @Inject constructor(
     }
 
     override suspend fun createGroup(
-        members: List<User>,
+        members: List<Any>,
         groupName: String,
         avatar: String,
     ): ChatEntity {
-        val currentUser = Client.getInstance().currentUser
-        val usersEntity = members.map {
-            UserEntity(it.username, it.email, it.fullName, it.phone, it.companyId, it.avatar)
-        }
-        val newChat = service.createChat(
-            currentUser.username,
-            currentUser.companyId,
-            NewChatPayload("", false, groupName, avatar, currentUser.username, usersEntity)
-        )
-        chatDao.insert(newChat)
-        return newChat
+//        val currentUser = Client.getInstance().currentUser
+//        val usersEntity = members.map {
+//            UserEntity(it.username, it.email, it.fullName, it.phone, it.companyId, it.avatar)
+//        }
+//        val newChat = service.createChat(
+//            currentUser.username,
+//            currentUser.companyId,
+//            NewChatPayload("", false, groupName, avatar, currentUser.username, usersEntity)
+//        )
+//        chatDao.insert(newChat)
+        return ChatEntity("", 0)
 
     }
 
     override suspend fun openChat(chatId: String) {
-        val gson = Gson()
-        val obj = OpenChatPayload(
-            Client.getInstance().username(), chatId
+        webSocketService.send(
+            WebSocketPayload(
+                WebSocketActions.OPEN_MESSAGES,
+                OpenChatPayload(Client.getInstance().username(), chatId)
+            )
         )
-        println("OPEN CHAT")
-        val payload = WebSocketPayload("open-messages", gson.toJson(obj))
-        Socket.getConnection()
-            .send(gson.toJson(payload))
-        println("VIEWED MESSAGES")
         chatDao.viewedMessages(chatId)
     }
 
-    override suspend fun updateChat(messageEntity: MessageEntity, received: Boolean): ChatEntity {
-        if (received) chatDao.receivedNewMessage(messageEntity.chatId)
-        chatDao.updateLastMessage(messageEntity.chatId, messageEntity)
-        messageDAO.insert(messageEntity)
-        return chatDao.getChat(messageEntity.chatId)
+    override fun updateChat(chat: ChatEntity) {
+        chatDao.update(chat)
     }
 
-    override fun messageSent(): LiveData<MessageEntity> {
-        return Socket.messageSentEvent
+    override fun observeChatUpdates(): Observable<WebSocketMessage<ChatEntity, ChatActions>> {
+        return webSocketService.observeChat()
     }
 
-    override fun messageReceived(): LiveData<MessageEntity> {
-        return Socket.messageReceived
+    override fun observeUserUpdates(): Observable<WebSocketMessage<UserEntity, UserActions>> {
+        return webSocketService.observeUser()
     }
-
 
 }

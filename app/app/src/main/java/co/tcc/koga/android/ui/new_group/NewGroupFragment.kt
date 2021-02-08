@@ -11,10 +11,9 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import co.tcc.koga.android.MainActivity
+import co.tcc.koga.android.ui.MainActivity
 import co.tcc.koga.android.R
 import co.tcc.koga.android.databinding.NewGroupFragmentBinding
-import co.tcc.koga.android.domain.User
 import co.tcc.koga.android.ui.adapter.SelectUserAdapter
 import co.tcc.koga.android.ui.adapter.SelectedUserAdapter
 import co.tcc.koga.android.utils.hide
@@ -47,7 +46,7 @@ class NewGroupFragment : Fragment() {
         viewModel.getUsers()
         viewModel.users.observe(viewLifecycleOwner, {
 
-            selectAdapter.users = it
+//            selectAdapter.users = it
             selectAdapter.notifyDataSetChanged()
         })
 
@@ -83,9 +82,9 @@ class NewGroupFragment : Fragment() {
 
     private fun setupRecyclerViews() {
         binding.apply {
-            selectAdapter = SelectUserAdapter(requireContext(), listOf(), fun(user) {
-                viewModel.handleSelectedUser(user)
-            })
+//            selectAdapter = SelectUserAdapter(requireContext(), listOf(), fun(user) {
+//                viewModel.handleSelectedUser(user)
+//            })
             selectedAdapter = SelectedUserAdapter(requireContext(), listOf(), fun(user) {
                 viewModel.handleSelectedUser(user)
             })

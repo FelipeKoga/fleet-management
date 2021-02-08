@@ -1,16 +1,21 @@
-package co.tcc.koga.android.data.network
+package co.tcc.koga.android.data.network.aws
 
 import android.content.Context
 import co.tcc.koga.android.data.database.entity.UserEntity
+import co.tcc.koga.android.utils.AUTH_STATUS
 import com.amazonaws.mobile.client.AWSMobileClient
 import com.amazonaws.mobile.client.Callback
 import com.amazonaws.mobile.client.UserState
 import com.amazonaws.mobile.client.UserStateDetails
 import com.amazonaws.mobile.client.results.ForgotPasswordResult
 import com.amazonaws.mobile.client.results.SignInResult
+import io.reactivex.Observable
+import io.reactivex.subjects.PublishSubject
 import java.lang.Exception
 
 class Client {
+
+    private val subject = PublishSubject.create<AUTH_STATUS>()
 
     lateinit var currentUser: UserEntity
 
@@ -25,6 +30,7 @@ class Client {
                     when (result?.userState) {
                         UserState.SIGNED_OUT -> onInitSuccess(false)
                         UserState.SIGNED_IN -> {
+                            subject.onNext(AUTH_STATUS.LOGGED_IN)
                             onInitSuccess(true)
                         }
                         else -> onInitError()
@@ -51,6 +57,7 @@ class Client {
             null,
             object : Callback<SignInResult> {
                 override fun onResult(result: SignInResult?) {
+                    subject.onNext(AUTH_STATUS.LOGGED_IN)
                     onSignInSuccess()
                 }
 
@@ -63,8 +70,14 @@ class Client {
     }
 
     fun signOut() {
+        subject.onNext(AUTH_STATUS.LOGGED_OUT)
         AWSMobileClient.getInstance().signOut()
     }
+
+    fun authStatus(): Observable<AUTH_STATUS> {
+        return subject.hide()
+    }
+
 
     fun username(): String {
         return AWSMobileClient.getInstance().username
@@ -107,11 +120,15 @@ class Client {
             })
     }
 
+    fun getToken(): String {
+        return AWSMobileClient.getInstance().tokens.idToken.tokenString
+    }
+
 
     companion object {
         private lateinit var instance: Client
         fun getInstance(): Client {
-            if (!::instance.isInitialized) {
+            if (!Companion::instance.isInitialized) {
                 instance = Client()
             }
             return instance

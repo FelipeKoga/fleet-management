@@ -1,21 +1,18 @@
-package co.tcc.koga.android.data.network
+package co.tcc.koga.android.data.network.retrofit
 
 import co.tcc.koga.android.data.database.entity.ChatEntity
 import co.tcc.koga.android.data.database.entity.MessageEntity
 import co.tcc.koga.android.data.database.entity.UserEntity
-import co.tcc.koga.android.data.dto.UserDTO
 import co.tcc.koga.android.data.network.payload.NewChatPayload
-import co.tcc.koga.android.data.network.payload.WebSocketPayload
 import io.reactivex.Observable
 import kotlinx.coroutines.flow.Flow
-import retrofit2.Call
 import retrofit2.http.*
 
 interface Service {
     @GET("company/{companyId}/users")
     fun getUsers(
         @Path("companyId") companyId: String
-    ): Flow<ApiResponse<List<UserEntity>>>
+    ): Observable<List<UserEntity>>
 
     @GET("user/{username}")
     fun getCurrentUser(

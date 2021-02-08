@@ -9,21 +9,19 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import co.tcc.koga.android.MainActivity
+import co.tcc.koga.android.ui.MainActivity
 import co.tcc.koga.android.R
-import co.tcc.koga.android.data.Resource
 import co.tcc.koga.android.data.database.entity.ChatEntity
-import co.tcc.koga.android.ui.adapter.ChatsAdapter
-import co.tcc.koga.android.utils.hide
-import co.tcc.koga.android.utils.show
-import kotlinx.android.synthetic.main.chats_fragment.*
+import co.tcc.koga.android.databinding.ChatsFragmentBinding
+import co.tcc.koga.android.utils.loadImage
 import javax.inject.Inject
 
 class ChatsFragment : Fragment(R.layout.chats_fragment) {
-    private lateinit var adapter: ChatsAdapter
-
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
+    private lateinit var adapter: ChatsAdapter
+    private lateinit var binding: ChatsFragmentBinding
+
     private val viewModel by viewModels<ChatsViewModel> { viewModelFactory }
 
     override fun onAttach(context: Context) {
@@ -31,12 +29,37 @@ class ChatsFragment : Fragment(R.layout.chats_fragment) {
         (requireActivity() as MainActivity).mainComponent.inject(this)
     }
 
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        binding = ChatsFragmentBinding.inflate(layoutInflater)
+        binding.viewModel = viewModel
+        binding.lifecycleOwner = viewLifecycleOwner
+        println("ON CREATE VIEW ===================")
+        return binding.root
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupViews()
         setupRecyclerView()
         setupObservers()
+        loadUserAvatar()
+
         viewModel.getAllChats()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        println("ON RESUME  ===================")
+        viewModel.chats.observe(viewLifecycleOwner, { chats ->
+            println("=== UPDATE LIST CHATS")
+            println(chats)
+            adapter.load(chats)
+        })
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -57,27 +80,11 @@ class ChatsFragment : Fragment(R.layout.chats_fragment) {
     }
 
     private fun setupObservers() {
-
-
-        viewModel.chats.observe(viewLifecycleOwner, {
-            if (!it.isNullOrEmpty()) {
-                recycler_view_chats.show()
-                progress_bar_chats.hide()
-                println("================ SIZE: ${it.size}")
-                adapter.chats = it
-                adapter.notifyDataSetChanged()
-
-            }
+        viewModel.chats.observe(viewLifecycleOwner, { chats ->
+            adapter.load(chats)
         })
-
-        viewModel.messageReceived().observe(viewLifecycleOwner, {
-            viewModel.handleNewMessage(it, true)
-        })
-
-        viewModel.messageSent().observe(viewLifecycleOwner, {
-            viewModel.handleNewMessage(it, false)
-        })
-
+        viewModel.observeChatUpdates()
+        viewModel.observeUserUpdates()
     }
 
     private fun redirectToChat(chat: ChatEntity) {
@@ -88,28 +95,51 @@ class ChatsFragment : Fragment(R.layout.chats_fragment) {
     }
 
     private fun setupViews() {
-        toolbar_profile.inflateMenu(R.menu.contacts_menu)
-        toolbar_profile.setOnMenuItemClickListener { item ->
-            onOptionsItemSelected(item)
-            true
-        }
-        toolbar_profile_content.setOnClickListener {
-            findNavController().navigate(
-                R.id.action_chatsFragment_to_profileFragment
-            )
+        binding.toolbarProfile.run {
+            inflateMenu(R.menu.contacts_menu)
+            setOnMenuItemClickListener { item ->
+                onOptionsItemSelected(item)
+                true
+            }
+            setOnClickListener {
+                findNavController().navigate(
+                    R.id.action_chatsFragment_to_profileFragment
+                )
 
+            }
         }
-        floatingButtonNewChat.setOnClickListener {
+
+        binding.floatingButtonNewChat.setOnClickListener {
             findNavController().navigate(R.id.action_chatsFragment_to_newChatFragment)
         }
 
     }
 
     private fun setupRecyclerView() {
-        adapter = ChatsAdapter(requireContext(), listOf()) { chat ->
+        adapter = ChatsAdapter({ avatar, isGroup, imageView ->
+            loadImage(
+                requireContext(),
+                imageView,
+                avatar,
+                if (isGroup) R.drawable.ic_round_group else R.drawable.ic_round_person
+            )
+        }, { chat ->
             redirectToChat(chat)
-        }
-        recycler_view_chats.layoutManager = LinearLayoutManager(requireContext())
-        recycler_view_chats.adapter = adapter
+        })
+
+        binding.recyclerViewChats.layoutManager = LinearLayoutManager(requireContext())
+        binding.recyclerViewChats.adapter = adapter
+    }
+
+
+    private fun loadUserAvatar() {
+        val avatar = viewModel.getUserAvatar()
+        loadImage(
+            requireContext(),
+            binding.imageViewUserPhoto,
+            avatar,
+            R.drawable.ic_round_person,
+        )
+
     }
 }

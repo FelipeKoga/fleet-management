@@ -34,4 +34,4 @@ yarn test chat messages
 
 ## WEBSOCKET
 
-{"action": "send-message", "data": { "chatId": "YCNzfqYoL0NvQqIPit1Yb", "username": "teste1@gmail.com", "message": "Ola from cmd" }}
+{"action": "SEND_MESSAGE", "data": { "chatId": "YCNzfqYoL0NvQqIPit1Yb", "username": "teste1@gmail.com", "message": "Ola from cmd" }}

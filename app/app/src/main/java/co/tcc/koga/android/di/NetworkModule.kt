@@ -1,21 +1,22 @@
 package co.tcc.koga.android.di
 
-import android.content.Context
-import co.tcc.koga.android.data.network.Service
-import co.tcc.koga.android.data.utils.CallAdapterFactory
+import co.tcc.koga.android.data.network.aws.Client
+import co.tcc.koga.android.data.network.retrofit.Service
+import co.tcc.koga.android.data.network.socket.WebSocketService
 import co.tcc.koga.android.utils.CONSTANTS
-import com.amazonaws.mobile.client.AWSMobileClient
+import com.tinder.scarlet.Lifecycle
+import com.tinder.scarlet.Scarlet
+import com.tinder.scarlet.lifecycle.LifecycleRegistry
+import com.tinder.scarlet.messageadapter.moshi.MoshiMessageAdapter
+import com.tinder.scarlet.streamadapter.rxjava2.RxJava2StreamAdapterFactory
+import com.tinder.scarlet.websocket.okhttp.newWebSocketFactory
 import dagger.Module
 import dagger.Provides
-import okhttp3.Cache
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import okhttp3.Response
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.converter.moshi.MoshiConverterFactory
-import java.io.File
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
@@ -42,14 +43,39 @@ class NetworkModule {
 
     @Singleton
     @Provides
+    fun providesWSLifecycle(): LifecycleRegistry  = LifecycleRegistry(0)
+
+    @Singleton
+    @Provides
+    fun providesScarletInstance(
+        okHttpClient: OkHttpClient,
+        lifecycleRegistry: LifecycleRegistry
+    ): WebSocketService {
+        val scarletInstance = Scarlet.Builder()
+            .webSocketFactory(
+                okHttpClient.newWebSocketFactory(
+                    "wss://87davwn2wl.execute-api.us-east-1.amazonaws.com/dev?username=${
+                        Client.getInstance().username()
+                    }"
+                )
+            )
+            .lifecycle(lifecycleRegistry)
+            .addMessageAdapterFactory(MoshiMessageAdapter.Factory())
+            .addStreamAdapterFactory(RxJava2StreamAdapterFactory())
+            .build()
+
+        return scarletInstance.create()
+    }
+
+    @Singleton
+    @Provides
     fun providesHttpClient(): OkHttpClient {
         return OkHttpClient
             .Builder()
             .connectTimeout(5, TimeUnit.SECONDS)
             .addInterceptor { chain ->
-                println("SHOW DE BOLA")
                 val authorizer =
-                    "Bearer ${AWSMobileClient.getInstance().tokens.idToken.tokenString}"
+                    "Bearer ${Client.getInstance().getToken()}"
                 val request: Request = chain.request()
                 val builder = request.newBuilder()
                     .addHeader(

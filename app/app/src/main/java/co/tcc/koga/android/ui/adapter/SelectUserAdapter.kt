@@ -10,15 +10,13 @@ import android.widget.TextView
 
 import androidx.recyclerview.widget.RecyclerView
 import co.tcc.koga.android.R
-import co.tcc.koga.android.domain.User
-import com.bumptech.glide.Glide
-import com.bumptech.glide.request.RequestOptions
+import co.tcc.koga.android.dto.UserDTO
 import kotlinx.android.synthetic.main.row_select_user.view.*
 
 class SelectUserAdapter(
     var context: Context,
-    var users: List<User>,
-    var onUserSelect: (user: User) -> Unit
+    var users: ArrayList<UserDTO>,
+    var onUserSelect: (user: UserDTO) -> Unit
 ) :
     RecyclerView.Adapter<SelectUserAdapter.UserViewHolder>() {
 
@@ -29,27 +27,27 @@ class SelectUserAdapter(
         private val imageViewAvatar: ImageView = itemView.image_view_select_user_avatar
         private val checkBox: CheckBox = itemView.check_box_select_user
 
-        fun bindView(user: User, context: Context, onUserSelect: (user: User) -> Unit) {
-            textViewName.text = user.fullName
+        fun bindView(user: UserDTO, context: Context, onUserSelect: (user: UserDTO) -> Unit) {
+            textViewName.text = user.name
             textViewPhone.text = user.email
-            checkBox.isChecked = user.isSelected
+//            checkBox.isChecked = user.isSelected
             checkBox.setOnCheckedChangeListener { _, isChecked ->
-                user.isSelected = isChecked
+//                user.isSelected = isChecked
                 onUserSelect(user)
             }
             bindAvatar(user, context)
         }
 
-        private fun bindAvatar(user: User, context: Context) {
+        private fun bindAvatar(user: UserDTO, context: Context) {
             println(user)
-            Glide
-                .with(context)
-                .load(user.avatar)
-                .centerInside()
-                .apply(RequestOptions.circleCropTransform())
-                .error(R.drawable.ic_round_person)
-                .placeholder(R.drawable.ic_round_person)
-                .into(imageViewAvatar)
+//            Glide
+//                .with(context)
+//                .load(user.avatar)
+//                .centerInside()
+//                .apply(RequestOptions.circleCropTransform())
+//                .error(R.drawable.ic_round_person)
+//                .placeholder(R.drawable.ic_round_person)
+//                .into(imageViewAvatar)
         }
     }
 

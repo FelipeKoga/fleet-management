@@ -1,4 +1,4 @@
-package co.tcc.koga.android.data.dto
+package co.tcc.koga.android.dto
 
 import java.io.Serializable
 

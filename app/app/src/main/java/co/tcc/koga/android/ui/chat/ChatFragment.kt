@@ -13,49 +13,52 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
-import co.tcc.koga.android.MainActivity
+import co.tcc.koga.android.ui.MainActivity
 import co.tcc.koga.android.R
-import co.tcc.koga.android.data.network.Client
-import co.tcc.koga.android.databinding.GroupDetailsFragmentBinding
-import co.tcc.koga.android.ui.adapter.ChatAdapter
-import co.tcc.koga.android.ui.adapter.UserAdapter
+import co.tcc.koga.android.databinding.ChatFragmentBinding
 import co.tcc.koga.android.utils.hide
 import co.tcc.koga.android.utils.hideKeyboard
 import co.tcc.koga.android.utils.show
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.chat_fragment.*
 import java.io.IOException
 import javax.inject.Inject
 
 class ChatFragment : Fragment(R.layout.chat_fragment) {
-    private lateinit var adapter: ChatAdapter
-    private val args: ChatFragmentArgs by navArgs()
-    private var recorder: MediaRecorder? = null
-
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
+
+    private lateinit var binding: ChatFragmentBinding
+    private val args: ChatFragmentArgs by navArgs()
     private val viewModel by viewModels<ChatViewModel> { viewModelFactory }
+    private var recorder: MediaRecorder? = null
+    private lateinit var adapter: ChatAdapter
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
         (requireActivity() as MainActivity).mainComponent.inject(this)
     }
 
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        binding = ChatFragmentBinding.inflate(layoutInflater)
+        binding.viewModel = viewModel
+        binding.lifecycleOwner = viewLifecycleOwner
+        return binding.root
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel.openChat(args.chat.chatId)
         setupToolbar()
         setupViews()
         setupRecyclerView()
         setupObservers()
-        viewModel.getMessages(args.chat.chatId)
-    }
-
-    override fun onResume() {
-        super.onResume()
-        setupObservers()
+        viewModel.openChat(args.chat.id)
+        viewModel.getMessages(args.chat.id)
     }
 
     override fun onDestroy() {
@@ -67,6 +70,8 @@ class ChatFragment : Fragment(R.layout.chat_fragment) {
         inflater.inflate(R.menu.chat_menu, menu)
         super.onCreateOptionsMenu(menu, inflater)
     }
+
+
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
@@ -88,29 +93,17 @@ class ChatFragment : Fragment(R.layout.chat_fragment) {
         }
     }
 
+
+
     private fun setupObservers() {
-        viewModel.messages.observe(viewLifecycleOwner, {
-            progress_bar_loading_messages.visibility = View.GONE
-            if (!it.isNullOrEmpty()) {
-                adapter.messages = it
-                adapter.notifyDataSetChanged()
-                if (adapter.messages.size > 2) {
-                    recycler_view_chat_messages.scrollToPosition(adapter.messages.size - 1)
-                }
-            } else {
-                adapter.messages = listOf()
-                adapter.notifyDataSetChanged()
+        viewModel.messages.observe(viewLifecycleOwner, { messages ->
+            adapter.load(messages)
+            if (adapter.itemCount > 2) {
+                binding.recyclerViewChatMessages.scrollToPosition(adapter.itemCount - 1)
             }
         })
 
-        viewModel.messageReceived().observe(viewLifecycleOwner) { message ->
-            viewModel.openChat(args.chat.chatId)
-            viewModel.handleNewMessage(args.chat.chatId, message, false)
-        }
-
-        viewModel.messageSent().observe(viewLifecycleOwner) { message ->
-            viewModel.handleNewMessage(args.chat.chatId, message, true)
-        }
+        viewModel.observeMessageUpdates(args.chat.id)
     }
 
     private fun startRecording() {
@@ -131,16 +124,16 @@ class ChatFragment : Fragment(R.layout.chat_fragment) {
     }
 
     private fun setupRecyclerView() {
-        adapter = ChatAdapter(listOf(), Client.getInstance().username(), args.chat.members)
         val linearLayoutManager = LinearLayoutManager(context)
         linearLayoutManager.stackFromEnd = true
-        recycler_view_chat_messages.layoutManager = linearLayoutManager
-        recycler_view_chat_messages.adapter = adapter
+        adapter = ChatAdapter(viewModel.username, args.chat.members)
+        binding.recyclerViewChatMessages.layoutManager = linearLayoutManager
+        binding.recyclerViewChatMessages.adapter = adapter
     }
 
     private fun setupToolbar() {
         text_view_chat_title.text =
-            if (args.chat.isPrivate) args.chat.user?.fullName else args.chat.groupName
+            if (args.chat.user !== null) args.chat.user?.name else args.chat.groupName
         loadChatAvatar(image_view_chat_avatar)
         toolbar_chat.apply {
             inflateMenu(R.menu.chat_menu)
@@ -149,7 +142,12 @@ class ChatFragment : Fragment(R.layout.chat_fragment) {
                 true
             }
             setNavigationOnClickListener {
-                findNavController().popBackStack()
+                if(findNavController().popBackStack(R.id.chatsFragment, false)) {
+
+                } else {
+                    findNavController().navigate(R.id.chatsFragment)
+                }
+//                findNavController().popBackStack()
             }
             setOnClickListener {
                 openChatDetails()
@@ -161,13 +159,13 @@ class ChatFragment : Fragment(R.layout.chat_fragment) {
         Glide
             .with(requireContext())
             .load(
-                if (args.chat.isPrivate) args.chat.user?.avatar
+                if (args.chat.user !== null) args.chat.user?.avatarUrl
                 else args.chat.avatar
             )
             .centerInside()
             .apply(RequestOptions.circleCropTransform())
-            .error(if (args.chat.isPrivate) R.drawable.ic_round_person else R.drawable.ic_round_group)
-            .placeholder(if (args.chat.isPrivate) R.drawable.ic_round_person else R.drawable.ic_round_group)
+            .error(if (args.chat.user !== null) R.drawable.ic_round_person else R.drawable.ic_round_group)
+            .placeholder(if (args.chat.user !== null) R.drawable.ic_round_person else R.drawable.ic_round_group)
             .into(imageView)
     }
 
@@ -180,7 +178,7 @@ class ChatFragment : Fragment(R.layout.chat_fragment) {
 
     private fun setupViews() {
         edit_text_message.addTextChangedListener {
-            recycler_view_chat_messages.scrollToPosition(adapter.messages.size - 1)
+            recycler_view_chat_messages.scrollToPosition(adapter.itemCount - 1)
             if (it != null) {
                 if (it.isNotEmpty()) {
                     image_button_send_message.show()
@@ -195,25 +193,25 @@ class ChatFragment : Fragment(R.layout.chat_fragment) {
                 edit_text_message.text.clear()
                 viewModel.sendMessage(
                     message,
-                    args.chat.chatId
+                    args.chat.id
                 )
             }
         }
     }
 
     private fun openChatDetails() {
-        if (args.chat.isPrivate) {
-
-        } else {
-            val contactDetailsView =
-                GroupDetailsFragmentBinding.inflate(LayoutInflater.from(requireContext()))
-            contactDetailsView.recyclerViewGroupMembers.layoutManager = LinearLayoutManager(context)
-            contactDetailsView.recyclerViewGroupMembers.adapter =
-                UserAdapter(requireContext(), args.chat.members!!, fun(_) {})
-            MaterialAlertDialogBuilder(context as Context)
-                .setView(contactDetailsView.root)
-                .show()
-        }
+//        if (args.chat.isPrivate) {
+//
+//        } else {
+//            val contactDetailsView =
+//                GroupDetailsFragmentBinding.inflate(LayoutInflater.from(requireContext()))
+//            contactDetailsView.recyclerViewGroupMembers.layoutManager = LinearLayoutManager(context)
+//            contactDetailsView.recyclerViewGroupMembers.adapter =
+//                UserAdapter(requireContext(), args.chat.members!!, fun(_) {})
+//            MaterialAlertDialogBuilder(context as Context)
+//                .setView(contactDetailsView.root)
+//                .show()
+//        }
 
 
     }

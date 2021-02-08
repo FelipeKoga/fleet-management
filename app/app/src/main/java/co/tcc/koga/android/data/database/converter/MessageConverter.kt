@@ -11,7 +11,6 @@ class MessageConverter {
 
     @TypeConverter
     fun toList(data: String?): MessageEntity? {
-        println("toList: $data")
         if (data == null) return null
         val model: Type = object : TypeToken<MessageEntity?>() {}.type
         return gson.fromJson(data, model)
@@ -20,7 +19,6 @@ class MessageConverter {
 
     @TypeConverter
     fun toString(data: MessageEntity?): String? {
-        println("toString: $data")
         if (data == null) return null
         return gson.toJson(data)
     }

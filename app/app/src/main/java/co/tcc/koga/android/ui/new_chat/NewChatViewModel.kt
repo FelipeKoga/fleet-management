@@ -1,13 +1,11 @@
 package co.tcc.koga.android.ui.new_chat
 
 import androidx.lifecycle.*
-import co.tcc.koga.android.data.Resource
 import co.tcc.koga.android.data.database.entity.ChatEntity
 import co.tcc.koga.android.data.database.entity.UserEntity
 import co.tcc.koga.android.data.repository.ChatsRepository
 import co.tcc.koga.android.data.repository.UserRepository
-import co.tcc.koga.android.domain.User
-import kotlinx.coroutines.flow.map
+import co.tcc.koga.android.dto.UserDTO
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -18,27 +16,27 @@ class NewChatViewModel @Inject constructor(
     ViewModel() {
     private val _chatCreated = MutableLiveData<ChatEntity>()
     private val _users = MutableLiveData<List<UserEntity>>()
-    private val _selectUser = MutableLiveData<List<User>>()
+    private val _selectUser = MutableLiveData<List<UserDTO>>()
 
     val users: LiveData<List<UserEntity>> get() = _users
-    val selectUser: LiveData<List<User>> get() = _selectUser
+    val selectUser: LiveData<List<UserDTO>> get() = _selectUser
     val chatCreated: LiveData<ChatEntity> get() = _chatCreated
 
-    fun getAllUsers() = userRepository.getUsers().map {
-        when (it.status) {
-            Resource.Status.SUCCESS -> {
-                _users.postValue(it.data)
-                Resource.success(it)
-            }
-            Resource.Status.ERROR -> Resource.error(it.message!!, null)
-
-            Resource.Status.LOCAL -> {
-                _users.postValue(it.data)
-                Resource.localData(it)
-            }
-            Resource.Status.LOADING -> Resource.loading(null)
-        }
-    }.asLiveData(viewModelScope.coroutineContext)
+//    fun getAllUsers() = userRepository.getUsers().map {
+////        when (it.status) {
+////            Resource.Status.SUCCESS -> {
+////                _users.postValue(it.data)
+////                Resource.success(it)
+////            }
+////            Resource.Status.ERROR -> Resource.error(it.message!!, null)
+////
+////            Resource.Status.LOCAL -> {
+////                _users.postValue(it.data)
+////                Resource.localData(it)
+////            }
+////            Resource.Status.LOADING -> Resource.loading(null)
+////        }
+//    }.asLiveData(viewModelScope.coroutineContext)
 
     fun createChat(
         member_username: String

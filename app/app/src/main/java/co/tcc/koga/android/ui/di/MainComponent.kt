@@ -1,6 +1,6 @@
 package co.tcc.koga.android.ui.di
 
-import co.tcc.koga.android.MainActivity
+import co.tcc.koga.android.ui.MainActivity
 import co.tcc.koga.android.ui.auth.confirm_forgot_password.ConfirmForgotPasswordFragment
 import co.tcc.koga.android.ui.auth.forgot_password.ForgotPasswordFragment
 import co.tcc.koga.android.ui.chat.ChatFragment
@@ -25,7 +25,6 @@ interface MainComponent {
     fun inject(fragment: LoginFragment)
     fun inject(fragment: ForgotPasswordFragment)
     fun inject(fragment: ConfirmForgotPasswordFragment)
-
     fun inject(fragment: ChatsFragment)
     fun inject(fragment: ChatFragment)
     fun inject(fragment: SettingsFragment)

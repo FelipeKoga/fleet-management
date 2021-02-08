@@ -1,6 +1,5 @@
 package co.tcc.koga.android.ui.new_chat
 
-import android.app.ProgressDialog
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -12,16 +11,13 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import co.tcc.koga.android.MainActivity
+import co.tcc.koga.android.ui.MainActivity
 import co.tcc.koga.android.R
-import co.tcc.koga.android.data.Resource
-import co.tcc.koga.android.data.database.entity.UserEntity
 import co.tcc.koga.android.databinding.NewChatFragmentBinding
 import co.tcc.koga.android.ui.adapter.UserAdapter
 import co.tcc.koga.android.utils.hide
 import co.tcc.koga.android.utils.show
 import kotlinx.android.synthetic.main.new_chat_fragment.*
-import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class NewChatFragment : Fragment() {
@@ -69,11 +65,11 @@ class NewChatFragment : Fragment() {
                 adapter.notifyDataSetChanged()
             })
 
-            viewModel.getAllUsers().observe(viewLifecycleOwner, {
-                if (it.status === Resource.Status.ERROR) {
-                    println("Error!")
-                }
-            })
+//            viewModel.getAllUsers().observe(viewLifecycleOwner, {
+//                if (it.status === Resource.Status.ERROR) {
+//                    println("Error!")
+//                }
+//            })
 
             viewModel.chatCreated.observe(viewLifecycleOwner, {
                 findNavController().popBackStack()

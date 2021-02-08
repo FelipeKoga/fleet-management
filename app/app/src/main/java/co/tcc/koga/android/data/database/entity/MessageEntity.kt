@@ -12,8 +12,9 @@ data class MessageEntity(
     val chatId: String,
     val message: String,
     val username: String,
-    val timestamp: String? = "${System.currentTimeMillis() / 1000}",
     val status: String,
+    val hasAudio: Boolean,
+    val createdAt: String? = "${System.currentTimeMillis() / 1000}",
     @PrimaryKey
-    val messageId: String
+    val messageId: String = UUID.randomUUID().toString()
 ) : Parcelable

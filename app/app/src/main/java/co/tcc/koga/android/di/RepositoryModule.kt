@@ -1,13 +1,7 @@
 package co.tcc.koga.android.di
 
-import co.tcc.koga.android.data.repository.ChatsRepository
-import co.tcc.koga.android.data.repository.ClientRepository
-import co.tcc.koga.android.data.repository.MessageRepository
-import co.tcc.koga.android.data.repository.UserRepository
-import co.tcc.koga.android.data.repository.impl.ChatsRepositoryImpl
-import co.tcc.koga.android.data.repository.impl.ClientRepositoryImpl
-import co.tcc.koga.android.data.repository.impl.MessageRepositoryImpl
-import co.tcc.koga.android.data.repository.impl.UserRepositoryImpl
+import co.tcc.koga.android.data.repository.*
+import co.tcc.koga.android.data.repository.impl.*
 import dagger.Binds
 import dagger.Module
 import javax.inject.Singleton

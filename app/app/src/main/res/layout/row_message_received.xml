@@ -1,4 +1,5 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
     <LinearLayout
@@ -6,95 +7,65 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="6dp"
+        android:layout_marginEnd="40dp"
         tools:ignore="PrivateResource">
 
-        <RelativeLayout
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="120dp"
             android:background="@drawable/shape_message_received"
             android:orientation="vertical"
             android:paddingStart="8dp"
             android:paddingTop="4dp"
             android:paddingEnd="8dp"
+            android:minWidth="80dp"
             android:paddingBottom="4dp">
 
-            <LinearLayout
-                android:id="@+id/linear_layout_message_header"
-                android:layout_width="match_parent"
-                android:visibility="gone"
-                android:layout_height="wrap_content">
 
-                <ImageView
-                    android:id="@+id/image_view_message_avatar"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:background="@drawable/shape_rounded_image"
-                    android:scaleType="centerInside"
-                    android:src="@drawable/ic_round_person" />
-
-                <TextView
-                    android:id="@+id/text_view_message_sender"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginEnd="12dp"
-                    android:layout_weight="1"
-                    android:text="Felipe Kosloski Koga Koga"
-                    android:textColor="?textColor"
-                    android:textStyle="bold"
-                    android:visibility="visible" />
-
-                <TextView
-                    android:id="@+id/text_view_message_date"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginStart="8dp"
-                    android:text="24/12"
-                    android:textColor="?attr/textHint"
-
-                    android:textSize="12sp"
-                    android:visibility="visible" />
-            </LinearLayout>
-
-
-            <LinearLayout
-                android:id="@+id/linear_layout_message_body"
+            <TextView
+                android:id="@+id/text_view_message_sender"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:text="Felipe Kosloski Koga Koga"
+                android:textColor="?textColor"
+
+                android:textStyle="bold"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+
+            <TextView
+                android:id="@+id/text_view_message_received"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:layout_below="@+id/linear_layout_message_header"
+                android:gravity="start"
+                android:text="Aeaeaeaeae"
+                android:textColor="?attr/textColor"
+                android:textSize="16sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/text_view_message_sender" />
 
-                android:layout_marginStart="0dp"
-                android:layout_marginEnd="0dp">
+            <TextView
+                android:id="@+id/text_view_message_received_hour"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|end"
+                android:gravity="end"
+                android:singleLine="true"
+                android:text="12:20"
+                android:layout_marginTop="8dp"
+                android:textColor="?attr/textHint"
+                android:textSize="10sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/text_view_message_received"
+                tools:ignore="SmallSp" />
 
-                <TextView
-                    android:id="@+id/text_view_message_received"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="12dp"
-                    android:layout_weight="1"
-                    android:text="Aeeee"
-                    android:textColor="?attr/textColor"
-                    android:textSize="16sp" />
 
-                <TextView
-                    android:id="@+id/text_view_message_received_hour"
-                    android:layout_width="42dp"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="bottom|end"
-                    android:gravity="end"
-                    android:singleLine="true"
-                    android:text="12:20"
-                    android:textColor="?attr/textHint"
-                    android:textSize="12sp"
-                    tools:ignore="SmallSp" />
-
-            </LinearLayout>
-
-        </RelativeLayout>
+        </LinearLayout>
 
 
     </LinearLayout>

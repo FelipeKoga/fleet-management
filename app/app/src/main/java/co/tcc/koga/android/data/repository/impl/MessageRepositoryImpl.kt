@@ -1,13 +1,11 @@
 package co.tcc.koga.android.data.repository.impl
 
-import androidx.lifecycle.LiveData
-import co.tcc.koga.android.data.database.dao.ChatDAO
 import co.tcc.koga.android.data.database.dao.MessageDAO
 import co.tcc.koga.android.data.database.entity.MessageEntity
-import co.tcc.koga.android.data.network.*
-import co.tcc.koga.android.data.network.payload.WebSocketPayload
+import co.tcc.koga.android.data.network.aws.Client
+import co.tcc.koga.android.data.network.retrofit.Service
+import co.tcc.koga.android.data.network.socket.*
 import co.tcc.koga.android.data.repository.MessageRepository
-import com.google.gson.Gson
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -16,10 +14,9 @@ import javax.inject.Inject
 class MessageRepositoryImpl @Inject constructor(
     private val service: Service,
     private val messageDAO: MessageDAO,
-    private val chatDAO: ChatDAO
+    private val webSocketService: WebSocketService
 ) :
     MessageRepository {
-
 
     private fun getMessagesNetwork(chatId: String): Observable<List<MessageEntity>> {
         val user = Client.getInstance().currentUser
@@ -47,26 +44,17 @@ class MessageRepositoryImpl @Inject constructor(
     override suspend fun sendMessage(
         message: MessageEntity
     ): MessageEntity {
-        val gson = Gson()
-        val payload = WebSocketPayload("send-message", gson.toJson(message))
         insertMessage(message)
-        println("SEND MESSAGE")
-        println(message)
-        Socket.getConnection()
-            .send(gson.toJson(payload))
+        val payload = WebSocketPayload(WebSocketActions.SEND_MESSAGE, message)
+        webSocketService.send(payload)
         return message
     }
 
     override suspend fun insertMessage(message: MessageEntity) {
         messageDAO.insert(message)
-        chatDAO.updateLastMessage(message.chatId, message)
     }
 
-    override fun messageSent(): LiveData<MessageEntity> {
-        return Socket.messageSentEvent
-    }
-
-    override fun messageReceived(): LiveData<MessageEntity> {
-        return Socket.messageReceived
+    override fun observeMessageUpdated(): Observable<WebSocketMessage<MessageEntity, MessageActions>> {
+        return webSocketService.observeMessage().subscribeOn(Schedulers.newThread())
     }
 }

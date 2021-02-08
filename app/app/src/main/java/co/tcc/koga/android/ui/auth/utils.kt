@@ -1,4 +1,4 @@
-package co.tcc.koga.android.ui.auth.forgot_password
+package co.tcc.koga.android.ui.auth
 
 import java.io.Serializable
 

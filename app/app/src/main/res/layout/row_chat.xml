@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <LinearLayout
+        android:id="@+id/linear_layout_row_chat"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="?attr/backgroundColor"
@@ -30,14 +31,22 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
             <ImageView
-                android:id="@+id/image_view_user_status"
+                android:visibility="gone"
+                android:id="@+id/image_view_user_status_online"
                 android:layout_width="12dp"
                 android:layout_height="12dp"
                 android:layout_gravity="bottom"
                 android:layout_marginStart="-10dp"
-                android:layout_marginBottom="4dp"
+                android:layout_marginBottom="8dp"
                 android:background="@drawable/shape_online" />
-
+            <ImageView
+                android:id="@+id/image_view_user_status_offline"
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:layout_gravity="bottom"
+                android:layout_marginStart="-10dp"
+                android:layout_marginBottom="8dp"
+                android:background="@drawable/shape_offline" />
             <LinearLayout
                 android:orientation="vertical"
                 android:layout_width="match_parent"

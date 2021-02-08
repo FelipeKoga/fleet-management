@@ -1,11 +1,10 @@
 package co.tcc.koga.android.data.repository
 
 import androidx.lifecycle.LiveData
-import co.tcc.koga.android.data.Resource
-import co.tcc.koga.android.data.database.entity.ChatEntity
 import co.tcc.koga.android.data.database.entity.MessageEntity
+import co.tcc.koga.android.data.network.socket.MessageActions
+import co.tcc.koga.android.data.network.socket.WebSocketMessage
 import io.reactivex.Observable
-import kotlinx.coroutines.flow.Flow
 
 interface MessageRepository {
 
@@ -17,9 +16,7 @@ interface MessageRepository {
         message: MessageEntity
     ): MessageEntity
 
-    fun messageReceived(): LiveData<MessageEntity>
-
-    fun messageSent(): LiveData<MessageEntity>
+    fun observeMessageUpdated(): Observable<WebSocketMessage<MessageEntity, MessageActions>>
 
     suspend fun insertMessage(message: MessageEntity)
 }

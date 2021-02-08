@@ -12,16 +12,16 @@ interface ChatDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(chat: ChatEntity)
 
-    @Query("UPDATE chat SET lastMessage = :message  WHERE chatId = :chatId ")
+    @Query("UPDATE chat SET lastMessage = :message  WHERE id = :chatId ")
     suspend fun updateLastMessage(chatId: String, message: MessageEntity)
 
-    @Query("UPDATE chat SET newMessages = 0 WHERE chatId = :chatId ")
+    @Query("UPDATE chat SET newMessages = 0 WHERE id = :chatId ")
     suspend fun viewedMessages(chatId: String)
 
-    @Query("UPDATE chat SET newMessages = newMessages + 1 WHERE chatId = :chatId ")
+    @Query("UPDATE chat SET newMessages = newMessages + 1 WHERE id = :chatId ")
     suspend fun receivedNewMessage(chatId: String)
 
-    @Query("SELECT * FROM chat WHERE chatId = :chatId")
+    @Query("SELECT * FROM chat WHERE id = :chatId")
     suspend fun getChat(chatId: String): ChatEntity
 
     @Update

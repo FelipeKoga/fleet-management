@@ -11,14 +11,12 @@ import android.widget.TextView
 
 import androidx.recyclerview.widget.RecyclerView
 import co.tcc.koga.android.R
-import co.tcc.koga.android.domain.User
-import com.bumptech.glide.Glide
-import com.bumptech.glide.request.RequestOptions
+import co.tcc.koga.android.dto.UserDTO
 
 class SelectedUserAdapter(
     var context: Context,
-    var users: List<User>,
-    var onUserRemoved: (user: User) -> Unit
+    var users: List<UserDTO>,
+    var onUserRemoved: (user: UserDTO) -> Unit
 ) :
     RecyclerView.Adapter<SelectedUserAdapter.UserViewHolder>() {
 
@@ -28,24 +26,24 @@ class SelectedUserAdapter(
         private val textViewName: TextView = itemView.text_view_selected_user
         private val imageViewAvatar: ImageView = itemView.image_view_selected_user_avatar
 
-        fun bindView(user: User, context: Context, onUserRemoved: (user: User) -> Unit) {
-            textViewName.text = user.fullName
+        fun bindView(user: UserDTO, context: Context, onUserRemoved: (user: UserDTO) -> Unit) {
+            textViewName.text = user.name
             view.setOnClickListener {
-                user.isSelected = false
+//                user.isSelected = false
                 onUserRemoved(user)
             }
             bindAvatar(user, context)
         }
 
-        private fun bindAvatar(user: User, context: Context) {
-            Glide
-                .with(context)
-                .load(user.avatar)
-                .centerInside()
-                .apply(RequestOptions.circleCropTransform())
-                .error(R.drawable.ic_round_person)
-                .placeholder(R.drawable.ic_round_person)
-                .into(imageViewAvatar)
+        private fun bindAvatar(user: UserDTO, context: Context) {
+//            Glide
+//                .with(context)
+//                .load(user.avatar)
+//                .centerInside()
+//                .apply(RequestOptions.circleCropTransform())
+//                .error(R.drawable.ic_round_person)
+//                .placeholder(R.drawable.ic_round_person)
+//                .into(imageViewAvatar)
         }
     }
 
