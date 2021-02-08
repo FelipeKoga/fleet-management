@@ -99,10 +99,10 @@
     <div class="message-row recipient">
       <div class="message-container">
         <div
-          style="font-weight: 500; color: grey; font-size: 12px"
+          class="recipient-user-name"
           *ngIf="!chat.private && message.username !== user.username"
         >
-          {{ message.username }}
+          {{ getName(message.username) }}
         </div>
         <ng-container *ngIf="message.hasAudio; else elseTemplate">
           <div>

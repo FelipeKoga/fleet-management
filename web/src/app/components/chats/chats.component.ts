@@ -42,7 +42,6 @@ export class ChatsComponent implements OnInit {
         this.selectedChat = state.chats.find(
           (chat) => chat.user && chat.user.username === withUsername
         );
-        console.log(this.selectedChat);
       }
 
       this.chats = state.chats;

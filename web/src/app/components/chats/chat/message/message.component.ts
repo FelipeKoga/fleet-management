@@ -71,4 +71,8 @@ export class MessageComponent implements OnInit {
   public convertTimestamp(timestamp: number, format: string) {
     return convertDate(timestamp, format);
   }
+
+  public getName(username: string) {
+    return this.chat.members.find((user) => user.username === username).name;
+  }
 }

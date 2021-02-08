@@ -1,3 +1,5 @@
+@import "../../../../variables";
+
 .message-row {
   display: grid;
   grid-template-columns: 70%;
@@ -81,4 +83,9 @@
   color: white;
   border-radius: 20px;
   margin: auto;
+}
+
+.recipient-user-name {
+  color: rgb(104, 104, 104);
+  font-weight: 500;
 }
