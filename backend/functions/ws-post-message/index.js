@@ -13,9 +13,7 @@ exports.handler = async ({ connectionIds, data }) => {
             apigwManagementApi
                 .postToConnection({
                     ConnectionId: connectionId,
-                    Data: JSON.stringify({
-                        data,
-                    }),
+                    Data: JSON.stringify({ ...data }),
                 })
                 .promise(),
         );

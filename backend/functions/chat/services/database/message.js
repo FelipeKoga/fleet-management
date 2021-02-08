@@ -1,25 +1,29 @@
 const { fetchByPK, getByPK, insert, update } = require('./query');
 
 async function fetchMessages(chatId) {
-    const messages = await fetchByPK({
-        ExpressionAttributeValues: {
-            ':pk': `CHAT#${chatId}`,
-            ':sk': 'MESSAGE#',
+    const messages = await fetchByPK(
+        {
+            ExpressionAttributeValues: {
+                ':pk': `CHAT#${chatId}`,
+                ':sk': 'MESSAGE#',
+            },
+            ScanIndexForward: true,
         },
-        ScanIndexForward: true,
-    });
+        true,
+    );
     return messages.map(item => {
-        const { sortKey, ...message } = item;
+        const { id, sortKey, ...message } = item;
         const messageId = sortKey;
         return {
             messageId,
+            chatId: id,
             ...message,
         };
     });
 }
 
 async function getMessage(partitionKey, sortKey) {
-    return getByPK(
+    const response = await getByPK(
         {
             ExpressionAttributeValues: {
                 ':pk': partitionKey,
@@ -28,6 +32,9 @@ async function getMessage(partitionKey, sortKey) {
         },
         true,
     );
+
+    const { id, ...rest } = response;
+    return { chatId: id, ...rest };
 }
 
 async function addMessage({
@@ -57,7 +64,7 @@ async function addMessage({
 
     return {
         ...newMessage,
-        chatId: id,
+        chatId,
         messageId: sortKey,
     };
 }
@@ -89,7 +96,7 @@ async function newMessages(chatId, username) {
 }
 
 async function getLastMessage(chatId) {
-    return getByPK({
+    const response = await getByPK({
         ScanIndexForward: false,
         ExpressionAttributeValues: {
             ':pk': `CHAT#${chatId}`,
@@ -97,6 +104,13 @@ async function getLastMessage(chatId) {
         },
         Limit: 1,
     });
+
+    console.log(response);
+
+    if (!response) return null;
+
+    const { id, ...rest } = response;
+    return { chatId: id, ...rest };
 }
 
 module.exports = {

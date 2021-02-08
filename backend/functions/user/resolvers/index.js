@@ -61,7 +61,7 @@ async function create(data, companyId) {
     const user = await get(newUser.email, companyId);
     const message = `Prezado(a) ${user.name}, seu usuário foi criado. Para logar, use as seguintes credenciais: <br><br><b>Usuário:</b> ${user.username}<br><b>Senha:</b> ${password}`;
     await Email.sendEmail(user.email, 'Seu usuário foi criado!', message);
-    await postMessage(user, 'user_created');
+    await postMessage(user, 'USER_CREATED');
     return user;
 }
 
@@ -76,7 +76,7 @@ async function update(data, username, companyId) {
     }
 
     await Database.user.updateUser(payload, username, companyId);
-    await postMessage(user, 'user_updated');
+    await postMessage(user, 'USER_UPDATED');
     return { ...user, ...payload };
 }
 
@@ -84,7 +84,7 @@ async function disable(username, companyId) {
     const user = await get(username, companyId);
     await Cognito.disable(username);
     await Database.user.disableUser(username, companyId);
-    await postMessage(user, 'user_disabled');
+    await postMessage(user, 'USER_DISABLED');
     const message = `Prezado(a) ${user.name}, seu usuário foi desabilitado por um administrador.`;
     await Email.sendEmail(user.email, 'Seu usuário foi desabilitado.', message);
     return true;
@@ -96,7 +96,7 @@ async function addLocation(companyId, username, args) {
         lastUpdate: Date.now(),
     });
     const user = await get(username, companyId);
-    await postMessage(user, 'user_new_location');
+    await postMessage(user, 'USER_NEW_LOCATION');
     return true;
 }
 

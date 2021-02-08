@@ -21,7 +21,7 @@ async function addConnection(connectionId, username) {
             user.avatarUrl = getObject(user.avatar);
         }
         user.location = await Database.getLastLocation(username);
-        await postMessage(user, 'user_connected');
+        await postMessage(user, 'USER_CONNECTED');
     }
 }
 
@@ -42,7 +42,7 @@ async function deleteConnection(connectionId) {
             user.status = 'OFFLINE';
             await Database.updateStatus(username, user.companyId, 'OFFLINE');
 
-            await postMessage(user, 'user_disconnected');
+            await postMessage(user, 'USER_DISCONNECTED');
         }
     }
 }

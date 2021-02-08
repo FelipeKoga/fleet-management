@@ -83,12 +83,17 @@ async function main({
         const payload = JSON.parse(body);
         const { routeKey } = requestContext;
 
-        if (routeKey === 'open-messages') {
-            return Resolver.viewedMessages(payload.body);
+        const parsedBody =
+            typeof payload.body === 'string'
+                ? JSON.parse(payload.body)
+                : payload.body;
+
+        if (routeKey === 'OPEN_MESSAGES') {
+            return Resolver.viewedMessages(parsedBody);
         }
 
-        if (routeKey === 'send-message') {
-            return Resolver.addMessage(payload.body);
+        if (routeKey === 'SEND_MESSAGE') {
+            return Resolver.addMessage(parsedBody);
         }
     }
 
