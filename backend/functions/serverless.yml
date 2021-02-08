@@ -94,10 +94,10 @@ chat:
                       Ref: ApiGatewayAuthorizer
 
         - websocket:
-              route: send-message
+              route: SEND_MESSAGE
               routeResponseSelectionExpression: $default
         - websocket:
-              route: open-messages
+              route: OPEN_MESSAGES
               routeResponseSelectionExpression: $default
     environment:
         APP: ${self:app}
@@ -189,6 +189,9 @@ connection-handler:
         - websocket:
               route: $disconnect
               routeResponseSelectionExpression: $default
+        - websocket:
+              route: $default
+              routeResponseSelectionExpression: $default
     environment:
         WS_URL: ${self:custom.webSocketUrl}
         APP: ${self:app}
@@ -250,7 +253,7 @@ ptt:
               - '!functions/ptt/node_modules/aws-sdk/**'
     events:
         - websocket:
-              route: push-to-talk
+              route: PUSH_TO_TALK
               routeResponseSelectionExpression: $default
     environment:
         APP: ${self:app}
