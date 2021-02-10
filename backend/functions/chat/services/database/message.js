@@ -105,8 +105,6 @@ async function getLastMessage(chatId) {
         Limit: 1,
     });
 
-    console.log(response);
-
     if (!response) return null;
 
     const { id, ...rest } = response;

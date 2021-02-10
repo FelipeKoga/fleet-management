@@ -48,7 +48,7 @@ async function getChat(chatId, username, member) {
     return {
         ...chat,
         newMessages,
-        lastMessage: lastMessage || null,
+        messages: lastMessage ? [lastMessage] : [],
     };
 }
 
@@ -58,7 +58,7 @@ async function addMessageAll(message) {
         users.map(async memberUsername => {
             await Database.message.newMessages(message.chatId, memberUsername);
             const memberChat = await getChat(message.chatId, memberUsername);
-            await sendWebSocketMessage(memberUsername, message, 'new_message');
+            await sendWebSocketMessage(memberUsername, message, 'NEW_MESSAGE');
             await sendWebSocketMessage(
                 memberUsername,
                 memberChat,
@@ -71,13 +71,11 @@ async function addMessageAll(message) {
 async function getAllChats(username) {
     const userChatsMetadata = await Database.chat.fetchUserChats(username);
 
-    console.log(userChatsMetadata);
     const chats = await Promise.all(
         userChatsMetadata.map(async ({ id }) => {
             return Database.chat.getChat(id);
         }),
     );
-    console.log(chats);
 
     const response = await Promise.all(
         chats.map(async chat => {
@@ -91,15 +89,15 @@ async function getAllChats(username) {
     );
 
     return response
-        .filter(chat => chat.lastMessage || !chat.private)
+        .filter(chat => chat.messages.length || !chat.private)
         .sort((a, b) => {
-            if (!a.lastMessage) return 1;
+            if (!a.messages.length) return 1;
 
-            if (a.lastMessage && !b.lastMessage) return -1;
+            if (a.messages.length && !b.messages.length) return -1;
 
             return (
-                new Date(b.lastMessage.createdAt) -
-                new Date(a.lastMessage.createdAt)
+                new Date(b.messages[0].createdAt) -
+                new Date(a.messages[0].createdAt)
             );
         });
 }
@@ -173,28 +171,21 @@ async function addMessage({
     hasAudio,
     recipient,
 }) {
-    console.log('=========== SEND MESSAGE');
-    console.log(recipient);
     let id = chatId;
     if (!chatId && recipient) {
         const chat = await createChat(username, recipient);
         id = chat.id;
     }
 
-    console.log(id);
-
     const messageResponse = await Database.message.addMessage({
         chatId: id,
         username,
         message,
         messageId,
-        createdAt: +createdAt,
+        createdAt: createdAt || Date.now(),
         status: 'SENT',
         hasAudio,
     });
-
-    console.log('====================== ADD MESSAGE');
-    console.log(messageResponse);
 
     if (hasAudio) {
         messageResponse.message = S3.getObject(messageResponse.message);
