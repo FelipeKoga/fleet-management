@@ -43,12 +43,19 @@
           >
             <div class="chat-item-wrapper">
               <div *ngIf="chat.private" class="user-photo-wrapper">
-                <img
-                  *ngIf="chat.private"
-                  class="user-photo"
-                  onerror="this.src='assets/default_user.png';"
-                  [src]="chat.user.avatarUrl"
-                />
+                <ng-container *ngIf="chat.user.avatarUrl; else elseTemplate">
+                  <img
+                    class="user-photo"
+                    onerror="this.src='assets/default_user.png';"
+                    [src]="chat.user.avatarUrl"
+                  />
+                </ng-container>
+                <ng-template #elseTemplate>
+                  <img
+                    class="user-photo"
+                    src="../../../assets/default_user.png"
+                  />
+                </ng-template>
                 <div
                   [ngClass]="
                     chat.user.status === 'ONLINE'
@@ -58,12 +65,22 @@
                 ></div>
               </div>
 
-              <img
-                *ngIf="!chat.private"
-                class="user-photo"
-                onerror="this.src='assets/default_group.png';"
-                [src]="chat.avatarUrl"
-              />
+              <div *ngIf="!chat.private">
+                <ng-container *ngIf="chat.avatarUrl; else elseTemplate">
+                  <img
+                    class="user-photo"
+                    [src]="chat.avatarUrl"
+                    onerror="this.src='assets/default_group.png';"
+                  />
+                </ng-container>
+                <ng-template #elseTemplate>
+                  <img
+                    class="user-photo"
+                    src="../../../assets/default_group.png"
+                  />
+                </ng-template>
+              </div>
+
               <div class="chat-item-content">
                 <div
                   class="chat-item-name"
@@ -75,12 +92,15 @@
                   <div *ngIf="chat.private">{{ chat.user.name }}</div>
                   <div *ngIf="chat.groupName">{{ chat.groupName }}</div>
                 </div>
-                <div *ngIf="chat.lastMessage" class="chat-item-message-content">
+                <div
+                  *ngIf="getLastMessage(chat)"
+                  class="chat-item-message-content"
+                >
                   <div class="chat-item-message-text">
-                    <div *ngIf="chat.lastMessage.username === username">
+                    <div *ngIf="getLastMessage(chat).username === username">
                       <ng-container
                         *ngIf="
-                          chat.lastMessage.status === 'SENT';
+                          getLastMessage(chat).status === 'SENT';
                           else elseTemplate
                         "
                       >
@@ -93,17 +113,17 @@
                       </ng-template>
                     </div>
                     <ng-container
-                      *ngIf="chat.lastMessage.hasAudio; else elseTemplate"
+                      *ngIf="getLastMessage(chat).hasAudio; else elseTemplate"
                     >
                       <mat-icon class="message-status">mic</mat-icon>
                       Áudio
                     </ng-container>
                     <ng-template #elseTemplate>
-                      {{ chat.lastMessage.message }}
+                      {{ getLastMessage(chat).message }}
                     </ng-template>
                   </div>
                   <div class="chat-item-message-date-text">
-                    {{ convertDate(chat.lastMessage.createdAt, "HH:mm") }}
+                    {{ convertDate(getLastMessage(chat).createdAt, "HH:mm") }}
                   </div>
                 </div>
               </div>

@@ -6,6 +6,8 @@ import { AuthService } from "../auth/auth.service";
 import { StateService } from "../state.service";
 import { ServiceEndpoint as API } from "../../../stack.json";
 import { User } from "src/app/models/user";
+import { format, parseISO } from "date-fns";
+import { Message } from "src/app/models/message";
 
 export interface ChatsState {
   chats: Chat[];
@@ -125,7 +127,7 @@ export class ChatsService extends StateService<ChatsState> {
             return chat;
           })
           .filter((chat) => {
-            return !chat.private || chat.lastMessage;
+            return !chat.private || chat.messages.length;
           })
           .sort(this.sort),
       });
@@ -133,7 +135,7 @@ export class ChatsService extends StateService<ChatsState> {
       chats.unshift(newChat);
       this.setState({
         chats: chats
-          .filter((chat) => !chat.private || chat.lastMessage)
+          .filter((chat) => !chat.private || chat.messages.length)
           .sort(this.sort),
       });
     }
@@ -163,10 +165,54 @@ export class ChatsService extends StateService<ChatsState> {
   }
 
   private sort(c1: Chat, c2: Chat) {
-    if (!c1.lastMessage) return 1;
+    if (!c1.messages.length) return 1;
 
-    if (c1.lastMessage && !c2.lastMessage) return -1;
+    if (c1.messages.length && !c2.messages.length) return -1;
 
-    return c2.lastMessage.createdAt - c1.lastMessage.createdAt;
+    return (
+      c2.messages[c2.messages.length - 1].createdAt -
+      c1.messages[c1.messages.length - 1].createdAt
+    );
+  }
+
+  public fetchMessages(chatId: string) {
+    this.http
+      .get<Message[]>(
+        `${API}/company/${this.user.companyId}/users/${this.user.username}/chats/${chatId}/messages`
+      )
+      .subscribe((messages) => {
+        const chat = this.findChat(chatId);
+        this.addOrReplaceChat({ ...chat, messages });
+      });
+  }
+
+  public addMessage(message: Message) {
+    const chat = this.findChat(message.chatId);
+    this.addOrReplaceChat({ ...chat, messages: [...chat.messages, message] });
+  }
+
+  public addOrReplaceMessage(message: Message) {
+    const chat = this.findChat(message.chatId);
+
+    if (chat.messages.find((msg) => msg.messageId === message.messageId)) {
+      this.addOrReplaceChat({
+        ...chat,
+        messages: chat.messages.map((msg) => {
+          if (msg.messageId === message.messageId) {
+            return message;
+          }
+          return msg;
+        }),
+      });
+    } else {
+      this.addOrReplaceChat({
+        ...chat,
+        messages: [...chat.messages, message],
+      });
+    }
+  }
+
+  public findChat(chatId: string) {
+    return this.state.chats.find((chat) => chat.id === chatId);
   }
 }

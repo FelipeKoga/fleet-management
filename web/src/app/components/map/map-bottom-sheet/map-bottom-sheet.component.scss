@@ -2,4 +2,19 @@
   border-radius: 5px;
   height: 100%;
   position: relative;
+  width: 540px;
+}
+
+.user-photo-wrapper {
+  position: relative;
+  width: 40px;
+  height: 40px;
+}
+
+.user-photo {
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  background-color: #c0c0c0;
 }

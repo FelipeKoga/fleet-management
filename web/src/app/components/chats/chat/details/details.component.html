@@ -13,7 +13,6 @@
 
     <div *ngIf="!chat.private" style="display: flex; justify-content: flex-end">
       <button
-        *ngIf="chat.admin === user.username"
         (click)="openAddMember()"
         mat-stroked-button
         style="margin-right: 4px"
@@ -32,9 +31,9 @@
         <img
           style="
             border-radius: 50%;
-            width: 180px;
+            width: 240px;
             object-fit: cover;
-            height: 180px;
+            height: 100%;
           "
           [src]="chat.user.avatarUrl || ''"
         />
@@ -71,9 +70,9 @@
           <img
             style="
               border-radius: 50%;
-              width: 180px;
-              height: 180px;
+              width: 240px;
               object-fit: cover;
+              height: 100%;
               background-color: #c0c0c0;
             "
             onerror="this.src='assets/default_group_high.png';"

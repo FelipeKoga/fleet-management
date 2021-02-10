@@ -2,13 +2,14 @@ import { HttpClient } from "@angular/common/http";
 import { ElementRef, SimpleChanges, ViewChild } from "@angular/core";
 import { Component, Input, OnInit } from "@angular/core";
 import { FormControl, FormGroup } from "@angular/forms";
+import { MatBottomSheet } from "@angular/material/bottom-sheet";
 import { nanoid } from "nanoid";
 import { Observable } from "rxjs";
 import { Chat } from "src/app/models/chat";
 import { Message, MessageStatus } from "src/app/models/message";
 import { User, UserStatus } from "src/app/models/user";
 import { AuthService } from "src/app/services/auth/auth.service";
-import { ChatsService } from "src/app/services/chats/chats.service";
+import { ChatsService, ChatsState } from "src/app/services/chats/chats.service";
 import {
   MessagesService,
   MessagesState,
@@ -19,6 +20,7 @@ import {
   WebsocketService,
 } from "src/app/services/websocket/websocket.service";
 import { convertDate } from "src/app/utils/date";
+import { MapBottomSheetComponent } from "../../map/map-bottom-sheet/map-bottom-sheet.component";
 declare var MediaRecorder: any;
 
 const mime = ["audio/wav", "audio/mpeg", "audio/webm", "audio/ogg"].filter(
@@ -37,7 +39,7 @@ export class ChatComponent implements OnInit {
   public showChatDetails: boolean;
   public convertDate = convertDate;
   public user: User = new User({});
-  public state$: Observable<MessagesState>;
+  public state$: Observable<ChatsState>;
   public receiving$: Observable<boolean>;
 
   public recordingAudio: boolean;
@@ -46,26 +48,33 @@ export class ChatComponent implements OnInit {
   private mediaRecorder;
 
   constructor(
-    private messagesService: MessagesService,
+    private chatsService: ChatsService,
     private webSocketService: WebsocketService,
     private authService: AuthService,
     private http: HttpClient,
-    private pttService: PttService
+    private pttService: PttService,
+    private _bottomSheet: MatBottomSheet
   ) {}
 
   ngOnInit() {
     this.user = this.authService.getUser();
-    this.state$ = this.messagesService.messageState$;
+    this.state$ = this.chatsService.chatsState$;
     this.receiving$ = this.pttService.receiving$;
 
+    this.chatsService.chatsState$.subscribe((state) => {
+      this.chat = state.chats.find((item) => item.id === this.chat.id);
+    });
+
     this.webSocketService.messages.subscribe((response) => {
+      console.log(response);
       if (
         response.action === Actions.MESSAGE_SENT ||
         response.action === Actions.MESSAGE_RECEIVED
       ) {
+        console.log(response);
         if (response.body.chatId === this.chat.id) {
           this.viewedMessages();
-          this.messagesService.addOrReplaceMessage(response.body);
+          this.chatsService.addOrReplaceMessage(response.body);
         }
       }
     });
@@ -73,10 +82,12 @@ export class ChatComponent implements OnInit {
     this.viewedMessages();
   }
 
-  ngOnChanges(_: SimpleChanges): void {
+  ngOnChanges(changes: SimpleChanges): void {
     this.viewedMessages();
     this.showChatDetails = false;
-    this.messagesService.fetch(this.chat.id);
+    if (this.chat.messages && this.chat.messages.length <= 1) {
+      this.chatsService.fetchMessages(this.chat.id);
+    }
   }
 
   ngAfterViewChecked() {
@@ -93,6 +104,10 @@ export class ChatComponent implements OnInit {
         },
       });
     }
+  }
+
+  public openBottomSheetMap() {
+    this._bottomSheet.open(MapBottomSheetComponent, { data: this.chat.user });
   }
 
   public scrollToBottom(): void {
@@ -114,7 +129,7 @@ export class ChatComponent implements OnInit {
       hasAudio: false,
     });
 
-    this.messagesService.addOrReplaceMessage(message);
+    this.chatsService.addOrReplaceMessage(message);
 
     this.webSocketService.sendMessage({
       action: Actions.SEND_MESSAGE,
@@ -171,7 +186,7 @@ export class ChatComponent implements OnInit {
       message: "",
       hasAudio: true,
     });
-    this.messagesService.addMessage(message);
+    this.chatsService.addMessage(message);
     this.http
       .post(
         `https://2p8b6trvua.execute-api.us-east-1.amazonaws.com/dev/files`,
@@ -192,7 +207,7 @@ export class ChatComponent implements OnInit {
             message: getURL,
             status: MessageStatus.PENDING,
           });
-          this.messagesService.addOrReplaceMessage(messageWithAudio);
+          this.chatsService.addOrReplaceMessage(messageWithAudio);
 
           this.webSocketService.sendMessage({
             action: Actions.SEND_MESSAGE,

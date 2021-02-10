@@ -1,36 +1,46 @@
 <div class="chat-container" *ngIf="!showChatDetails">
-  <div class="toolbar" (click)="onShowChatDetails()">
-    <img
-      onerror="this.src='assets/default_user.png';"
-      *ngIf="chat.private"
-      class="chat-avatar"
-      [src]="chat.user.avatarUrl"
-    />
-    <img
-      onerror="this.src='assets/default_group.png';"
-      *ngIf="!chat.private"
-      class="chat-avatar"
-      [src]="chat.avatarUrl"
-    />
+  <div
+    style="
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      align-items: center;
+    "
+  >
+    <div class="toolbar" (click)="onShowChatDetails()">
+      <img
+        onerror="this.src='assets/default_user.png';"
+        *ngIf="chat.private"
+        class="chat-avatar"
+        [src]="chat.user.avatarUrl"
+      />
+      <img
+        onerror="this.src='assets/default_group.png';"
+        *ngIf="!chat.private"
+        class="chat-avatar"
+        [src]="chat.avatarUrl"
+      />
 
-    <div style="display: flex; flex-direction: column">
-      <span class="user-name" *ngIf="chat.user">{{ chat.user.name }}</span>
-      <span class="user-name" *ngIf="chat.groupName">{{ chat.groupName }}</span>
+      <div style="display: flex; flex-direction: column">
+        <span class="user-name" *ngIf="chat.user">{{ chat.user.name }}</span>
+        <span class="user-name" *ngIf="chat.groupName">{{
+          chat.groupName
+        }}</span>
 
-      <div *ngIf="chat.private" class="status-wrapper">
-        <span
-          style="position: relative"
-          [ngClass]="
-            chat.user.status === 'ONLINE' ? 'status online' : 'status offline'
-          "
-        ></span>
-        <span class="status-text">
-          {{ translateStatus(chat.user.status) }}
-        </span>
-      </div>
-      <div *ngIf="!chat.private" class="status-wrapper">
-        Criado em: {{ convertDate(chat.createdAt, "dd/MM/yyyy HH:mm") }}<br />
-        Administrador: {{ chat.admin }}
+        <div *ngIf="chat.private" class="status-wrapper">
+          <span
+            style="position: relative"
+            [ngClass]="
+              chat.user.status === 'ONLINE' ? 'status online' : 'status offline'
+            "
+          ></span>
+          <span class="status-text">
+            {{ translateStatus(chat.user.status) }}
+          </span>
+        </div>
+        <div *ngIf="!chat.private" class="status-wrapper">
+          Criado em: {{ convertDate(chat.createdAt, "dd/MM/yyyy HH:mm") }}<br />
+        </div>
       </div>
     </div>
 
@@ -53,7 +63,7 @@
         ></mat-spinner>
       </ng-container>
       <ng-template #elseTemplate>
-        <div *ngFor="let message of (state$ | async).messages">
+        <div *ngFor="let message of chat.messages">
           <app-message [chat]="chat" [message]="message"></app-message>
         </div>
       </ng-template>

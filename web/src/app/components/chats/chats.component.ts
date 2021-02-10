@@ -10,6 +10,7 @@ import {
 import { NewChatType } from "./new-chat/new-chat.component";
 import { convertDate } from "../../utils/date";
 import { ActivatedRoute } from "@angular/router";
+import { Message } from "src/app/models/message";
 @Component({
   selector: "app-chats",
   templateUrl: "./chats.component.html",
@@ -34,7 +35,6 @@ export class ChatsComponent implements OnInit {
 
   ngOnInit(): void {
     const withUsername = this.activatedRoute.snapshot.paramMap.get("username");
-    console.log(withUsername);
 
     this.selectedChat = new Chat();
     this.chatsService.chatsState$.subscribe((state) => {
@@ -65,7 +65,15 @@ export class ChatsComponent implements OnInit {
         response.action === Actions.CHAT_UPDATED ||
         response.action === Actions.CHAT_CREATED
       ) {
-        this.chatsService.addOrReplaceChat(response.body);
+        const chat = this.chatsService.findChat(response.body.id);
+        if (!chat) {
+          this.chatsService.addOrReplaceChat(response.body);
+        } else {
+          this.chatsService.addOrReplaceChat({
+            ...response.body,
+            messages: chat.messages,
+          });
+        }
       }
 
       if (response.action === Actions.CHAT_REMOVED) {
@@ -81,7 +89,9 @@ export class ChatsComponent implements OnInit {
 
   public openChat(chat: Chat) {
     this.showNewChat = null;
-    this.selectedChat = chat;
+    if (this.selectedChat.id !== chat.id) {
+      this.selectedChat = chat;
+    }
   }
 
   public newGroup() {
@@ -106,5 +116,9 @@ export class ChatsComponent implements OnInit {
         return chat.groupName.toLowerCase().includes(text.toLowerCase());
       }
     });
+  }
+
+  public getLastMessage(chat: Chat): Message {
+    return chat.messages[chat.messages.length - 1];
   }
 }

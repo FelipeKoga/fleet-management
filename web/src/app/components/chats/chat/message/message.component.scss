@@ -52,9 +52,10 @@
   min-width: 80px;
   max-width: 100%;
 
-  background-color: #e0e5f5;
   color: black;
-  border: 1px solid #c8d5ff;
+
+  background-color: white;
+  border: 1px solid #fafafa;
   border-radius: 14px 14px 0 14px;
 }
 
@@ -63,8 +64,8 @@
   max-width: 100%;
 
   color: black;
-  background-color: white;
-  border: 1px solid #fafafa;
+  background-color: #e0e5f5;
+  border: 1px solid #c8d5ff;
   border-radius: 0 14px 14px 14px;
   box-shadow: 1px 2px 1px #ececec;
 }
@@ -72,6 +73,7 @@
 .system-message {
   width: 100%;
   margin-top: 4px;
+  margin-bottom: 4px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -86,6 +88,6 @@
 }
 
 .recipient-user-name {
-  color: rgb(104, 104, 104);
+  color: black;
   font-weight: 500;
 }

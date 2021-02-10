@@ -33,8 +33,7 @@ export class DetailsComponent implements OnInit {
   public isLoadingMembers: boolean;
   public user: User;
   public convertDate = convertDate;
-  public members: User[] = [];
-
+  public members: User[];
   public groupNameForm: FormGroup;
   public loadingForm: boolean;
   public administratorForm: FormGroup;
@@ -49,7 +48,6 @@ export class DetailsComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.members = [];
     this.user = this.authService.getUser();
 
     if (!this.chat.private) {
@@ -63,20 +61,12 @@ export class DetailsComponent implements OnInit {
     }
 
     if (!this.chat.private) {
-      this.isLoadingMembers = true;
-      this.chatsService.getChatMembers(this.chat.id).subscribe((members) => {
-        this.isLoadingMembers = false;
-        this.members = members;
-
-        if (!this.chat.private) {
-          this.members.find((member) => this.chat.admin === member.username);
-          this.administratorForm
-            .get("admin")
-            .setValue(
-              this.members.find((member) => this.chat.admin === member.username)
-            );
-        }
-      });
+      this.members = [...this.chat.members, this.user];
+      this.administratorForm
+        .get("admin")
+        .setValue(
+          this.members.find((member) => this.chat.admin === member.username)
+        );
     }
   }
 

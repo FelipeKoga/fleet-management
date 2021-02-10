@@ -100,4 +100,10 @@ export class UsersService extends StateService<UsersState> {
       isLoading: false,
     });
   }
+
+  public get(username: string) {
+    return this.http.get<User>(
+      `${API}/company/${this.companyId}/users/${username}`
+    );
+  }
 }

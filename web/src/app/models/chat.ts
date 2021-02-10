@@ -4,7 +4,7 @@ import { User } from "./user";
 export class Chat {
   id: string;
   private?: string;
-  lastMessage?: Message;
+  messages: Message[];
   newMessages: number;
   groupName?: string;
   admin?: string;
