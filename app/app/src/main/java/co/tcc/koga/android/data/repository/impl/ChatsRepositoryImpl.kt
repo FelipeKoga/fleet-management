@@ -2,7 +2,6 @@ package co.tcc.koga.android.data.repository.impl
 
 import co.tcc.koga.android.data.database.dao.ChatDAO
 import co.tcc.koga.android.data.database.entity.ChatEntity
-import co.tcc.koga.android.data.database.entity.MessageEntity
 import co.tcc.koga.android.data.database.entity.UserEntity
 import co.tcc.koga.android.data.network.aws.Client
 import co.tcc.koga.android.data.network.retrofit.Service
@@ -10,6 +9,7 @@ import co.tcc.koga.android.data.network.payload.NewChatPayload
 import co.tcc.koga.android.data.network.payload.OpenChatPayload
 import co.tcc.koga.android.data.network.socket.*
 import co.tcc.koga.android.data.repository.ChatsRepository
+import co.tcc.koga.android.data.domain.ChatsResponse
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -23,19 +23,32 @@ class ChatsRepositoryImpl @Inject constructor(
 ) : ChatsRepository {
 
 
-    private fun getChatsDatabase(): Observable<List<ChatEntity>> {
-        return chatDao.getAll().subscribeOn(Schedulers.computation())
+    private fun getChatsDatabase(): Observable<ChatsResponse> {
+        val comparator = Comparator { chat1: ChatEntity, chat2: ChatEntity ->
+            if (chat1.messages.isEmpty()) return@Comparator 1
+
+            if (chat1.messages.isNotEmpty() && chat2.messages.isEmpty()) return@Comparator -1;
+
+            return@Comparator (chat2.messages.last()?.createdAt?.minus(chat1.messages.last()?.createdAt!!))!!.toInt();
+        }
+        return chatDao.getAll().subscribeOn(Schedulers.computation()).map { chats ->
+            ChatsResponse(chats.sortedWith(comparator), true)
+        }
     }
 
-    private fun getChatsNetwork(): Observable<List<ChatEntity>> {
+    private fun getChatsNetwork(): Observable<ChatsResponse> {
         val user = Client.getInstance().currentUser
         return service.getChats(user.companyId, user.username).subscribeOn(Schedulers.newThread())
             .doOnNext { chats ->
+                println(chats)
                 chatDao.insertAll(chats)
-            }.subscribeOn(Schedulers.newThread())
+            }.subscribeOn(Schedulers.newThread()).map { chats ->
+                println(chats)
+                ChatsResponse(chats, false)
+            }
     }
 
-    override fun getChats(): Observable<List<ChatEntity>> {
+    override fun getChats(): Observable<ChatsResponse> {
         return Observable.merge(getChatsDatabase(), getChatsNetwork())
             .observeOn(AndroidSchedulers.mainThread())
 
@@ -84,7 +97,7 @@ class ChatsRepositoryImpl @Inject constructor(
         chatDao.viewedMessages(chatId)
     }
 
-    override fun updateChat(chat: ChatEntity) {
+    override suspend fun updateChat(chat: ChatEntity) {
         chatDao.update(chat)
     }
 

@@ -11,6 +11,7 @@ import com.amazonaws.mobile.client.results.ForgotPasswordResult
 import com.amazonaws.mobile.client.results.SignInResult
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
+import kotlinx.coroutines.runBlocking
 import java.lang.Exception
 
 class Client {
@@ -18,18 +19,21 @@ class Client {
     private val subject = PublishSubject.create<AUTH_STATUS>()
 
     lateinit var currentUser: UserEntity
+    lateinit var tokenString: String
 
     fun initAWSClient(
         applicationContext: Context, onInitSuccess: (isSignIn: Boolean) -> Unit,
         onInitError: () -> Unit
     ) {
-        AWSMobileClient.getInstance().initialize(applicationContext,
+        AWSMobileClient.getInstance()
+            .initialize(applicationContext,
             object : Callback<UserStateDetails> {
                 override fun onResult(result: UserStateDetails?) {
                     println(result?.userState)
                     when (result?.userState) {
                         UserState.SIGNED_OUT -> onInitSuccess(false)
                         UserState.SIGNED_IN -> {
+                            tokenString = AWSMobileClient.getInstance().tokens.idToken.tokenString
                             subject.onNext(AUTH_STATUS.LOGGED_IN)
                             onInitSuccess(true)
                         }
@@ -120,10 +124,8 @@ class Client {
             })
     }
 
-    fun getToken(): String {
-        return AWSMobileClient.getInstance().tokens.idToken.tokenString
-    }
 
+    fun getToken(): String = tokenString
 
     companion object {
         private lateinit var instance: Client

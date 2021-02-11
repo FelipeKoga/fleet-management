@@ -1,7 +1,9 @@
 package co.tcc.koga.android.data.repository.impl
 
 import co.tcc.koga.android.data.database.dao.MessageDAO
+import co.tcc.koga.android.data.database.entity.ChatEntity
 import co.tcc.koga.android.data.database.entity.MessageEntity
+import co.tcc.koga.android.data.domain.MessagesResponse
 import co.tcc.koga.android.data.network.aws.Client
 import co.tcc.koga.android.data.network.retrofit.Service
 import co.tcc.koga.android.data.network.socket.*
@@ -18,7 +20,7 @@ class MessageRepositoryImpl @Inject constructor(
 ) :
     MessageRepository {
 
-    private fun getMessagesNetwork(chatId: String): Observable<List<MessageEntity>> {
+    private fun getMessagesNetwork(chatId: String): Observable<MessagesResponse> {
         val user = Client.getInstance().currentUser
         return service.getMessages(user.companyId, user.username, chatId)
             .subscribeOn(Schedulers.newThread())
@@ -28,15 +30,20 @@ class MessageRepositoryImpl @Inject constructor(
                 } else {
                     messageDAO.insertAll(messages)
                 }
-            }.subscribeOn(Schedulers.newThread())
+            }.subscribeOn(Schedulers.newThread()).map { messages ->
+                MessagesResponse(messages, true)
+            }
     }
 
-    private fun getMessagesDatabase(chatId: String): Observable<List<MessageEntity>> {
+    private fun getMessagesDatabase(chatId: String): Observable<MessagesResponse> {
         return messageDAO.getAll(chatId)
+            .map { messages ->
+                MessagesResponse(messages, true)
+            }
             .subscribeOn(Schedulers.computation())
     }
 
-    override fun getMessages(chatId: String): Observable<List<MessageEntity>> {
+    override fun getMessages(chatId: String): Observable<MessagesResponse> {
         return Observable.merge(getMessagesDatabase(chatId), getMessagesNetwork(chatId))
             .observeOn(AndroidSchedulers.mainThread())
     }

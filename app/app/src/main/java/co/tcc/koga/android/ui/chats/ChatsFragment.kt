@@ -3,17 +3,23 @@ package co.tcc.koga.android.ui.chats
 import android.content.Context
 import android.os.Bundle
 import android.view.*
+import android.widget.Toast
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.asLiveData
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import co.tcc.koga.android.ui.MainActivity
 import co.tcc.koga.android.R
 import co.tcc.koga.android.data.database.entity.ChatEntity
 import co.tcc.koga.android.databinding.ChatsFragmentBinding
+import co.tcc.koga.android.utils.hide
 import co.tcc.koga.android.utils.loadImage
+import co.tcc.koga.android.utils.show
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collect
 import javax.inject.Inject
 
 class ChatsFragment : Fragment(R.layout.chats_fragment) {
@@ -37,30 +43,44 @@ class ChatsFragment : Fragment(R.layout.chats_fragment) {
         binding = ChatsFragmentBinding.inflate(layoutInflater)
         binding.viewModel = viewModel
         binding.lifecycleOwner = viewLifecycleOwner
-        println("ON CREATE VIEW ===================")
         return binding.root
     }
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupViews()
         setupRecyclerView()
-        setupObservers()
         loadUserAvatar()
 
+    }
+
+    override fun onStart() {
+        super.onStart()
         viewModel.getAllChats()
-    }
+        viewModel.observeChatUpdates()
+        viewModel.observeUserUpdates()
+        viewModel.observeMessageUpdates()
 
-    override fun onResume() {
-        super.onResume()
-        println("ON RESUME  ===================")
-        viewModel.chats.observe(viewLifecycleOwner, { chats ->
-            println("=== UPDATE LIST CHATS")
-            println(chats)
+        viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
+            if (isLoading) {
+                binding.progressBarChats.show()
+            } else {
+                binding.progressBarChats.hide()
+            }
+        }
+
+        viewModel.chats.observe(viewLifecycleOwner) { chats ->
             adapter.load(chats)
-        })
+        }
 
+        viewModel.error.observe(viewLifecycleOwner) { error ->
+            if (error) {
+                showErrorToast()
+            }
+        }
     }
+
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.contacts_menu, menu)
@@ -77,14 +97,6 @@ class ChatsFragment : Fragment(R.layout.chats_fragment) {
             }
             else -> super.onOptionsItemSelected(item)
         }
-    }
-
-    private fun setupObservers() {
-        viewModel.chats.observe(viewLifecycleOwner, { chats ->
-            adapter.load(chats)
-        })
-        viewModel.observeChatUpdates()
-        viewModel.observeUserUpdates()
     }
 
     private fun redirectToChat(chat: ChatEntity) {
@@ -140,6 +152,10 @@ class ChatsFragment : Fragment(R.layout.chats_fragment) {
             avatar,
             R.drawable.ic_round_person,
         )
+    }
 
+    private fun showErrorToast() {
+        Toast.makeText(requireContext(), "Ocorreu um erro ao listar os chats", Toast.LENGTH_LONG)
+            .show()
     }
 }

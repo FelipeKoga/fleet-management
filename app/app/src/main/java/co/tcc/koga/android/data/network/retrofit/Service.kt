@@ -37,6 +37,6 @@ interface Service {
         @Path("companyId") companyId: String,
         @Path("username") username: String,
         @Path("chatId") chatId: String
-    ): Observable<List<MessageEntity>>
+    ): Observable<MutableList<MessageEntity?>>
 
 }

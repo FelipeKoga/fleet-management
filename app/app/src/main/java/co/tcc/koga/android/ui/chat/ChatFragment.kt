@@ -10,6 +10,7 @@ import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.asLiveData
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -56,9 +57,44 @@ class ChatFragment : Fragment(R.layout.chat_fragment) {
         setupToolbar()
         setupViews()
         setupRecyclerView()
-        setupObservers()
         viewModel.openChat(args.chat.id)
         viewModel.getMessages(args.chat.id)
+    }
+
+    override fun onStart() {
+        super.onStart()
+        viewModel.run {
+            observeMessageUpdates(args.chat.id)
+            observeChatUpdates(args.chat)
+            observeUserUpdates()
+
+            adapter.load(args.chat.messages)
+            messages.observe(viewLifecycleOwner) { messages ->
+                adapter.load(messages)
+                if (adapter.itemCount > 2) {
+                    binding.recyclerViewChatMessages.scrollToPosition(adapter.itemCount - 1)
+                }
+            }
+
+            chat.observe(viewLifecycleOwner) { chat ->
+                binding.run {
+                    loadChatAvatar(imageViewChatAvatar)
+                    if (chat.user !== null) {
+                        textViewChatTitle.text = chat.user?.name
+                        imageViewUserStatusOnline.hide()
+                        imageViewUserStatusOffline.hide()
+                        if (chat.user?.status == "ONLINE") {
+                            imageViewUserStatusOnline.show()
+                        } else {
+                            imageViewUserStatusOffline.show()
+                        }
+                    } else {
+                        textViewChatTitle.text = chat.groupName
+                    }
+                }
+
+            }
+        }
     }
 
     override fun onDestroy() {
@@ -70,7 +106,6 @@ class ChatFragment : Fragment(R.layout.chat_fragment) {
         inflater.inflate(R.menu.chat_menu, menu)
         super.onCreateOptionsMenu(menu, inflater)
     }
-
 
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -91,19 +126,6 @@ class ChatFragment : Fragment(R.layout.chat_fragment) {
             }
             else -> super.onOptionsItemSelected(item)
         }
-    }
-
-
-
-    private fun setupObservers() {
-        viewModel.messages.observe(viewLifecycleOwner, { messages ->
-            adapter.load(messages)
-            if (adapter.itemCount > 2) {
-                binding.recyclerViewChatMessages.scrollToPosition(adapter.itemCount - 1)
-            }
-        })
-
-        viewModel.observeMessageUpdates(args.chat.id)
     }
 
     private fun startRecording() {
@@ -142,7 +164,7 @@ class ChatFragment : Fragment(R.layout.chat_fragment) {
                 true
             }
             setNavigationOnClickListener {
-                if(findNavController().popBackStack(R.id.chatsFragment, false)) {
+                if (findNavController().popBackStack(R.id.chatsFragment, false)) {
 
                 } else {
                     findNavController().navigate(R.id.chatsFragment)

@@ -9,11 +9,13 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import co.tcc.koga.android.R
 import co.tcc.koga.android.databinding.ProfileFragmentBinding
+import co.tcc.koga.android.utils.loadImage
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 
 class ProfileFragment : Fragment() {
     private lateinit var binding: ProfileFragmentBinding
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -21,7 +23,7 @@ class ProfileFragment : Fragment() {
     ): View? {
         binding = ProfileFragmentBinding.inflate(inflater)
         binding.apply {
-            loadProfilePhoto()
+//            loadProfilePhoto()
             toolbarProfile.inflateMenu(R.menu.settings_menu)
             toolbarProfile.setOnMenuItemClickListener { item ->
                 onOptionsItemSelected(item)
@@ -51,14 +53,13 @@ class ProfileFragment : Fragment() {
         }
     }
 
-    private fun loadProfilePhoto() {
-        Glide
-            .with(this)
-            .load("https://scontent.fpgz1-1.fna.fbcdn.net/v/t31.0-8/23509456_1409309355854887_1466911775224434071_o.jpg?_nc_cat=108&_nc_sid=09cbfe&_nc_eui2=AeG623DjsuyKytHojdUetGk7pVh_hLQD8-ulWH-EtAPz68zvBVOrDuTeDTDkcwcMKguceUm-oHC3hNPbdhEQuVZK&_nc_ohc=inhZTXaPe04AX-lM6La&_nc_ht=scontent.fpgz1-1.fna&oh=3c51f2abbda394c3c8165b3abe21e0c3&oe=5F2B1497")
-            .centerCrop()
-            .apply(RequestOptions.circleCropTransform())
-            .error(R.drawable.ic_outline_person)
-            .placeholder(R.drawable.ic_round_person)
-            .into(binding.imageViewProfilePhoto)
-    }
+//    private fun loadUserAvatar() {
+//        val avatar = viewModel.getUserAvatar()
+//        loadImage(
+//            requireContext(),
+//            binding.imageViewUserPhoto,
+//            avatar,
+//            R.drawable.ic_round_person,
+//        )
+//    }
 }

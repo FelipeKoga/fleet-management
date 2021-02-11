@@ -13,11 +13,11 @@ interface MessageDAO {
     suspend fun insert(message: MessageEntity): Long
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertAll(messages: List<MessageEntity>)
+    fun insertAll(messages: MutableList<MessageEntity?>)
 
     @Query("DELETE FROM message where chatId = :chatId")
     fun deleteAll(chatId: String)
 
     @Query("SELECT * FROM message WHERE chatId = :chatId")
-    fun getAll(chatId: String): Observable<List<MessageEntity>>
+    fun getAll(chatId: String): Observable<MutableList<MessageEntity?>>
 }

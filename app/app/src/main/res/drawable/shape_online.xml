@@ -7,6 +7,6 @@
 
     <stroke
         android:color="?backgroundColor"
-        android:width="1dp" />
+        android:width="2dp" />
     <solid android:color="@color/online" />
 </shape>

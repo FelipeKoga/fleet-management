@@ -166,7 +166,6 @@ async function addMessage({
     chatId,
     username,
     message,
-    createdAt,
     messageId,
     hasAudio,
     recipient,
@@ -182,7 +181,7 @@ async function addMessage({
         username,
         message,
         messageId,
-        createdAt: createdAt || Date.now(),
+        createdAt: Date.now(),
         status: 'SENT',
         hasAudio,
     });

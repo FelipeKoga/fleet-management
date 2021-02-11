@@ -16,6 +16,6 @@ data class ChatEntity(
     var admin: String? = "",
     var user: UserEntity? = null,
     var members: List<UserEntity>? = null,
-    var lastMessage: MessageEntity? = null
+    var messages: MutableList<MessageEntity?> = mutableListOf()
 ) : Parcelable {
 }

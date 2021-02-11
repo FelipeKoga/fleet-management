@@ -3,22 +3,30 @@ package co.tcc.koga.android.ui.chats
 import androidx.lifecycle.*
 import co.tcc.koga.android.data.database.entity.ChatEntity
 import co.tcc.koga.android.data.network.socket.ChatActions
+import co.tcc.koga.android.data.network.socket.MessageActions
 import co.tcc.koga.android.data.network.socket.UserActions
 import co.tcc.koga.android.data.repository.ChatsRepository
 import co.tcc.koga.android.data.repository.ClientRepository
+import co.tcc.koga.android.data.repository.MessageRepository
 import io.reactivex.disposables.CompositeDisposable
+
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class ChatsViewModel @Inject constructor(
     val repository: ChatsRepository,
+    private val messagesRepository: MessageRepository,
     private val clientRepository: ClientRepository,
 ) : ViewModel() {
-    private val _chats = MutableLiveData<List<ChatEntity>>()
-    private val _loadingChats = MutableLiveData(false)
     private val compositeDisposable: CompositeDisposable = CompositeDisposable()
 
+    private val _chats = MutableLiveData<List<ChatEntity>>(mutableListOf())
+    private val _isLoading = MutableLiveData(false)
+    private val _error = MutableLiveData(false)
+
     val chats: LiveData<List<ChatEntity>> get() = _chats
-    val loadingChats: LiveData<Boolean> get() = _loadingChats
+    val isLoading: LiveData<Boolean> get() = _isLoading
+    val error: LiveData<Boolean> get() = _error
 
     override fun onCleared() {
         super.onCleared()
@@ -26,15 +34,20 @@ class ChatsViewModel @Inject constructor(
     }
 
     fun getAllChats() {
-        if (_chats.value === null) {
-            _loadingChats.postValue(true)
-            compositeDisposable.add(repository.getChats().subscribe({ chats ->
-                _loadingChats.postValue(false)
-                _chats.postValue(chats)
-            }, { error ->
-                println(error)
-            }))
-        }
+        _isLoading.postValue(true)
+        compositeDisposable.add(repository.getChats().subscribe({ response ->
+            println(response.data)
+            println("OOOOOOOOOOOOOOPA")
+            if (response.data.isNotEmpty() || !response.fromCache) {
+                _isLoading.postValue(false)
+                _error.postValue(false)
+                _chats.postValue(response.data)
+            }
+        }, {
+            println(it)
+            _isLoading.postValue(false)
+            _error.postValue(true)
+        }))
 
     }
 
@@ -43,27 +56,64 @@ class ChatsViewModel @Inject constructor(
     }
 
     fun observeChatUpdates() {
-        repository.observeChatUpdates()
         compositeDisposable.add(repository.observeChatUpdates().subscribe { update ->
             if (update.action === ChatActions.CHAT_UPDATED) {
-                repository.updateChat(update.body)
+                val foundChat = _chats.value?.find { chat -> chat.id == update.body.id }
+                if (foundChat !== null) {
+                    val updateChat = update.body
+                    if (foundChat.messages.size > 1) {
+                        updateChat.messages = foundChat.messages
+                    }
+                    updateChat(update.body)
+                }
             }
-
         })
     }
 
     fun observeUserUpdates() {
-        repository.observeChatUpdates()
         compositeDisposable.add(repository.observeUserUpdates().subscribe { update ->
             if (update.action === UserActions.USER_CONNECTED || update.action === UserActions.USER_DISCONNECTED) {
-                val chat =
-                    chats.value?.find { chat -> chat.user?.username == update.body.username }
-                if (chat !== null) {
-                    chat.user = update.body
-                    repository.updateChat(chat)
-                }
-
+                _chats.postValue(_chats.value?.map { chat ->
+                    if (chat.user?.username == update.body.username) {
+                        val newChat = chat.copy()
+                        newChat.user = update.body
+                        updateChat(newChat)
+                        newChat
+                    } else {
+                        chat
+                    }
+                })
             }
         })
+    }
+
+    fun observeMessageUpdates() {
+        compositeDisposable.add(messagesRepository.observeMessageUpdated().subscribe { update ->
+            if (update.action === MessageActions.NEW_MESSAGE) {
+                val foundChat = _chats.value?.find { chat -> chat.id == update.body.chatId }
+                    ?: return@subscribe
+                val foundMessage =
+                    foundChat.messages.find { message -> message?.messageId == update.body.messageId }
+                if (foundMessage !== null) {
+                    foundChat.messages.addAll(foundChat.messages.map { if (it?.messageId === update.body.messageId) update.body else it })
+                } else {
+                    foundChat.messages.add(update.body)
+                }
+                _chats.postValue(_chats.value?.map { chat ->
+                    if (chat.id == foundChat.id) {
+                        updateChat(foundChat)
+                        foundChat
+                    } else {
+                        chat
+                    }
+                })
+            }
+        })
+    }
+
+    private fun updateChat(chat: ChatEntity?) = viewModelScope.launch {
+        if (chat !== null) {
+            repository.updateChat(chat)
+        }
     }
 }

@@ -1,5 +1,6 @@
 package co.tcc.koga.android.ui.chat
 
+import android.os.Message
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -20,17 +21,16 @@ class ChatAdapter(
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private val viewSenderItem = 1
     private val viewRecipientItem = 3
-    private val messages: MutableList<MessageEntity> = mutableListOf()
+    private val messages: MutableList<MessageEntity?> = mutableListOf()
 
     class SenderViewHolder(private val binding: RowMessageSentBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(item: MessageEntity, members: List<UserEntity>?) {
             binding.apply {
                 textViewMessageSent.text = if (item.hasAudio) "Áudio" else item.message
-                if (!item.createdAt.isNullOrEmpty()) {
-                    textViewMessageSentDate.text = getHour(item.createdAt)
 
-                }
+                textViewMessageSentDate.text = getHour(item.createdAt)
+
                 if (item.status == "SENT") {
                     imageViewMessageStatus.setImageResource(R.drawable.ic_baseline_check)
                 } else {
@@ -51,10 +51,8 @@ class ChatAdapter(
 
                 }
                 textViewMessageReceived.text = if (item.hasAudio) "Áudio" else item.message
-                if (!item.createdAt.isNullOrEmpty()) {
-                    textViewMessageReceivedHour.text = getHour(item.createdAt)
+                textViewMessageReceivedHour.text = getHour(item.createdAt)
 
-                }
             }
         }
     }
@@ -69,7 +67,13 @@ class ChatAdapter(
             return RecipientViewHolder(RowMessageReceivedBinding.inflate(LayoutInflater.from(parent.context)))
         }
 
-        return SenderViewHolder(RowMessageSentBinding.inflate(LayoutInflater.from(parent.context), parent, false))
+        return SenderViewHolder(
+            RowMessageSentBinding.inflate(
+                LayoutInflater.from(parent.context),
+                parent,
+                false
+            )
+        )
     }
 
     override fun getItemCount(): Int {
@@ -78,7 +82,7 @@ class ChatAdapter(
 
     override fun getItemViewType(position: Int): Int {
         val message = messages[position]
-        if (message.username == username) {
+        if (message?.username == username) {
             return viewSenderItem
         }
         return viewRecipientItem
@@ -88,12 +92,12 @@ class ChatAdapter(
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val message = messages[position]
         when (holder) {
-            is SenderViewHolder -> holder.bind(message, members)
-            is RecipientViewHolder -> holder.bind(message, members)
+            is SenderViewHolder -> holder.bind(message as MessageEntity, members)
+            is RecipientViewHolder -> holder.bind(message as MessageEntity, members)
         }
     }
 
-    fun load(items: List<MessageEntity>) {
+    fun load(items: MutableList<MessageEntity?>) {
         messages.clear()
         messages.addAll(items)
         notifyDataSetChanged()
@@ -101,10 +105,10 @@ class ChatAdapter(
 
     fun add(message: MessageEntity) {
         println(message)
-        val found = messages.find { it.messageId === message.messageId }
+        val found = messages.find { it?.messageId === message.messageId }
         println(found)
         if (found !== null) {
-            messages.addAll(messages.map { if (it.messageId === message.messageId) message else it })
+            messages.addAll(messages.map { if (it?.messageId === message.messageId) message else it })
         } else {
             messages.add(message)
         }

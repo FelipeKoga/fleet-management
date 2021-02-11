@@ -6,6 +6,7 @@ import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import co.tcc.koga.android.data.database.entity.ChatEntity
 import co.tcc.koga.android.data.database.entity.MessageEntity
+import co.tcc.koga.android.data.database.entity.UserEntity
 import co.tcc.koga.android.databinding.RowChatBinding
 import co.tcc.koga.android.utils.*
 
@@ -15,7 +16,7 @@ class ChatsAdapter(
 ) :
     RecyclerView.Adapter<ChatsAdapter.ChatsViewHolder>() {
 
-    private val chats: MutableList<ChatEntity> = mutableListOf()
+    private var chats: MutableList<ChatEntity> = mutableListOf()
 
     class ChatsViewHolder(val binding: RowChatBinding) :
         RecyclerView.ViewHolder(binding.root) {
@@ -28,7 +29,7 @@ class ChatsAdapter(
 
         private fun getMessageHour(message: MessageEntity?): String {
             if (message === null) return ""
-            return getHour(message.createdAt as String)
+            return getHour(message.createdAt)
         }
 
         fun bind(
@@ -39,8 +40,11 @@ class ChatsAdapter(
 
 
             binding.apply {
-                textViewLastMessage.text = getLastMessage(chat.lastMessage)
-                textViewLastMessageHour.text = getMessageHour(chat.lastMessage)
+                if (chat.messages.isNotEmpty()) {
+                    textViewLastMessage.text = getLastMessage(chat.messages.last())
+                    textViewLastMessageHour.text = getMessageHour(chat.messages.last())
+                }
+
 
 
                 if (chat.user !== null) {
@@ -90,12 +94,12 @@ class ChatsAdapter(
     }
 
     fun newMessage(message: MessageEntity) {
-        val chat = chats.find { it.lastMessage?.chatId === message.chatId }
-        if (chat !== null) {
-            chat.lastMessage = message
-            chats.addAll(chats.map { if (it.id === chat.id) chat else it })
-        }
-        notifyItemChanged(itemCount)
+//        val chat = chats.find { it.lastMessage?.chatId === message.chatId }
+//        if (chat !== null) {
+//            chat.lastMessage = message
+//            chats.addAll(chats.map { if (it.id === chat.id) chat else it })
+//        }
+//        notifyItemChanged(itemCount)
     }
 
 }
