@@ -1,15 +1,14 @@
 package co.tcc.koga.android.data.network.socket
 
 enum class WebSocketActions {
-    NEW_MESSAGE,
-    MESSAGE_SENT,
     SEND_MESSAGE,
     OPEN_MESSAGES,
-    CHAT_UPDATED
+    SEND_LOCATION
 }
 
 enum class ChatActions {
-    CHAT_UPDATED
+    CHAT_UPDATED,
+    CHAT_CREATED
 }
 
 enum class MessageActions {

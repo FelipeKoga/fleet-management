@@ -1,5 +1,6 @@
 package co.tcc.koga.android.ui.di
 
+import co.tcc.koga.android.service.LocationService
 import co.tcc.koga.android.ui.MainActivity
 import co.tcc.koga.android.ui.auth.confirm_forgot_password.ConfirmForgotPasswordFragment
 import co.tcc.koga.android.ui.auth.forgot_password.ForgotPasswordFragment
@@ -31,4 +32,7 @@ interface MainComponent {
     fun inject(fragment: NewChatFragment)
     fun inject(fragment: NewGroupFragment)
     fun inject(fragment: SplashScreenFragment)
+
+    fun inject(service: LocationService)
+
 }

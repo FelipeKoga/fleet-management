@@ -24,4 +24,8 @@ abstract class RepositoryModule {
     @Singleton
     @Binds
     abstract fun providesUserRepository(repository: UserRepositoryImpl): UserRepository
+
+    @Singleton
+    @Binds
+    abstract fun providesAudioRepository(repository: AudioRepositoryImpl): AudioRepository
 }

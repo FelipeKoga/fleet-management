@@ -1,30 +1,34 @@
 package co.tcc.koga.android.ui.chat
 
+import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Context
+import android.content.pm.PackageManager
 import android.media.MediaRecorder
 import android.os.Bundle
 import android.view.*
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.asLiveData
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
-import co.tcc.koga.android.ui.MainActivity
 import co.tcc.koga.android.R
 import co.tcc.koga.android.databinding.ChatFragmentBinding
+import co.tcc.koga.android.ui.MainActivity
 import co.tcc.koga.android.utils.hide
 import co.tcc.koga.android.utils.hideKeyboard
 import co.tcc.koga.android.utils.show
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import kotlinx.android.synthetic.main.chat_fragment.*
-import java.io.IOException
+import java.io.*
 import javax.inject.Inject
+
 
 class ChatFragment : Fragment(R.layout.chat_fragment) {
     @Inject
@@ -33,7 +37,6 @@ class ChatFragment : Fragment(R.layout.chat_fragment) {
     private lateinit var binding: ChatFragmentBinding
     private val args: ChatFragmentArgs by navArgs()
     private val viewModel by viewModels<ChatViewModel> { viewModelFactory }
-    private var recorder: MediaRecorder? = null
     private lateinit var adapter: ChatAdapter
 
     override fun onAttach(context: Context) {
@@ -128,22 +131,9 @@ class ChatFragment : Fragment(R.layout.chat_fragment) {
         }
     }
 
-    private fun startRecording() {
-        recorder = MediaRecorder().apply {
-            setAudioSource(MediaRecorder.AudioSource.MIC)
-            setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP)
-            setOutputFile("audio ${Math.random()}")
-            setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB)
 
-            try {
-                prepare()
-            } catch (e: IOException) {
-                println("prepare() failed")
-            }
 
-            start()
-        }
-    }
+
 
     private fun setupRecyclerView() {
         val linearLayoutManager = LinearLayoutManager(context)
@@ -198,6 +188,7 @@ class ChatFragment : Fragment(R.layout.chat_fragment) {
         }
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private fun setupViews() {
         edit_text_message.addTextChangedListener {
             recycler_view_chat_messages.scrollToPosition(adapter.itemCount - 1)
@@ -209,6 +200,46 @@ class ChatFragment : Fragment(R.layout.chat_fragment) {
                 }
             }
         }
+
+
+        image_button_send_audio.setOnLongClickListener {
+            if (ContextCompat.checkSelfPermission(
+                    requireContext(),
+                    Manifest.permission.RECORD_AUDIO
+                ) != PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(
+                    requireContext(),
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                val permissions = arrayOf(
+                    Manifest.permission.RECORD_AUDIO,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                    Manifest.permission.READ_EXTERNAL_STORAGE
+                )
+                requestPermissions(permissions, 0)
+            } else {
+                println("START")
+                viewModel.startRecording()
+            }
+            true
+        }
+
+        image_button_send_audio.setOnClickListener {
+
+        }
+
+        image_button_send_audio.setOnTouchListener { v, event ->
+            when (event.action) {
+                MotionEvent.ACTION_UP -> {
+                    viewModel.stopRecording()
+
+                    return@setOnTouchListener true
+                }
+            }
+            false
+        }
+
+
         image_button_send_message.setOnClickListener {
             val message = edit_text_message.text.toString()
             if (message.isNotEmpty()) {

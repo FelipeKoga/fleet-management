@@ -25,6 +25,9 @@ interface ChatsRepository {
 
     suspend fun openChat(chatId: String)
 
+
+    suspend fun insertChat(chat: ChatEntity)
+
     suspend fun updateChat(chat: ChatEntity)
 
     fun observeChatUpdates(): Observable<WebSocketMessage<ChatEntity, ChatActions>>

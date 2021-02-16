@@ -4,7 +4,6 @@ import co.tcc.koga.android.data.network.aws.Client
 import co.tcc.koga.android.data.network.retrofit.Service
 import co.tcc.koga.android.data.network.socket.WebSocketService
 import co.tcc.koga.android.utils.CONSTANTS
-import com.tinder.scarlet.Lifecycle
 import com.tinder.scarlet.Scarlet
 import com.tinder.scarlet.lifecycle.LifecycleRegistry
 import com.tinder.scarlet.messageadapter.moshi.MoshiMessageAdapter
@@ -14,6 +13,7 @@ import dagger.Module
 import dagger.Provides
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
@@ -70,9 +70,14 @@ class NetworkModule {
     @Singleton
     @Provides
     fun providesHttpClient(): OkHttpClient {
+        val loggingInterceptor = HttpLoggingInterceptor()
+        loggingInterceptor.level = HttpLoggingInterceptor.Level.BODY
         return OkHttpClient
             .Builder()
             .connectTimeout(5, TimeUnit.SECONDS)
+            .addNetworkInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
+
+            .addInterceptor(loggingInterceptor)
             .addInterceptor { chain ->
                 val authorizer =
                     "Bearer ${Client.getInstance().getToken()}"
@@ -82,7 +87,8 @@ class NetworkModule {
                         "Authorization",
                         authorizer
                     )
+                println("INTERCEPTOR ${chain.request().url()}")
                 chain.proceed(builder.build())
-            }.retryOnConnectionFailure(true).build()
+            } .retryOnConnectionFailure(true).build()
     }
 }

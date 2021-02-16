@@ -36,15 +36,12 @@ class ChatsViewModel @Inject constructor(
     fun getAllChats() {
         _isLoading.postValue(true)
         compositeDisposable.add(repository.getChats().subscribe({ response ->
-            println(response.data)
-            println("OOOOOOOOOOOOOOPA")
             if (response.data.isNotEmpty() || !response.fromCache) {
                 _isLoading.postValue(false)
                 _error.postValue(false)
                 _chats.postValue(response.data)
             }
         }, {
-            println(it)
             _isLoading.postValue(false)
             _error.postValue(true)
         }))
@@ -66,6 +63,12 @@ class ChatsViewModel @Inject constructor(
                     }
                     updateChat(update.body)
                 }
+            }
+
+            println(update.action)
+            if (update.action === ChatActions.CHAT_CREATED) {
+
+                insertChat(update.body)
             }
         })
     }
@@ -109,6 +112,11 @@ class ChatsViewModel @Inject constructor(
                 })
             }
         })
+    }
+
+
+    private fun insertChat(chat: ChatEntity) = viewModelScope.launch {
+        repository.insertChat(chat)
     }
 
     private fun updateChat(chat: ChatEntity?) = viewModelScope.launch {

@@ -79,6 +79,7 @@ class LoginViewModel @Inject constructor(
     private fun getUser() = viewModelScope.launch {
         try {
             compositeDisposable.add(repository.getCurrentUser().subscribe {
+                println("USER: $it")
                 _authenticationStatus.value = AUTH_STATUS.LOGGED_IN
             })
         } catch (e: Exception) {

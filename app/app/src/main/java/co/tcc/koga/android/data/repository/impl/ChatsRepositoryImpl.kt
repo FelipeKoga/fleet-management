@@ -105,6 +105,10 @@ class ChatsRepositoryImpl @Inject constructor(
         return webSocketService.observeChat()
     }
 
+    override suspend fun insertChat(chat: ChatEntity) {
+        chatDao.insert(chat)
+    }
+
     override fun observeUserUpdates(): Observable<WebSocketMessage<UserEntity, UserActions>> {
         return webSocketService.observeUser()
     }

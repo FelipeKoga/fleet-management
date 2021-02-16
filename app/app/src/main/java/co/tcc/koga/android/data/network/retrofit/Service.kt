@@ -4,8 +4,10 @@ import co.tcc.koga.android.data.database.entity.ChatEntity
 import co.tcc.koga.android.data.database.entity.MessageEntity
 import co.tcc.koga.android.data.database.entity.UserEntity
 import co.tcc.koga.android.data.network.payload.NewChatPayload
+import co.tcc.koga.android.data.network.payload.UploadResponse
+import co.tcc.koga.android.data.network.payload.UploadUrlPayload
 import io.reactivex.Observable
-import kotlinx.coroutines.flow.Flow
+import okhttp3.RequestBody
 import retrofit2.http.*
 
 interface Service {
@@ -38,5 +40,18 @@ interface Service {
         @Path("username") username: String,
         @Path("chatId") chatId: String
     ): Observable<MutableList<MessageEntity?>>
+
+
+    @POST("files")
+    fun uploadUrl(
+        @Body uploadUrlPayload: UploadUrlPayload
+    ): Observable<UploadResponse>
+
+    @PUT
+    fun uploadAudio(
+        @Url url: String,
+        @Header("Content-type") contentType: String,
+        @Body body: RequestBody
+    ): Observable<Unit>
 
 }

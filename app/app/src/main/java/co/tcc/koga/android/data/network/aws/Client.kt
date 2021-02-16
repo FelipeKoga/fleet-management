@@ -62,6 +62,7 @@ class Client {
             object : Callback<SignInResult> {
                 override fun onResult(result: SignInResult?) {
                     subject.onNext(AUTH_STATUS.LOGGED_IN)
+                    tokenString = AWSMobileClient.getInstance().tokens.idToken.tokenString
                     onSignInSuccess()
                 }
 

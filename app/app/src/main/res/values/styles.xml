@@ -16,7 +16,7 @@
         <item name="colorControlHighlight">#1a237e</item>
         <item name="android:progressBackgroundTint">#d1d1d1</item>
         <item name="android:progressTint">#1a237e</item>
-        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowLightStatusBar">false</item>
 
 
 
