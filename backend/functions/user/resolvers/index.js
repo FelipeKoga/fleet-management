@@ -3,7 +3,7 @@ const { getObject } = require('../services/s3');
 
 const generateRandomString = length => {
     const characters =
-        'abcdefghijklmnopqrstuvwxyz123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        'abcdefghijklmnopqrstuvwxyz123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789';
     let randomPassword = '';
     for (let i = 0; i <= length; i += 1) {
         randomPassword += characters.charAt(
@@ -90,9 +90,10 @@ async function disable(username, companyId) {
     return true;
 }
 
-async function addLocation(companyId, username, args) {
+async function addLocation({ companyId, username, latitude, longitude }) {
     await Database.location.addLocation(username, {
-        ...args,
+        latitude,
+        longitude,
         lastUpdate: Date.now(),
     });
     const user = await get(username, companyId);

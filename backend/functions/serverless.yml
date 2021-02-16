@@ -167,6 +167,9 @@ user:
                   type: COGNITO_USER_POOLS
                   authorizerId:
                       Ref: ApiGatewayAuthorizer
+        - websocket:
+              route: SEND_LOCATION
+              routeResponseSelectionExpression: $default
     environment:
         APP: ${self:app}
         STAGE: ${self:custom.stage}
