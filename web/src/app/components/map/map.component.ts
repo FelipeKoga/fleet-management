@@ -1,6 +1,6 @@
 import { Component, OnInit } from "@angular/core";
 import { UsersService } from "src/app/services/users/users.service";
-import { User, UserStatus } from "src/app/models/user";
+import { User, UserRole, UserStatus } from "src/app/models/user";
 import { AuthService } from "src/app/services/auth/auth.service";
 import {
   Actions,
@@ -54,6 +54,7 @@ export class MapComponent implements OnInit {
         .filter(
           (user) =>
             user.username !== this.currentUser.username &&
+            user.role === UserRole.EMPLOYEEE &&
             user.status !== UserStatus.DISABLED
         )
         .sort((a) => {
@@ -106,13 +107,6 @@ export class MapComponent implements OnInit {
     this.messageFormControl.reset();
 
     this.selectedUser = marker.user;
-    if (this.previousInfoWindow == null) this.previousInfoWindow = infoWindow;
-    else {
-      this.infoWindowOpened = infoWindow;
-      this.previousInfoWindow.close();
-    }
-
-    this.previousInfoWindow = infoWindow;
 
     const that = this;
     const location = { lat: marker.latitude, lng: marker.longitude };
