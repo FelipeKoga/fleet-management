@@ -2,7 +2,7 @@ const { getByPK, fetchBySK, insert, update } = require('./query');
 const { removeConnectionIds } = require('./connection');
 
 const ProjectionExpression =
-    'username, #name, email, avatar, #status, #role, phone, companyId, customName, locationUpdate';
+    'username, #name, email, avatar, #status, #role, phone, companyId, customName, locationUpdate, color';
 
 async function getUser(username, companyId) {
     return getByPK({

@@ -1,3 +1,4 @@
+const randomColor = require('randomcolor');
 const { Cognito, Database, Lambda, S3, Email } = require('../services');
 const { getObject } = require('../services/s3');
 
@@ -55,7 +56,11 @@ async function list(companyId) {
 
 async function create(data, companyId) {
     const password = generateRandomString(8);
-    const newUser = { ...data, password };
+    const color = randomColor({
+        luminosity: 'light',
+    });
+
+    const newUser = { ...data, password, color: color.replace('#', '') };
     await Cognito.create(newUser, companyId);
     await Database.user.createUser(newUser, companyId);
     const user = await get(newUser.email, companyId);
