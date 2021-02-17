@@ -29,6 +29,7 @@ export class FormDialogComponent implements OnInit {
   private user: User = new User({});
   public state$: Observable<UsersState>;
   public userRoles: string[] = ["ADMIN", "OPERATOR", "EMPLOYEE"];
+  public isLoading: boolean;
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: FormDialogData,
@@ -66,13 +67,19 @@ export class FormDialogComponent implements OnInit {
       ...this.form.value,
     });
 
+    this.isLoading = true;
+
     if (this.data.type === FormType.INSERT) {
-      this.usersService.add(user, () => {
+      this.usersService.add({ ...user, username: user.email }, () => {
+        this.isLoading = false;
+
         this.showSuccess("Usuário criado com sucesso!");
         this.dialogRef.close();
       });
     } else {
       this.usersService.update(user, () => {
+        this.isLoading = false;
+
         this.dialogRef.close();
         this.showSuccess("Usuário atualizado com sucesso!");
       });
@@ -80,16 +87,21 @@ export class FormDialogComponent implements OnInit {
   }
 
   public changeUserStatus() {
+    this.isLoading = true;
     if (this.data.type === FormType.ENABLE) {
       this.usersService.update(
         { ...this.user, status: UserStatus.OFFLINE },
         () => {
+          this.isLoading = false;
+
           this.dialogRef.close();
           this.showSuccess("Usuário habilitado com sucesso!");
         }
       );
     } else {
       this.usersService.disable(this.user.username, () => {
+        this.isLoading = false;
+
         this.dialogRef.close();
         this.showSuccess("Usuário desabilitado com sucesso!");
       });

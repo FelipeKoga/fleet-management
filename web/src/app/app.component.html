@@ -48,9 +48,8 @@
         <div class="user-wrapper">
           <div class="user-photo-wrapper">
             <img
-              onerror="this.src='assets/default_user.png';"
               class="user-photo"
-              [src]="currentUser.avatarUrl"
+              [src]="currentUser.avatarUrl || getUserAvatar(currentUser)"
             />
             <div
               [ngClass]="
@@ -72,22 +71,3 @@
     </div>
   </div>
 </ng-template>
-<!--
-<mat-menu #menu="matMenu">
-  <button
-    (click)="goToProfile()"
-    style="background-color: #fafafa"
-    mat-menu-item
-  >
-    <mat-icon>person</mat-icon>
-    <span>Perfil</span>
-  </button>
-  <button style="background-color: #fafafa" mat-menu-item>
-    <mat-icon>notifications_off</mat-icon>
-    <span>Desabilitar notificações</span>
-  </button>
-  <button (click)="signOut()" style="background-color: #fafafa" mat-menu-item>
-    <mat-icon>power_settings_new</mat-icon>
-    <span>Sair</span>
-  </button>
-</mat-menu> -->

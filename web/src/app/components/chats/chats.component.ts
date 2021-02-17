@@ -11,6 +11,9 @@ import { NewChatType } from "./new-chat/new-chat.component";
 import { convertDate } from "../../utils/date";
 import { ActivatedRoute } from "@angular/router";
 import { Message } from "src/app/models/message";
+import { User } from "src/app/models/user";
+import { getAvatar } from "src/app/utils/avatar";
+import { isToday } from "date-fns";
 @Component({
   selector: "app-chats",
   templateUrl: "./chats.component.html",
@@ -24,7 +27,6 @@ export class ChatsComponent implements OnInit {
   public username: string;
   public showNewChat: NewChatType;
   public isLoadingChats: boolean;
-  public convertDate = convertDate;
 
   constructor(
     private chatsService: ChatsService,
@@ -44,6 +46,7 @@ export class ChatsComponent implements OnInit {
         );
       }
 
+      console.log(state.chats);
       this.chats = state.chats;
       this.isLoadingChats = state.isLoading;
     });
@@ -66,7 +69,9 @@ export class ChatsComponent implements OnInit {
         response.action === Actions.CHAT_CREATED
       ) {
         const chat = this.chatsService.findChat(response.body.id);
+        console.log(response.action);
         if (!chat) {
+          console.log(response.body);
           this.chatsService.addOrReplaceChat(response.body);
         } else {
           this.chatsService.addOrReplaceChat({
@@ -104,6 +109,8 @@ export class ChatsComponent implements OnInit {
   }
 
   public handleChatCreated(chat: Chat) {
+    console.log("handle chat created", chat);
+    this.chatsService.addOrReplaceChat(chat);
     this.selectedChat = chat;
     this.showNewChat = null;
   }
@@ -118,7 +125,19 @@ export class ChatsComponent implements OnInit {
     });
   }
 
+  public getUserAvatar(user: User) {
+    return getAvatar(user);
+  }
+
   public getLastMessage(chat: Chat): Message {
     return chat.messages[chat.messages.length - 1];
+  }
+
+  public convertDate(timestamp: number) {
+    if (isToday(timestamp)) {
+      return convertDate(timestamp, "HH:mm");
+    }
+
+    return convertDate(timestamp, "dd/MM/yyyy");
   }
 }

@@ -32,7 +32,7 @@
             object-fit: cover;
           "
           onerror="this.src='assets/default_user.png';"
-          [src]="user.avatarUrl"
+          [src]="user.avatarUrl || getUserAvatar(user)"
         />
         <input
           type="file"

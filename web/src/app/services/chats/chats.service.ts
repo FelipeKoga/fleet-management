@@ -126,17 +126,13 @@ export class ChatsService extends StateService<ChatsState> {
             if (chat.id === newChat.id) return newChat;
             return chat;
           })
-          .filter((chat) => {
-            return !chat.private || chat.messages.length;
-          })
           .sort(this.sort),
       });
     } else {
       chats.unshift(newChat);
+      console.log(chats);
       this.setState({
-        chats: chats
-          .filter((chat) => !chat.private || chat.messages.length)
-          .sort(this.sort),
+        chats: chats.sort(this.sort),
       });
     }
   }
@@ -192,8 +188,9 @@ export class ChatsService extends StateService<ChatsState> {
   }
 
   public addOrReplaceMessage(message: Message) {
+    console.log(message.chatId);
     const chat = this.findChat(message.chatId);
-
+    console.log(chat);
     if (chat.messages.find((msg) => msg.messageId === message.messageId)) {
       this.addOrReplaceChat({
         ...chat,

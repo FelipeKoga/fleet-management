@@ -6,10 +6,10 @@ import {
   Actions,
   WebsocketService,
 } from "src/app/services/websocket/websocket.service";
-import { FormControl, Validators } from "@angular/forms";
+import { FormControl } from "@angular/forms";
 import { Message, MessageStatus } from "src/app/models/message";
 import { MatSnackBar } from "@angular/material/snack-bar";
-import { Router } from "@angular/router";
+import { getAvatar } from "src/app/utils/avatar";
 declare var google: any;
 @Component({
   selector: "app-map",
@@ -70,9 +70,7 @@ export class MapComponent implements OnInit {
               latitude: +user.location.latitude,
               longitude: +user.location.longitude,
               icon: {
-                url: user.avatarUrl
-                  ? user.avatarUrl
-                  : this.getAvatar(user.name),
+                url: user.avatarUrl ? user.avatarUrl : this.getUserAvatar(user),
               },
               user,
             });
@@ -146,8 +144,8 @@ export class MapComponent implements OnInit {
     this.messageFormControl.reset();
   }
 
-  public getAvatar(name: string) {
-    return `https://ui-avatars.com/api/?rounded=true&name=${name}`;
+  public getUserAvatar(user: User) {
+    return getAvatar(user);
   }
 
   public getActiveUsers() {

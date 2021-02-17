@@ -6,6 +6,7 @@ import { Auth } from "aws-amplify";
 import { User } from "src/app/models/user";
 import { AuthService } from "src/app/services/auth/auth.service";
 import { UsersService } from "src/app/services/users/users.service";
+import { getAvatar } from "src/app/utils/avatar";
 import { roles } from "src/app/utils/role";
 
 @Component({
@@ -151,6 +152,10 @@ export class ProfileComponent implements OnInit {
 
   public signOut() {
     this.authService.signOut();
+  }
+
+  public getUserAvatar(user: User) {
+    return getAvatar(user);
   }
 
   get oldPassword() {

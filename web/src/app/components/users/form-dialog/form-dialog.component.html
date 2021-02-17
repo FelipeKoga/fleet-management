@@ -39,15 +39,27 @@
     <form class="form" [formGroup]="form" (ngSubmit)="submit()">
       <mat-form-field appearance="outline">
         <mat-label>Nome completo</mat-label>
-        <input formControlName="name" matInput />
+        <input
+          [disabled]="data.type === 'UPDATE'"
+          formControlName="name"
+          matInput
+        />
       </mat-form-field>
-      <mat-form-field appearance="outline">
+      <mat-form-field [disabled]="data.type === 'UPDATE'" appearance="outline">
         <mat-label>E-mail</mat-label>
-        <input formControlName="email" matInput />
+        <input
+          [disabled]="data.type === 'UPDATE'"
+          formControlName="email"
+          matInput
+        />
       </mat-form-field>
       <mat-form-field appearance="outline">
         <mat-label>Telefone</mat-label>
-        <input formControlName="phone" matInput />
+        <input
+          [disabled]="data.type === 'UPDATE'"
+          formControlName="phone"
+          matInput
+        />
       </mat-form-field>
       <mat-form-field appearance="outline">
         <mat-label>Cargo</mat-label>
@@ -60,11 +72,7 @@
       </mat-form-field>
 
       <mat-dialog-actions align="end">
-        <button
-          [disabled]="(state$ | async).isLoading"
-          mat-button
-          mat-dialog-close
-        >
+        <button [disabled]="isLoading" mat-button mat-dialog-close>
           Cancelar
         </button>
         <button
@@ -73,7 +81,7 @@
           type="submit"
           [disabled]="form.invalid"
         >
-          <ng-container *ngIf="(state$ | async).isLoading; else elseTemplate">
+          <ng-container *ngIf="isLoading; else elseTemplate">
             <mat-spinner
               color="primary"
               style="margin: 2px"

@@ -5,6 +5,7 @@ import { User } from "src/app/models/user";
 import { AuthService } from "src/app/services/auth/auth.service";
 import { ChatsService } from "src/app/services/chats/chats.service";
 import { UsersService } from "src/app/services/users/users.service";
+import { getAvatar } from "src/app/utils/avatar";
 
 export enum NewChatType {
   GROUP = "GROUP",
@@ -51,6 +52,7 @@ export class NewChatComponent implements OnInit {
   public newPrivateChat(user: User) {
     this.isLoadingNewChat = true;
     this.chatsService.newPrivateChat(user.username, (chat) => {
+      console.log("NEW PRIVATE CHAT");
       this.isLoadingNewChat = false;
       this.onChatCreated.next(chat);
     });
@@ -72,5 +74,9 @@ export class NewChatComponent implements OnInit {
 
   get members() {
     return this.newGroupForm.get("members");
+  }
+
+  getUserAvatar(user: User) {
+    return getAvatar(user);
   }
 }

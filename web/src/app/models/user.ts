@@ -9,7 +9,7 @@ export enum UserStatus {
 export enum UserRole {
   ADMIN = "ADMIN",
   OPERATOR = "OPERATOR",
-  EMPLOYEEE = "EMPLOYEEE",
+  EMPLOYEEE = "EMPLOYEE",
 }
 
 export class User {
@@ -25,6 +25,7 @@ export class User {
   avatarUrl?: string;
   location?: Location;
   locationUpdate: number;
+  color: string;
 
   constructor({
     name = "",
@@ -39,6 +40,7 @@ export class User {
     avatarUrl = "",
     location = null,
     locationUpdate = 0,
+    color = "#2196f3",
   }) {
     this.name = name;
     this.email = email;
@@ -52,5 +54,6 @@ export class User {
     this.avatarUrl = avatarUrl;
     this.location = location;
     this.locationUpdate = locationUpdate;
+    this.color = color;
   }
 }

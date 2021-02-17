@@ -9,6 +9,7 @@ import {
   Actions,
   WebsocketService,
 } from "src/app/services/websocket/websocket.service";
+import { getAvatar } from "src/app/utils/avatar";
 declare var google: any;
 
 @Component({
@@ -50,8 +51,8 @@ export class MapBottomSheetComponent implements OnInit {
     event.preventDefault();
   }
 
-  public getAvatar(name: string) {
-    return `https://ui-avatars.com/api/?rounded=true&name=${name}`;
+  public getUserAvatar(user: User) {
+    return getAvatar(user);
   }
 
   public selectMarker() {

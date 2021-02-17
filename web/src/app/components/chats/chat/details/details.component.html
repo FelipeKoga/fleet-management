@@ -35,7 +35,7 @@
             object-fit: cover;
             height: 100%;
           "
-          [src]="chat.user.avatarUrl || ''"
+          [src]="chat.user.avatarUrl || getUserAvatar(chat.user)"
         />
       </div>
 
@@ -75,7 +75,7 @@
               height: 100%;
               background-color: #c0c0c0;
             "
-            onerror="this.src='assets/default_group_high.png';"
+            onerror="this.src='assets/default_group.png';"
             [src]="chat.avatarUrl"
           />
           <input
@@ -202,15 +202,9 @@
                 <mat-form-field style="width: 100%">
                   <mat-select [disabled]="!editAdmin" formControlName="admin">
                     <mat-option *ngFor="let member of members" [value]="member">
-                      {{ member.name }}
+                      <div style="font-weight: 500">{{ member.name }}</div>
                     </mat-option>
                   </mat-select>
-                  <!-- <input
-                    [readonly]="!editAdmin"
-                    matInput
-                    type="text"
-                    formControlName="admin"
-                  /> -->
                 </mat-form-field>
               </form>
             </mat-card>

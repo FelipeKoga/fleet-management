@@ -4,6 +4,7 @@ import { Chat } from "src/app/models/chat";
 import { User } from "src/app/models/user";
 import { ChatsService } from "src/app/services/chats/chats.service";
 import { UsersService } from "src/app/services/users/users.service";
+import { getAvatar } from "src/app/utils/avatar";
 
 @Component({
   selector: "app-add-member",
@@ -41,5 +42,9 @@ export class AddMemberComponent implements OnInit {
           this.dialogRef.close(member);
         }
       });
+  }
+
+  public getUserAvatar(user: User) {
+    return getAvatar(user);
   }
 }

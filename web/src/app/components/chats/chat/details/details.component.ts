@@ -13,6 +13,7 @@ import { User } from "src/app/models/user";
 import { AuthService } from "src/app/services/auth/auth.service";
 import { ChatsService } from "src/app/services/chats/chats.service";
 import { ConfirmationDialogComponent } from "src/app/shared/confirmation-dialog/confirmation-dialog.component";
+import { getAvatar } from "src/app/utils/avatar";
 import { convertDate } from "src/app/utils/date";
 import { roles } from "src/app/utils/role";
 import { AddMemberComponent } from "../add-member/add-member.component";
@@ -197,5 +198,9 @@ export class DetailsComponent implements OnInit {
           panelClass: ["snackbar-success"],
         });
       });
+  }
+
+  public getUserAvatar(user: User) {
+    return getAvatar(user);
   }
 }

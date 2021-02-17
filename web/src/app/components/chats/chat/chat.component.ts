@@ -19,6 +19,7 @@ import {
   Actions,
   WebsocketService,
 } from "src/app/services/websocket/websocket.service";
+import { getAvatar } from "src/app/utils/avatar";
 import { convertDate } from "src/app/utils/date";
 import { MapBottomSheetComponent } from "../../map/map-bottom-sheet/map-bottom-sheet.component";
 declare var MediaRecorder: any;
@@ -28,6 +29,7 @@ const mime = ["audio/wav", "audio/mpeg", "audio/webm", "audio/ogg"].filter(
 )[0];
 @Component({
   selector: "app-chat",
+
   templateUrl: "./chat.component.html",
   styleUrls: ["./chat.component.scss"],
   providers: [MessagesService],
@@ -62,16 +64,17 @@ export class ChatComponent implements OnInit {
     this.receiving$ = this.pttService.receiving$;
 
     this.chatsService.chatsState$.subscribe((state) => {
-      this.chat = state.chats.find((item) => item.id === this.chat.id);
+      const chat = state.chats.find((item) => item.id === this.chat.id);
+      if (chat) {
+        this.chat = chat;
+      }
     });
 
     this.webSocketService.messages.subscribe((response) => {
-      console.log(response);
       if (
         response.action === Actions.MESSAGE_SENT ||
         response.action === Actions.MESSAGE_RECEIVED
       ) {
-        console.log(response);
         if (response.body.chatId === this.chat.id) {
           this.viewedMessages();
           this.chatsService.addOrReplaceMessage(response.body);
@@ -236,5 +239,9 @@ export class ChatComponent implements OnInit {
   public stopRecordingPTT() {
     this.recordingPTT = false;
     this.pttService.stop();
+  }
+
+  public getUserAvatar(user: User) {
+    return getAvatar(user);
   }
 }

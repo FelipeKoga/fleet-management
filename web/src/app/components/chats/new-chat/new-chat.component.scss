@@ -16,3 +16,12 @@
   height: 100%;
   position: relative;
 }
+
+.user-avatar {
+  width: 42px;
+  background-color: #c0c0c0;
+  outline: none;
+  object-fit: cover;
+  border-radius: 50%;
+  border: none;
+}

@@ -3,3 +3,13 @@
   border-radius: 4px;
   cursor: pointer;
 }
+
+.user-avatar {
+  width: 52px;
+  height: 52px;
+  background-color: #c0c0c0;
+  outline: none;
+  object-fit: cover;
+  border-radius: 50%;
+  border: none;
+}

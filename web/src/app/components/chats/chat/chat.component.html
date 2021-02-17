@@ -9,10 +9,9 @@
   >
     <div class="toolbar" (click)="onShowChatDetails()">
       <img
-        onerror="this.src='assets/default_user.png';"
         *ngIf="chat.private"
         class="chat-avatar"
-        [src]="chat.user.avatarUrl"
+        [src]="chat.user.avatarUrl || getUserAvatar(chat.user)"
       />
       <img
         onerror="this.src='assets/default_group.png';"

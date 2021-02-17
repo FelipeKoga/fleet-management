@@ -43,19 +43,10 @@
           >
             <div class="chat-item-wrapper">
               <div *ngIf="chat.private" class="user-photo-wrapper">
-                <ng-container *ngIf="chat.user.avatarUrl; else elseTemplate">
-                  <img
-                    class="user-photo"
-                    onerror="this.src='assets/default_user.png';"
-                    [src]="chat.user.avatarUrl"
-                  />
-                </ng-container>
-                <ng-template #elseTemplate>
-                  <img
-                    class="user-photo"
-                    src="../../../assets/default_user.png"
-                  />
-                </ng-template>
+                <img
+                  class="user-photo"
+                  [src]="chat.user.avatarUrl || getUserAvatar(chat.user)"
+                />
                 <div
                   [ngClass]="
                     chat.user.status === 'ONLINE'

@@ -9,6 +9,7 @@ import {
   WebsocketService,
 } from "./services/websocket/websocket.service";
 import { PttSnackbarComponent } from "./shared/ptt-snackbar/ptt-snackbar.component";
+import { getAvatar } from "./utils/avatar";
 import { roles } from "./utils/role";
 
 @Component({
@@ -80,6 +81,11 @@ export class AppComponent implements OnInit {
   public getRole(role: string) {
     return roles[role];
   }
+
+  public getUserAvatar(user: User) {
+    return getAvatar(user);
+  }
+
   @HostBinding("class")
   get theme() {
     return "theme-light";
