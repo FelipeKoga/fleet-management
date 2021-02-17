@@ -18,11 +18,10 @@ async function sendWebSocketMessage(username, body, action) {
 
 async function getChat(chatId, username, member) {
     const chat = await Database.chat.getChat(chatId);
-    const { newMessages } = await Database.chat.getUserChatMetadata(
+    const userChatMetadata = await Database.chat.getUserChatMetadata(
         chatId,
         username,
     );
-
     chat.user = member ? await getUser(member) : null;
     const lastMessage = await Database.message.getLastMessage(chatId);
 
@@ -47,7 +46,7 @@ async function getChat(chatId, username, member) {
 
     return {
         ...chat,
-        newMessages,
+        newMessages: userChatMetadata ? userChatMetadata.newMessages : 0,
         messages: lastMessage ? [lastMessage] : [],
     };
 }
@@ -125,7 +124,7 @@ async function createChat(username, withUsername) {
     await sendWebSocketMessage(
         withUsername,
         await getChat(chatId, withUsername, username),
-        'CREATED_CHAT',
+        'CHAT_CREATED',
     );
     return chat;
 }
@@ -138,14 +137,14 @@ async function createGroup(username, { members, groupName }) {
         createdAt: Date.now(),
     });
 
-    const chat = await Database.chat.getChat(groupId, username);
+    const chat = await getChat(groupId, username);
     await Promise.all(
         members.map(async member => {
             await Database.chat.addMember(groupId, member);
-            await sendWebSocketMessage(member, chat, 'CREATED_CHAT');
+            await sendWebSocketMessage(member, chat, 'CHAT_CREATED');
         }),
         await Database.chat.addMember(groupId, username),
-        await sendWebSocketMessage(username, chat, 'CREATED_CHAT'),
+        await sendWebSocketMessage(username, chat, 'CHAT_CREATED'),
     );
 
     const user = await getUser(username);
@@ -288,7 +287,7 @@ async function addMember(chatId, username) {
           )
         : await getChat(chatId, username);
 
-    await sendWebSocketMessage(username, chat, 'chat_updated');
+    await sendWebSocketMessage(username, chat, 'CHAT_UPDATED');
     const user = await getUser(username);
     const messageResponse = await Database.message.addMessage({
         chatId,
