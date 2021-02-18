@@ -45,8 +45,6 @@ class ChatsAdapter(
                     textViewLastMessageHour.text = getMessageHour(chat.messages.last())
                 }
 
-
-
                 if (chat.user !== null) {
                     if (chat.user?.status == "ONLINE") {
                         imageViewUserStatusOnline.show()
@@ -55,7 +53,13 @@ class ChatsAdapter(
                         imageViewUserStatusOnline.hide()
                         imageViewUserStatusOffline.show()
                     }
-                    onLoadAvatar(chat.user?.avatarUrl, false, imageViewAvatar)
+                    onLoadAvatar(
+                        if (chat.user?.avatarUrl != "") chat.user?.avatarUrl else getUserAvatar(
+                            chat.user as UserEntity
+                        ),
+                        false,
+                        imageViewAvatar
+                    )
                     textViewName.text = chat.user?.name
                 } else {
                     onLoadAvatar(chat.avatar, true, imageViewAvatar)
@@ -91,15 +95,6 @@ class ChatsAdapter(
         chats.clear()
         chats.addAll(items)
         notifyDataSetChanged()
-    }
-
-    fun newMessage(message: MessageEntity) {
-//        val chat = chats.find { it.lastMessage?.chatId === message.chatId }
-//        if (chat !== null) {
-//            chat.lastMessage = message
-//            chats.addAll(chats.map { if (it.id === chat.id) chat else it })
-//        }
-//        notifyItemChanged(itemCount)
     }
 
 }

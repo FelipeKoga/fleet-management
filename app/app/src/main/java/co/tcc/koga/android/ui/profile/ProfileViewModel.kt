@@ -1,13 +1,18 @@
 package co.tcc.koga.android.ui.profile
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+
 import androidx.lifecycle.ViewModel
+import co.tcc.koga.android.data.repository.ClientRepository
+import co.tcc.koga.android.utils.getUserAvatar
+import javax.inject.Inject
 
-class ProfileViewModel : ViewModel() {
+class ProfileViewModel @Inject constructor(
+    private val clientRepository: ClientRepository,
+) : ViewModel() {
 
-    private val _text = MutableLiveData<String>().apply {
-        value = "This is notifications Fragment"
+    fun getAvatar(): String {
+        return if (clientRepository.user().avatarUrl != null) clientRepository.user().avatarUrl as String else getUserAvatar(
+            clientRepository.user()
+        )
     }
-    val text: LiveData<String> = _text
 }

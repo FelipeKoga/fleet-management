@@ -9,6 +9,7 @@ import co.tcc.koga.android.ui.chats.ChatsFragment
 import co.tcc.koga.android.ui.new_group.NewGroupFragment
 import co.tcc.koga.android.ui.auth.login.LoginFragment
 import co.tcc.koga.android.ui.new_chat.NewChatFragment
+import co.tcc.koga.android.ui.profile.ProfileFragment
 import co.tcc.koga.android.ui.settings.SettingsFragment
 import co.tcc.koga.android.ui.splash_screen.SplashScreenFragment
 import dagger.Subcomponent
@@ -32,6 +33,7 @@ interface MainComponent {
     fun inject(fragment: NewChatFragment)
     fun inject(fragment: NewGroupFragment)
     fun inject(fragment: SplashScreenFragment)
+    fun inject(fragment: ProfileFragment)
 
     fun inject(service: LocationService)
 

@@ -41,6 +41,13 @@ interface Service {
         @Path("chatId") chatId: String
     ): Observable<MutableList<MessageEntity?>>
 
+    @PUT("company/{companyId}/users/{username}")
+    fun updateUser(
+        @Path("companyId") companyId: String,
+        @Path("username") username: String,
+        @Body body: UserEntity
+    ): Observable<UserEntity>
+
 
     @POST("files")
     fun uploadUrl(

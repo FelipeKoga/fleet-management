@@ -27,4 +27,12 @@
     <string name="change">Trocar</string>
     <string name="sendCodeError">Não foi possível enviar o código</string>
 
+    <string-array name="location_array">
+        <item>30 segundos</item>
+        <item>45 segundos</item>
+        <item>1 minuto</item>
+        <item>2 minutos</item>
+        <item>Bloqueado</item>
+    </string-array>
+
 </resources>

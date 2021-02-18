@@ -10,10 +10,13 @@ import co.tcc.koga.android.data.network.socket.WebSocketPayload
 import co.tcc.koga.android.data.network.socket.WebSocketService
 import co.tcc.koga.android.data.repository.UserRepository
 import com.google.gson.Gson
+import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
 import javax.inject.Inject
 
 class UserRepositoryImpl @Inject constructor(
     private val userDao: UserDAO,
+    private val service: Service,
     private val webSocketService: WebSocketService
 ) : UserRepository {
 
@@ -35,5 +38,17 @@ class UserRepositoryImpl @Inject constructor(
                 )
             )
         )
+    }
+
+    override suspend fun updateUser(userEntity: UserEntity): Observable<UserEntity> {
+//        println("INSERT IN DAO")
+        userDao.insert(userEntity)
+//        println("passei")
+
+        println(userEntity)
+        return service.updateUser(userEntity.companyId, userEntity.username, userEntity).doOnNext {
+                Client.getInstance().currentUser = it
+            }
+
     }
 }

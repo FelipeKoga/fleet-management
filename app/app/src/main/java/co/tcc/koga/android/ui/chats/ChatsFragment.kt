@@ -8,7 +8,6 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.asLiveData
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import co.tcc.koga.android.ui.MainActivity
@@ -18,8 +17,7 @@ import co.tcc.koga.android.databinding.ChatsFragmentBinding
 import co.tcc.koga.android.utils.hide
 import co.tcc.koga.android.utils.loadImage
 import co.tcc.koga.android.utils.show
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.collect
+
 import javax.inject.Inject
 
 class ChatsFragment : Fragment(R.layout.chats_fragment) {
@@ -129,6 +127,7 @@ class ChatsFragment : Fragment(R.layout.chats_fragment) {
 
     private fun setupRecyclerView() {
         adapter = ChatsAdapter({ avatar, isGroup, imageView ->
+            println("AVATAR: $avatar")
             loadImage(
                 requireContext(),
                 imageView,
@@ -145,7 +144,7 @@ class ChatsFragment : Fragment(R.layout.chats_fragment) {
 
 
     private fun loadUserAvatar() {
-        val avatar = viewModel.getUserAvatar()
+        val avatar = viewModel.getAvatar()
         loadImage(
             requireContext(),
             binding.imageViewUserPhoto,

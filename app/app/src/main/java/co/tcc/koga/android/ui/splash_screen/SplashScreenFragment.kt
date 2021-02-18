@@ -46,25 +46,25 @@ class SplashScreenFragment : Fragment(R.layout.splash_screen_fragment) {
                     if (ActivityCompat.checkSelfPermission(
                             requireContext(),
                             Manifest.permission.ACCESS_FINE_LOCATION
-                        ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                        ) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
                             requireContext(),
                             Manifest.permission.ACCESS_COARSE_LOCATION
-                        ) != PackageManager.PERMISSION_GRANTED
+                        ) == PackageManager.PERMISSION_GRANTED
                     ) {
-                        return@observe
-                    }
-                    val mLocationRequest = LocationRequest.create()
-                    mLocationRequest.interval = 5000
-                    mLocationRequest.fastestInterval = 5000
-                    mLocationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
-                    val mLocationCallback: LocationCallback = object : LocationCallback() {
-                        override fun onLocationResult(locationResult: LocationResult) {
+                        val mLocationRequest = LocationRequest.create()
+                        mLocationRequest.interval = 5000
+                        mLocationRequest.fastestInterval = 5000
+                        mLocationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+                        val mLocationCallback: LocationCallback = object : LocationCallback() {
+                            override fun onLocationResult(locationResult: LocationResult) {
+                            }
                         }
+
+                        LocationServices.getFusedLocationProviderClient(requireContext())
+                            .requestLocationUpdates(mLocationRequest, mLocationCallback, null);
+                        actionOnService(Actions.START)
                     }
 
-                    LocationServices.getFusedLocationProviderClient(requireContext())
-                        .requestLocationUpdates(mLocationRequest, mLocationCallback, null);
-                    actionOnService(Actions.START)
                     findNavController().navigate(
                         R.id.action_splashScreenFragment_to_chatsFragment,
                     )

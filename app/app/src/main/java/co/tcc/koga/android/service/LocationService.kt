@@ -116,15 +116,12 @@ class LocationService : Service() {
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         fusedLocationClient?.lastLocation?.addOnSuccessListener { location ->
-            println(location)
+            println("Location: $location")
             if (location !== null) {
-                repository.sendLocation(location.latitude, location.longitude)
+//                repository.sendLocation(location.latitude, location.longitude)
             }
 
         }
-        compositeDisposable.add(clientRepository.observeAuthStatus().subscribe { status ->
-            fusedLocationClient = null
-        })
     }
 
     private fun createNotification(): Notification {

@@ -11,4 +11,6 @@ interface UserRepository {
     fun sendLocation(
         latitude: Double, longitude: Double
     )
+
+    suspend fun updateUser(userEntity: UserEntity): Observable<UserEntity>
 }

@@ -1,29 +1,39 @@
 package co.tcc.koga.android.ui.profile
 
+import android.content.Context
 import android.os.Bundle
 import android.view.*
-import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import co.tcc.koga.android.R
 import co.tcc.koga.android.databinding.ProfileFragmentBinding
-import co.tcc.koga.android.utils.loadImage
-import com.bumptech.glide.Glide
-import com.bumptech.glide.request.RequestOptions
+import co.tcc.koga.android.ui.MainActivity
 
-class ProfileFragment : Fragment() {
+import co.tcc.koga.android.utils.loadImage
+
+import javax.inject.Inject
+
+class ProfileFragment : Fragment(R.layout.profile_fragment) {
+    @Inject
+    lateinit var viewModelFactory: ViewModelProvider.Factory
     private lateinit var binding: ProfileFragmentBinding
+    private val viewModel by viewModels<ProfileViewModel> { viewModelFactory }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        (requireActivity() as MainActivity).mainComponent.inject(this)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = ProfileFragmentBinding.inflate(inflater)
         binding.apply {
-//            loadProfilePhoto()
+            loadUserAvatar()
             toolbarProfile.inflateMenu(R.menu.settings_menu)
             toolbarProfile.setOnMenuItemClickListener { item ->
                 onOptionsItemSelected(item)
@@ -53,13 +63,13 @@ class ProfileFragment : Fragment() {
         }
     }
 
-//    private fun loadUserAvatar() {
-//        val avatar = viewModel.getUserAvatar()
-//        loadImage(
-//            requireContext(),
-//            binding.imageViewUserPhoto,
-//            avatar,
-//            R.drawable.ic_round_person,
-//        )
-//    }
+    private fun loadUserAvatar() {
+        val avatar = viewModel.getAvatar()
+        loadImage(
+            requireContext(),
+            binding.imageViewProfilePhoto,
+            avatar,
+            R.drawable.ic_round_person,
+        )
+    }
 }

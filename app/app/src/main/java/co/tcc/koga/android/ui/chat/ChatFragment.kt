@@ -18,11 +18,10 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import co.tcc.koga.android.R
+import co.tcc.koga.android.data.database.entity.UserEntity
 import co.tcc.koga.android.databinding.ChatFragmentBinding
 import co.tcc.koga.android.ui.MainActivity
-import co.tcc.koga.android.utils.hide
-import co.tcc.koga.android.utils.hideKeyboard
-import co.tcc.koga.android.utils.show
+import co.tcc.koga.android.utils.*
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import kotlinx.android.synthetic.main.chat_fragment.*
@@ -132,9 +131,6 @@ class ChatFragment : Fragment(R.layout.chat_fragment) {
     }
 
 
-
-
-
     private fun setupRecyclerView() {
         val linearLayoutManager = LinearLayoutManager(context)
         linearLayoutManager.stackFromEnd = true
@@ -168,17 +164,20 @@ class ChatFragment : Fragment(R.layout.chat_fragment) {
     }
 
     private fun loadChatAvatar(imageView: ImageView) {
-        Glide
-            .with(requireContext())
-            .load(
-                if (args.chat.user !== null) args.chat.user?.avatarUrl
-                else args.chat.avatar
+        val url: String? = if (args.chat.user !== null) {
+            if (args.chat.user?.avatarUrl != "") args.chat.user?.avatarUrl as String else getUserAvatar(
+                args.chat.user as UserEntity
             )
-            .centerInside()
-            .apply(RequestOptions.circleCropTransform())
-            .error(if (args.chat.user !== null) R.drawable.ic_round_person else R.drawable.ic_round_group)
-            .placeholder(if (args.chat.user !== null) R.drawable.ic_round_person else R.drawable.ic_round_group)
-            .into(imageView)
+        } else {
+            args.chat.avatarUrl
+        }
+
+        loadImage(
+            requireContext(),
+            imageView,
+            url,
+            if (args.chat.user !== null) R.drawable.ic_round_person else R.drawable.ic_round_group
+        )
     }
 
     private fun hideKeyboard() {

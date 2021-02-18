@@ -10,6 +10,7 @@ import co.tcc.koga.android.ui.chats.ChatsViewModel
 import co.tcc.koga.android.ui.auth.login.LoginViewModel
 import co.tcc.koga.android.ui.new_chat.NewChatViewModel
 import co.tcc.koga.android.ui.new_group.NewGroupViewModel
+import co.tcc.koga.android.ui.profile.ProfileViewModel
 import co.tcc.koga.android.ui.settings.SettingsViewModel
 import co.tcc.koga.android.ui.splash_screen.SplashScreenViewModel
 import dagger.Binds
@@ -69,5 +70,9 @@ interface MainModule {
     @ViewModelKey(MainViewModel::class)
     fun bindMainViewModel(viewModel: MainViewModel): ViewModel
 
+    @Binds
+    @IntoMap
+    @ViewModelKey(ProfileViewModel::class)
+    fun bindProfileViewModel(viewModel: ProfileViewModel): ViewModel
 
 }

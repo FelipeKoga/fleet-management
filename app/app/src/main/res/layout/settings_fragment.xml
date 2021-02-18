@@ -1,148 +1,155 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
     <RelativeLayout
         android:layout_width="match_parent"
-        android:background="?backgroundColor"
         android:layout_height="match_parent"
+        android:background="?backgroundColor"
         tools:context=".ui.settings.SettingsFragment">
+
+
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbarSettings"
             android:layout_width="match_parent"
             android:layout_height="?actionBarSize"
             android:background="?colorPrimary"
-            app:titleTextColor="?backgroundColor"
-            app:title="Opções"
             android:elevation="2dp"
-            app:navigationIcon="@drawable/ic_arrow_back_white" />
+            app:navigationIcon="@drawable/ic_arrow_back_white"
+            app:title="Opções"
+            app:titleTextColor="?backgroundColor" />
 
-                <ScrollView
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/toolbarSettings"
+            android:layout_marginTop="0dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginTop="12dp"
+                android:orientation="vertical"
+                android:padding="8dp">
+
+                <LinearLayout
+                    android:id="@+id/linear_layout_location_update"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_below="@+id/toolbarSettings"
-                    android:layout_marginTop="0dp">
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="12dp">
 
-                    <LinearLayout
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Envio de localização"
+                        android:textColor="?textColor"
+                        android:textSize="18sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="A cada 30s" />
+                </LinearLayout>
+
+                <View
+                    android:id="@+id/divider2"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="?android:attr/listDivider" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+
+                    android:padding="12dp">
+
+
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/switch1"
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
-                        android:layout_marginTop="12dp"
-                        android:orientation="vertical"
-                        android:padding="8dp">
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:padding="12dp"
-                            android:orientation="horizontal">
+                        android:checked="true"
+                        android:hint="?colorPrimary"
+                        android:text="Receber áudio instântaneo"
+                        android:textSize="18sp"
+                        android:thumbTint="?colorPrimary" />
 
-                            <TextView
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:text="Envio de localização"
-                                android:layout_weight="1"
-                                android:textColor="?textColor"
-                                android:textSize="18sp" />
+                </LinearLayout>
 
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="A cada 30s" />
-                        </LinearLayout>
+                <View
+                    android:id="@+id/divider4"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="?android:attr/listDivider" />
 
-                        <View
-                            android:id="@+id/divider2"
-                            android:layout_width="match_parent"
-                            android:layout_height="1dp"
-                            android:background="?android:attr/listDivider" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="12dp">
 
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:padding="12dp"
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/switch2"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:checked="true"
+                        android:text="Notificações"
+                        android:textSize="18sp"
+                        android:thumbTint="?colorPrimary"
+                        android:trackTint="?colorPrimary" />
 
-                            android:orientation="vertical">
+                </LinearLayout>
 
+                <View
+                    android:id="@+id/divider1"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="?android:attr/listDivider" />
 
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
 
-                            <com.google.android.material.switchmaterial.SwitchMaterial
-                                android:id="@+id/switch1"
-                                android:layout_width="match_parent"
-                                android:layout_height="0dp"
-                                android:textSize="18sp"
-                                android:hint="?colorPrimary"
-                                android:checked="true"
-                                android:thumbTint="?colorPrimary"
-                                android:text="Receber áudio instântaneo" />
+                    android:padding="12dp">
 
-                        </LinearLayout>
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Alterar senha"
+                        android:textColor="?textColor"
+                        android:textSize="18sp" />
+                </LinearLayout>
 
-                        <View
-                            android:id="@+id/divider4"
-                            android:layout_width="match_parent"
-                            android:layout_height="1dp"
-                            android:background="?android:attr/listDivider" />
+                <View
+                    android:id="@+id/divider5"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="?android:attr/listDivider" />
 
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:padding="12dp"
-                            android:orientation="vertical">
+                <LinearLayout
+                    android:id="@+id/linearLayoutLogout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:orientation="vertical"
+                    android:padding="12dp">
 
-                            <com.google.android.material.switchmaterial.SwitchMaterial
-                                android:id="@+id/switch2"
-                                android:layout_width="match_parent"
-                                android:layout_height="0dp"
-                                android:textSize="18sp"
-                                android:checked="true"
-                                android:thumbTint="?colorPrimary"
-                                android:trackTint="?colorPrimary"
-                                android:text="Notificações" />
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Sair"
+                        android:textColor="?colorError"
+                        android:textSize="18sp" />
 
-                        </LinearLayout>
-                        <View
-                            android:id="@+id/divider1"
-                            android:layout_width="match_parent"
-                            android:layout_height="1dp"
-                            android:background="?android:attr/listDivider" />
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:padding="12dp"
+                </LinearLayout>
+            </LinearLayout>
+        </ScrollView>
 
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:text="Alterar senha"
-                                android:textColor="?textColor"
-                                android:textSize="18sp" />
-                        </LinearLayout>
-
-                        <View
-                            android:id="@+id/divider5"
-                            android:layout_width="match_parent"
-                            android:layout_height="1dp"
-                            android:background="?android:attr/listDivider" />
-
-                        <LinearLayout
-                            android:id="@+id/linearLayoutLogout"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp"
-                            android:padding="12dp"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:text="Sair"
-                                android:textColor="?colorError"
-                                android:textSize="18sp" />
-
-                        </LinearLayout>
-                    </LinearLayout>
-                </ScrollView>
 
     </RelativeLayout>
 </layout>

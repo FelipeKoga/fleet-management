@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:padding="12dp"
+        android:layout_height="match_parent">
+
+        <RadioGroup
+            android:id="@+id/radio_group_location"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:checkedButton="@+id/radio_button_1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <RadioButton
+                android:id="@+id/radio_button_30_seconds"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="a cada 30 segundos" />
+
+            <RadioButton
+                android:id="@+id/radio_button_45_seconds"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="a cada 45 segundos" />
+
+            <RadioButton
+                android:id="@+id/radio_button_1_minute"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="a cada 1 minuto" />
+
+            <RadioButton
+                android:id="@+id/radio_button_5_minutes"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="a cada 5 minutos" />
+
+            <RadioButton
+                android:id="@+id/radio_button_disabled_location"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="Desabilitar" />
+        </RadioGroup>
+
+        <Button
+            android:id="@+id/button_save_location_update"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentEnd="true"
+            android:padding="16dp"
+            android:layout_marginTop="12dp"
+            android:text="Salvar"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/radio_group_location" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

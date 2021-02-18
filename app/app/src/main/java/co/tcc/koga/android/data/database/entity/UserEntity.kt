@@ -13,9 +13,11 @@ data class UserEntity(
     val companyId: String,
     val email: String = "",
     val fullName: String? = "",
-    val phone: String?  = "",
-    val avatar: String?  = "",
+    val phone: String? = "",
+    val avatar: String? = "",
     val avatarUrl: String? = "",
-    val name: String?  = "",
-    val status: String = "OFFLINE"
+    val name: String? = "",
+    val status: String = "OFFLINE",
+    val locationUpdate: Int? = null,
+    val color: String = ""
 ) : Parcelable

@@ -12,6 +12,7 @@ data class ChatEntity(
     var newMessages: Long = 0L,
     var groupName: String? = "",
     var avatar: String? = "",
+    var avatarUrl: String? = "",
     var createdAt: String? = "",
     var admin: String? = "",
     var user: UserEntity? = null,
