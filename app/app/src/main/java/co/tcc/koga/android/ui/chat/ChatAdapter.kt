@@ -85,7 +85,6 @@ class ChatAdapter(
     }
 
     private fun playAudio(url: String, context: Context) {
-        println(url)
         mediaPlayer = MediaPlayer()
         mediaPlayer.setDataSource(url)
         mediaPlayer.prepareAsync()

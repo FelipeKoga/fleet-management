@@ -32,6 +32,8 @@ class ProfileFragment : Fragment(R.layout.profile_fragment) {
         savedInstanceState: Bundle?
     ): View {
         binding = ProfileFragmentBinding.inflate(inflater)
+        binding.viewModel = viewModel
+        binding.lifecycleOwner = viewLifecycleOwner
         binding.apply {
             loadUserAvatar()
             toolbarProfile.inflateMenu(R.menu.settings_menu)
@@ -44,6 +46,29 @@ class ProfileFragment : Fragment(R.layout.profile_fragment) {
             }
         }
         return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        binding.textViewRole.text = viewModel.getRole()
+        binding.textViewCompany.text = "Koga Transportes"
+        viewModel.formErrors.observe(viewLifecycleOwner, { errors ->
+            clearError()
+            for ((key, value) in errors) {
+                if (key === "name") {
+                    binding.textInputName.error = value
+                }
+
+                if (key === "phone") {
+                    binding.textInputPhone.error = value
+                }
+
+                if (key === "email") {
+                    binding.textInputEmail.error = value
+                }
+            }
+        })
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -71,5 +96,15 @@ class ProfileFragment : Fragment(R.layout.profile_fragment) {
             avatar,
             R.drawable.ic_round_person,
         )
+    }
+
+    private fun clearError() {
+        binding.apply {
+            textInputName.error = null
+            textInputEmail.error = null
+            textInputPhone.error = null
+
+        }
+
     }
 }

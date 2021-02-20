@@ -217,7 +217,6 @@ class ChatFragment : Fragment(R.layout.chat_fragment) {
                 )
                 requestPermissions(permissions, 0)
             } else {
-                println("START")
                 viewModel.startRecording()
             }
             true

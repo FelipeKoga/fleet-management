@@ -13,7 +13,7 @@ import co.tcc.koga.android.data.database.entity.ChatEntity
 import co.tcc.koga.android.data.database.entity.MessageEntity
 import co.tcc.koga.android.data.database.entity.UserEntity
 
-@Database(entities = [ChatEntity::class, UserEntity::class, MessageEntity::class], version = 36)
+@Database(entities = [ChatEntity::class, UserEntity::class, MessageEntity::class], version = 38)
 @TypeConverters(MembersConverter::class, UserConverter::class, MessagesConverter::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract val messageDAO: MessageDAO

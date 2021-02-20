@@ -214,7 +214,6 @@ class ChatViewModel @Inject constructor(
             true
         )
 
-        println("NEW MESSAGE $message")
         repository.sendMessage(message)
         val chat = _chat.value
         chat?.messages?.add(message)

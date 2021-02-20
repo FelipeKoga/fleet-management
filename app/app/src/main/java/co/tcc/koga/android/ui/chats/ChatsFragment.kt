@@ -123,7 +123,6 @@ class ChatsFragment : Fragment(R.layout.chats_fragment) {
 
     private fun setupRecyclerView() {
         adapter = ChatsAdapter({ avatar, isGroup, imageView ->
-            println("AVATAR: $avatar")
             loadImage(
                 requireContext(),
                 imageView,

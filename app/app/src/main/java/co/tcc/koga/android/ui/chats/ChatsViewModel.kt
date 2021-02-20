@@ -51,7 +51,6 @@ class ChatsViewModel @Inject constructor(
     }
 
     fun getAvatar(): String {
-        println("clientRepository.user(): ${clientRepository.user()}")
         return if (clientRepository.user().avatarUrl != null) clientRepository.user().avatarUrl as String else getUserAvatar(
             clientRepository.user()
         )
@@ -70,7 +69,6 @@ class ChatsViewModel @Inject constructor(
                 }
             }
 
-            println(update.action)
             if (update.action === ChatActions.CHAT_CREATED) {
 
                 insertChat(update.body)

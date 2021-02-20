@@ -3,6 +3,15 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <data>
+
+        <import type="android.view.View" />
+
+        <variable
+            name="viewModel"
+            type="co.tcc.koga.android.ui.profile.ProfileViewModel" />
+    </data>
+
     <RelativeLayout
         android:background="?backgroundColor"
         android:layout_width="match_parent"
@@ -19,266 +28,196 @@
             app:titleTextColor="?backgroundColor" />
 
 
-        <RelativeLayout
-            android:id="@+id/constraint_layout_profile_header"
+        <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="240dp"
+            android:layout_height="match_parent"
+            android:layout_above="@+id/button_save_profile"
             android:layout_below="@+id/toolbar_profile"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentEnd="true"
-            android:layout_marginStart="0dp"
             android:layout_marginTop="0dp"
-            android:layout_marginEnd="0dp"
-            android:gravity="center">
+            android:layout_marginBottom="0dp">
 
-            <ImageView
-                android:id="@+id/image_view_profile_photo"
-                android:layout_width="240dp"
-                android:layout_height="240dp"
-                android:background="@drawable/shape_big_rouded_image"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/imageView"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignEnd="@+id/image_view_profile_photo"
-                android:layout_alignParentBottom="true"
-                android:layout_marginEnd="0dp"
-                android:backgroundTint="?colorPrimary"
-                android:src="@drawable/ic_round_camera"
-                app:borderWidth="0dp"
-                app:tint="?backgroundColor" />
+                android:orientation="vertical">
 
-        </RelativeLayout>
+                <RelativeLayout
+                    android:id="@+id/constraint_layout_profile_header"
+                    android:layout_width="match_parent"
+                    android:layout_height="240dp"
+                    android:layout_marginStart="0dp"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginEnd="0dp"
+                    android:gravity="center">
 
-        <LinearLayout
-            android:id="@+id/linearLayoutProfileData"
+                    <ImageView
+                        android:id="@+id/image_view_profile_photo"
+                        android:layout_width="240dp"
+                        android:layout_height="240dp"
+                        android:background="@drawable/shape_big_rouded_image"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <com.google.android.material.floatingactionbutton.FloatingActionButton
+                        android:id="@+id/imageView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignEnd="@+id/image_view_profile_photo"
+                        android:layout_alignParentBottom="true"
+                        android:layout_marginEnd="0dp"
+                        android:backgroundTint="?colorPrimary"
+                        android:src="@drawable/ic_round_camera"
+                        app:borderWidth="0dp"
+                        app:tint="?backgroundColor" />
+
+                </RelativeLayout>
+
+                <LinearLayout
+                    android:id="@+id/linearLayoutProfileData"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="0dp"
+                    android:layout_marginBottom="0dp"
+                    android:orientation="vertical"
+                    android:padding="8dp">
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/text_input_name"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Nome completo"
+                        app:endIconMode="custom"
+                        app:errorEnabled="true">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/edit_text_username"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:enabled="@{!viewModel.isLoading()}"
+                            android:singleLine="true"
+                            android:text="@={viewModel.formFields.name}" />
+
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/text_input_custom_name"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Nome de exibição"
+                        app:endIconMode="custom"
+                        app:errorEnabled="true">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/edit_text_custom_name"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:enabled="@{!viewModel.isLoading()}"
+                            android:singleLine="true"
+                            android:text="@={viewModel.formFields.customName}" />
+
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/text_input_email"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Email"
+                        app:endIconMode="custom"
+                        app:errorEnabled="true">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/edit_text_email"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:enabled="@{!viewModel.isLoading()}"
+                            android:singleLine="true"
+                            android:text="@={viewModel.formFields.email}" />
+
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/text_input_phone"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Telefone"
+                        app:endIconMode="custom"
+                        app:errorEnabled="true">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/edit_text_phone"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:enabled="@{!viewModel.isLoading()}"
+                            android:singleLine="true"
+                            android:text="@={viewModel.formFields.phone}" />
+
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:text="Cargo"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:id="@+id/text_view_role"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="?textColor"
+                        android:textSize="16sp" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginTop="12dp"
+                        android:background="?android:attr/listDivider" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:text="Empresa"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:id="@+id/text_view_company"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="?textColor"
+                        android:textSize="16sp" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginTop="12dp"
+                        android:background="?android:attr/listDivider" />
+
+                </LinearLayout>
+            </LinearLayout>
+
+
+        </ScrollView>
+
+
+
+        <Button
+            android:id="@+id/button_save_profile"
             android:layout_width="match_parent"
+            android:text="Salvar"
+            android:enabled="@{!viewModel.isLoading()}"
+            android:padding="16dp"
+            android:onClick="@{() -> viewModel.save()}"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="12dp"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/constraint_layout_profile_header"
             android:layout_alignParentBottom="true"
-            android:layout_marginTop="0dp"
-            android:layout_marginBottom="0dp"
-            android:orientation="vertical"
-            android:padding="8dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:text="Nome completo"
-                        android:textSize="16sp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Felipe Kosloski Koga"
-                        android:textColor="?textColor"
-                        android:textSize="16sp" />
-                </LinearLayout>
-
-                <Button
-                    style="@style/Widget.App.Button.OutlinedButton.IconOnly"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginEnd="0dp"
-                    app:icon="@drawable/ic_baseline_edit"
-                    app:strokeColor="@android:color/transparent" />
-            </LinearLayout>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginTop="12dp"
-                android:background="?android:attr/listDivider" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:text="Nome de exibição"
-                        android:textSize="16sp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Koga"
-                        android:textColor="?textColor"
-                        android:textSize="16sp" />
-                </LinearLayout>
-
-                <Button
-                    style="@style/Widget.App.Button.OutlinedButton.IconOnly"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginEnd="0dp"
-                    app:icon="@drawable/ic_baseline_edit"
-                    app:strokeColor="@android:color/transparent" />
-            </LinearLayout>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginTop="12dp"
-                android:background="?android:attr/listDivider" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:text="Email"
-                        android:textSize="16sp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="kosloski.fkoga@gmail.com"
-                        android:textColor="?textColor"
-                        android:textSize="16sp" />
-                </LinearLayout>
-
-                <Button
-                    style="@style/Widget.App.Button.OutlinedButton.IconOnly"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginEnd="0dp"
-                    app:icon="@drawable/ic_baseline_edit"
-                    app:strokeColor="@android:color/transparent" />
-            </LinearLayout>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginTop="12dp"
-                android:background="?android:attr/listDivider" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:text="Telefone"
-                        android:textSize="16sp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="42999991093"
-                        android:textColor="?textColor"
-                        android:textSize="16sp" />
-                </LinearLayout>
-
-                <Button
-                    style="@style/Widget.App.Button.OutlinedButton.IconOnly"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginEnd="0dp"
-                    app:icon="@drawable/ic_baseline_edit"
-                    app:strokeColor="@android:color/transparent" />
-            </LinearLayout>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginTop="12dp"
-                android:background="?android:attr/listDivider" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-
-                android:text="Empresa"
-                android:textSize="16sp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Koga Transportes"
-
-                android:textColor="?textColor"
-                android:textSize="16sp" />
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginTop="12dp"
-                android:background="?android:attr/listDivider" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:text="Cargo"
-
-                android:textSize="16sp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Funcionário"
-
-                android:textColor="?textColor"
-                android:textSize="16sp" />
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginTop="12dp"
-                android:background="?android:attr/listDivider" />
-
-        </LinearLayout>
-
+            android:layout_marginBottom="0dp" />
     </RelativeLayout>
 </layout>
