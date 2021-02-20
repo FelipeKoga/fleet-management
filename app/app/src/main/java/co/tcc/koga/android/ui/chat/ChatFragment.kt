@@ -172,7 +172,7 @@ class ChatFragment : Fragment(R.layout.chat_fragment) {
             args.chat.avatarUrl
         }
 
-        loadImage(
+        Avatar.loadImage(
             requireContext(),
             imageView,
             url,

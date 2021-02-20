@@ -14,8 +14,8 @@ import co.tcc.koga.android.ui.MainActivity
 import co.tcc.koga.android.R
 import co.tcc.koga.android.data.database.entity.ChatEntity
 import co.tcc.koga.android.databinding.ChatsFragmentBinding
+import co.tcc.koga.android.utils.Avatar
 import co.tcc.koga.android.utils.hide
-import co.tcc.koga.android.utils.loadImage
 import co.tcc.koga.android.utils.show
 
 import javax.inject.Inject
@@ -123,7 +123,7 @@ class ChatsFragment : Fragment(R.layout.chats_fragment) {
 
     private fun setupRecyclerView() {
         adapter = ChatsAdapter({ avatar, isGroup, imageView ->
-            loadImage(
+            Avatar.loadImage(
                 requireContext(),
                 imageView,
                 avatar,
@@ -140,7 +140,7 @@ class ChatsFragment : Fragment(R.layout.chats_fragment) {
 
     private fun loadUserAvatar() {
         val avatar = viewModel.getAvatar()
-        loadImage(
+        Avatar.loadImage(
             requireContext(),
             binding.imageViewUserPhoto,
             avatar,

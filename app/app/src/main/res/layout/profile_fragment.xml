@@ -60,8 +60,8 @@
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
 
-                    <com.google.android.material.floatingactionbutton.FloatingActionButton
-                        android:id="@+id/imageView"
+                    <ProgressBar
+                        android:id="@+id/progress_bar_photo"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignEnd="@+id/image_view_profile_photo"
@@ -70,6 +70,19 @@
                         android:backgroundTint="?colorPrimary"
                         android:src="@drawable/ic_round_camera"
                         app:borderWidth="0dp"
+                        android:visibility="@{viewModel.isLoadingUpload() ? View.VISIBLE : View.GONE}"
+                        app:tint="?backgroundColor" />
+                    <com.google.android.material.floatingactionbutton.FloatingActionButton
+                        android:id="@+id/button_change_photo"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignEnd="@+id/image_view_profile_photo"
+                        android:layout_alignParentBottom="true"
+                        android:layout_marginEnd="0dp"
+                        android:backgroundTint="?colorPrimary"
+                        android:src="@drawable/ic_round_camera"
+                        app:borderWidth="0dp"
+                        android:visibility="@{viewModel.isLoadingUpload() ? View.GONE : View.VISIBLE}"
                         app:tint="?backgroundColor" />
 
                 </RelativeLayout>
@@ -211,7 +224,7 @@
             android:id="@+id/button_save_profile"
             android:layout_width="match_parent"
             android:text="Salvar"
-            android:enabled="@{!viewModel.isLoading()}"
+            android:enabled="@{!viewModel.isLoading() &amp;&amp; !viewModel.isLoadingUpload()}"
             android:padding="16dp"
             android:onClick="@{() -> viewModel.save()}"
             android:layout_marginStart="12dp"

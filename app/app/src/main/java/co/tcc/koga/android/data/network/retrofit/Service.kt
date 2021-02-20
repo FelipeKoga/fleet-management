@@ -8,7 +8,9 @@ import co.tcc.koga.android.data.network.payload.UploadResponse
 import co.tcc.koga.android.data.network.payload.UploadUrlPayload
 import io.reactivex.Observable
 import okhttp3.RequestBody
+import okhttp3.ResponseBody
 import retrofit2.http.*
+import java.io.File
 
 interface Service {
     @GET("company/{companyId}/users")
@@ -54,11 +56,10 @@ interface Service {
         @Body uploadUrlPayload: UploadUrlPayload
     ): Observable<UploadResponse>
 
-    @PUT
-    fun uploadAudio(
+    @PUT("")
+    fun uploadFile(
         @Url url: String,
-        @Header("Content-type") contentType: String,
         @Body body: RequestBody
-    ): Observable<Unit>
+    ): Observable<ResponseBody>
 
 }

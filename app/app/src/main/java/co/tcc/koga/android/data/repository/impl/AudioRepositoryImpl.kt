@@ -28,44 +28,9 @@ class AudioRepositoryImpl @Inject constructor(val service: Service, private val 
     }
 
     override fun uploadAudio(file: File, putURL: String): Observable<Boolean> {
-        println(file)
-        println(putURL)
-        val body: RequestBody =
-            RequestBody.create(MediaType.parse("audio/wav"), file)
-        val credentialsProvider = CognitoCachingCredentialsProvider(
-            context.applicationContext,
-            "us-east-1:37c2e9f4-7fac-4274-bd9e-747803cbbedb",
-            Regions.US_EAST_1
-        )
-        val s3Client = AmazonS3Client(credentialsProvider)
-        val transferUtility = TransferUtility.builder().s3Client(s3Client).context(context).build()
-
-
-        println(putURL)
-        val transferObserver = transferUtility.upload(
-            "tcc-projects-assets",
-            putURL,
-            file,
-            CannedAccessControlList.PublicRead
-        )
-
         var obs = Observable.just(false)
 
-        transferObserver.setTransferListener(object : TransferListener {
-            override fun onStateChanged(id: Int, state: TransferState?) {
-                println(state)
-                obs = Observable.just(true)
-            }
 
-            override fun onProgressChanged(id: Int, bytesCurrent: Long, bytesTotal: Long) {
-                println(bytesCurrent)
-            }
-
-            override fun onError(id: Int, ex: Exception?) {
-                println(ex)
-            }
-
-        })
         return obs
 
     }

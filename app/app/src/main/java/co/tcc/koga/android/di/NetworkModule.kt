@@ -77,7 +77,6 @@ class NetworkModule {
             .connectTimeout(5, TimeUnit.SECONDS)
             .addNetworkInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
 
-            .addInterceptor(loggingInterceptor)
             .addInterceptor { chain ->
                 val authorizer =
                     "Bearer ${Client.getInstance().getToken()}"
@@ -87,8 +86,7 @@ class NetworkModule {
                         "Authorization",
                         authorizer
                     )
-                println("INTERCEPTOR ${chain.request().url()}")
                 chain.proceed(builder.build())
-            } .retryOnConnectionFailure(true).build()
+            }.retryOnConnectionFailure(true).build()
     }
 }
