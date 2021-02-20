@@ -2,7 +2,7 @@ const { getByPK, fetchBySK, insert, update } = require('./query');
 const { removeConnectionIds } = require('./connection');
 
 const ProjectionExpression =
-    'username, #name, email, avatar, #status, #role, phone, companyId, customName, locationUpdate, color';
+    'username, #name, email, avatar, #status, #role, phone, companyId, customName, locationUpdate, color, locationEnabled, notificationEnabled, pushToTalkEnabled';
 
 async function getUser(username, companyId) {
     return getByPK({
@@ -38,7 +38,7 @@ async function createUser(data, companyId) {
     const { password, ...user } = data;
     await insert({
         ...user,
-        locationUpdate: 10,
+        locationUpdate: 30,
         partitionKey: `USER#${data.email}`,
         username: data.email,
         sortKey: `CONFIG#${companyId}`,
@@ -55,7 +55,9 @@ async function updateUser(
         role,
         status,
         avatar,
-        locationUpdate = 10,
+        locationEnabled,
+        pushToTalkEnabled,
+        notificationEnabled,
     },
     username,
     companyId,
@@ -66,12 +68,15 @@ async function updateUser(
             sortKey: `CONFIG#${companyId}`,
         },
         UpdateExpression:
-            'set customName = :customName, phone = :phone, email = :email, #role = :role, #status = :status, #name = :name, #avatar = :avatar, locationUpdate = :locationUpdate',
+            'set customName = :customName, phone = :phone, email = :email, #role = :role, #status = :status, #name = :name, #avatar = :avatar, #locationEnabled = :locationEnabled, #pushToTalkEnabled = :pushToTalkEnabled, #notificationEnabled = :notificationEnabled',
         ExpressionAttributeNames: {
             '#status': 'status',
             '#role': 'role',
             '#name': 'name',
             '#avatar': 'avatar',
+            '#locationEnabled': 'locationEnabled',
+            '#pushToTalkEnabled': 'pushToTalkEnabled',
+            '#notificationEnabled': 'notificationEnabled',
         },
         ExpressionAttributeValues: {
             ':customName': customName,
@@ -81,7 +86,9 @@ async function updateUser(
             ':status': status,
             ':name': name,
             ':avatar': avatar,
-            ':locationUpdate': locationUpdate,
+            ':locationEnabled': locationEnabled,
+            ':pushToTalkEnabled': pushToTalkEnabled,
+            ':notificationEnabled': notificationEnabled,
         },
     });
 }

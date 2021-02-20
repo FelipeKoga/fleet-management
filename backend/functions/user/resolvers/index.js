@@ -60,7 +60,14 @@ async function create(data, companyId) {
         luminosity: 'light',
     });
 
-    const newUser = { ...data, password, color: color.replace('#', '') };
+    const newUser = {
+        ...data,
+        password,
+        color: color.replace('#', ''),
+        locationEnabled: true,
+        pushToTalkEnabled: true,
+        notificationEnabled: true,
+    };
     await Cognito.create(newUser, companyId);
     await Database.user.createUser(newUser, companyId);
     const user = await get(newUser.email, companyId);
