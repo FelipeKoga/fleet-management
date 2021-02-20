@@ -181,9 +181,10 @@
               >
                 <div class="user-photo-wrapper">
                   <img
-                    onerror="this.src='assets/default_user.png';"
                     class="user-photo"
-                    [src]="selectedUser.avatarUrl"
+                    [src]="
+                      selectedUser.avatarUrl || getUserAvatar(selectedUser)
+                    "
                   />
                 </div>
               </div>
@@ -213,17 +214,10 @@
                 <span style="font-weight: 500"
                   >Intervalo de atualizações:
                 </span>
-                <ng-container
-                  *ngIf="selectedUser.status === 'OFFLINE'; else elseTemplate"
+                <span *ngIf="selectedUser.locationUpdate"
+                  >{{ selectedUser.locationUpdate }} segundos</span
                 >
-                  Desabilitado
-                </ng-container>
-                <ng-template #elseTemplate>
-                  <span *ngIf="selectedUser.locationUpdate">{{
-                    selectedUser.locationUpdate
-                  }}</span>
-                  <span *ngIf="!selectedUser.locationUpdate">Desabilitado</span>
-                </ng-template>
+                <span *ngIf="!selectedUser.locationUpdate">Desabilitado</span>
               </p>
               <div
                 style="display: flex; align-items: center"
