@@ -45,6 +45,7 @@ class ClientRepositoryImpl @Inject constructor(
     private fun getUserDatabase(): Observable<UserEntity> {
         return userDao.getCurrentUser(Client.getInstance().username())
             .subscribeOn(Schedulers.computation()).doOnNext { user ->
+                Client.getInstance().subCurrentUser.onNext(user)
                 Client.getInstance().currentUser = user
             }
     }
@@ -56,12 +57,16 @@ class ClientRepositoryImpl @Inject constructor(
             .subscribeOn(Schedulers.newThread())
             .doOnNext { user ->
                 userDao.setCurrentUser(user)
+                Client.getInstance().subCurrentUser.onNext(user)
                 Client.getInstance().currentUser = user
             }.subscribeOn(Schedulers.computation())
 
     }
 
-    override fun getCurrentUser(): Observable<UserEntity> {
+    override fun getCurrentUser(networkOnly: Boolean): Observable<UserEntity> {
+        if (networkOnly) {
+            return getUserNetwork()
+        }
         return Observable.merge(getUserDatabase(), getUserNetwork())
             .observeOn(AndroidSchedulers.mainThread())
     }

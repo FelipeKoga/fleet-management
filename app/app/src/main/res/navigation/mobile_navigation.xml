@@ -9,7 +9,7 @@
         android:id="@+id/profileFragment"
         android:name="co.tcc.koga.android.ui.profile.ProfileFragment"
         android:label="@string/title_notifications"
-        tools:layout="@layout/profile_fragment" >
+        tools:layout="@layout/profile_fragment">
         <action
 
             android:id="@+id/action_profileFragment_to_settingsFragment"
@@ -19,7 +19,7 @@
         android:id="@+id/chatFragment"
         android:name="co.tcc.koga.android.ui.chat.ChatFragment"
         android:label="chat_fragment"
-        tools:layout="@layout/chat_fragment" >
+        tools:layout="@layout/chat_fragment">
         <argument
             android:name="chat"
             app:argType="co.tcc.koga.android.data.database.entity.ChatEntity" />
@@ -27,7 +27,7 @@
     <fragment
         android:id="@+id/searchContactsFragment"
         android:name="co.tcc.koga.android.ui.contacts.SearchContactsFragment"
-        android:label="SearchContactsFragment" >
+        android:label="SearchContactsFragment">
         <action
             android:id="@+id/action_searchContactsFragment_to_chatFragment"
             app:destination="@id/chatFragment" />
@@ -35,17 +35,18 @@
     <fragment
         android:id="@+id/settingsFragment"
         android:name="co.tcc.koga.android.ui.settings.SettingsFragment"
-        android:label="SettingsFragment" >
+        android:label="SettingsFragment">
         <action
-            app:popUpToInclusive="true"
-            app:popUpTo="@id/settingsFragment"
+
             android:id="@+id/action_settingsFragment_to_loginFragment"
-            app:destination="@id/loginFragment" />
+            app:destination="@id/loginFragment"
+            app:popUpTo="@id/loginFragment"
+            app:popUpToInclusive="true" />
     </fragment>
     <fragment
         android:id="@+id/newGroupFragment"
         android:name="co.tcc.koga.android.ui.new_group.NewGroupFragment"
-        android:label="NewGroupFragment" >
+        android:label="NewGroupFragment">
         <action
             android:id="@+id/action_newGroupFragment_to_chatFragment"
             app:destination="@id/chatFragment" />
@@ -71,25 +72,24 @@
         android:id="@+id/splashScreenFragment"
         android:name="co.tcc.koga.android.ui.splash_screen.SplashScreenFragment"
         android:label="splash_screen_fragment"
-        tools:layout="@layout/splash_screen_fragment" >
+        tools:layout="@layout/splash_screen_fragment">
         <action
             android:id="@+id/action_splashScreenFragment_to_chatsFragment"
-            app:popUpToInclusive="true"
+            app:destination="@id/chatsFragment"
             app:popUpTo="@id/splashScreenFragment"
-            app:destination="@id/chatsFragment" />
+            app:popUpToInclusive="true" />
         <action
-            app:popUpToInclusive="true"
-            app:popUpTo="@id/splashScreenFragment"
             android:id="@+id/action_splashScreenFragment_to_loginFragment"
-            app:destination="@id/loginFragment" />
+            app:destination="@id/loginFragment"
+            app:popUpTo="@id/splashScreenFragment"
+            app:popUpToInclusive="true" />
     </fragment>
     <fragment
         android:id="@+id/loginFragment"
         android:name="co.tcc.koga.android.ui.auth.login.LoginFragment"
-        android:label="LoginFragment" >
+        android:label="LoginFragment">
         <action
-            app:popUpToInclusive="true"
-            app:popUpTo="@id/loginFragment"
+
             android:id="@+id/action_loginFragment_to_chatsFragment"
             app:destination="@id/chatsFragment" />
         <action
@@ -99,7 +99,7 @@
     <fragment
         android:id="@+id/newChatFragment"
         android:name="co.tcc.koga.android.ui.new_chat.NewChatFragment"
-        android:label="NewChatFragment" >
+        android:label="NewChatFragment">
         <action
             android:id="@+id/action_newChatFragment_to_chatFragment"
             app:destination="@id/chatFragment" />
@@ -110,7 +110,7 @@
     <fragment
         android:id="@+id/forgotPasswordFragment"
         android:name="co.tcc.koga.android.ui.auth.forgot_password.ForgotPasswordFragment"
-        android:label="ForgotPasswordFragment" >
+        android:label="ForgotPasswordFragment">
         <action
             android:id="@+id/action_forgotPasswordFragment_to_confirmForgotPasswordFragment"
             app:destination="@id/confirmForgotPasswordFragment" />
@@ -118,14 +118,14 @@
     <fragment
         android:id="@+id/confirmForgotPasswordFragment"
         android:name="co.tcc.koga.android.ui.auth.confirm_forgot_password.ConfirmForgotPasswordFragment"
-        android:label="ConfirmForgotPasswordFragment" >
+        android:label="ConfirmForgotPasswordFragment">
         <argument
             android:name="username"
             app:argType="string" />
         <action
-            app:popUpToInclusive="true"
-            app:popUpTo="@id/confirmForgotPasswordFragment"
             android:id="@+id/action_confirmForgotPasswordFragment_to_chatsFragment"
-            app:destination="@id/chatsFragment" />
+            app:destination="@id/chatsFragment"
+            app:popUpTo="@id/confirmForgotPasswordFragment"
+            app:popUpToInclusive="true" />
     </fragment>
 </navigation>

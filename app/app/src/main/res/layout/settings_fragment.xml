@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
+<layout >
 
     <RelativeLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="?backgroundColor"
@@ -27,49 +28,54 @@
             android:layout_marginTop="0dp">
 
             <LinearLayout
+
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_marginTop="12dp"
                 android:orientation="vertical"
-                android:padding="8dp">
+                android:padding="12dp">
 
                 <LinearLayout
                     android:id="@+id/linear_layout_location_update"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:padding="12dp">
-
-                    <TextView
-                        android:layout_width="0dp"
+                    android:orientation="vertical"
+                    android:layout_height="wrap_content">
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Envio de localização"
-                        android:textColor="?textColor"
-                        android:textSize="18sp" />
+                        android:orientation="horizontal"
+                        android:padding="12dp">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="A cada 30s" />
+                        <com.google.android.material.switchmaterial.SwitchMaterial
+                            android:id="@+id/switch_location"
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:checked="true"
+                            android:hint="?colorPrimary"
+                            android:text="Enviar localização"
+                            android:textSize="18sp"
+                            android:thumbTint="?colorPrimary" />
+
+
+                    </LinearLayout>
+
+                    <View
+                        android:id="@+id/divider2"
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="?android:attr/listDivider" />
                 </LinearLayout>
 
-                <View
-                    android:id="@+id/divider2"
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="?android:attr/listDivider" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-
                     android:padding="12dp">
 
 
                     <com.google.android.material.switchmaterial.SwitchMaterial
-                        android:id="@+id/switch1"
+                        android:id="@+id/switch_push_to_talk"
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
                         android:checked="true"
@@ -93,7 +99,7 @@
                     android:padding="12dp">
 
                     <com.google.android.material.switchmaterial.SwitchMaterial
-                        android:id="@+id/switch2"
+                        android:id="@+id/switch_notification"
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
                         android:checked="true"
@@ -111,10 +117,10 @@
                     android:background="?android:attr/listDivider" />
 
                 <LinearLayout
+                    android:id="@+id/linear_Layout_change_password"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-
                     android:padding="12dp">
 
                     <TextView
@@ -132,7 +138,7 @@
                     android:background="?android:attr/listDivider" />
 
                 <LinearLayout
-                    android:id="@+id/linearLayoutLogout"
+                    android:id="@+id/linear_layout_logout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"

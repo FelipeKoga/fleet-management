@@ -5,19 +5,15 @@ import android.app.*
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Color
 import android.os.Build
 import android.os.IBinder
 import android.os.PowerManager
-import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import co.tcc.koga.android.App
 import co.tcc.koga.android.R
 import co.tcc.koga.android.data.repository.ClientRepository
 import co.tcc.koga.android.data.repository.UserRepository
 import co.tcc.koga.android.ui.MainActivity
-import co.tcc.koga.android.utils.AUTH_STATUS
-import co.tcc.koga.android.utils.log
 import com.google.android.gms.location.*
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.coroutines.Dispatchers
@@ -36,7 +32,6 @@ class LocationService : Service() {
     private var wakeLock: PowerManager.WakeLock? = null
     private var isServiceStarted = false
     private var fusedLocationClient: FusedLocationProviderClient? = null
-    private val compositeDisposable: CompositeDisposable = CompositeDisposable()
 
     @Inject
     lateinit var repository: UserRepository
@@ -50,10 +45,10 @@ class LocationService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (intent != null) {
-            when (intent.action) {
-                Actions.START.name -> startService()
-                Actions.STOP.name -> stopService()
-                else -> log("This should never happen. No action in the received intent")
+            if (intent.action === Actions.START.name) {
+                startService()
+            } else {
+                stopService()
             }
         }
         return START_STICKY
@@ -72,8 +67,8 @@ class LocationService : Service() {
         setServiceState(this, ServiceState.STARTED)
         wakeLock =
             (getSystemService(Context.POWER_SERVICE) as PowerManager).run {
-                newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "EndlessService::lock").apply {
-                    acquire()
+                newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Location::lock").apply {
+                    acquire(10 * 60 * 1000L)
                 }
             }
         GlobalScope.launch {
@@ -87,7 +82,6 @@ class LocationService : Service() {
     }
 
     private fun stopService() {
-        Toast.makeText(this, "Service stopping", Toast.LENGTH_SHORT).show()
         try {
             wakeLock?.let {
                 if (it.isHeld) {
@@ -118,29 +112,23 @@ class LocationService : Service() {
         fusedLocationClient?.lastLocation?.addOnSuccessListener { location ->
             println("Location: $location")
             if (location !== null) {
-//                repository.sendLocation(location.latitude, location.longitude)
+                repository.sendLocation(location.latitude, location.longitude)
             }
-
         }
+
+
     }
 
     private fun createNotification(): Notification {
-        val notificationChannelId = "ENDLESS SERVICE CHANNEL"
+        val notificationChannelId = "LOCATION CHANNEL"
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val notificationManager =
                 getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager;
             val channel = NotificationChannel(
                 notificationChannelId,
-                "Endless Service notifications channel",
+                "Location channel",
                 NotificationManager.IMPORTANCE_HIGH
-            ).let {
-                it.description = "Endless Service channel"
-                it.enableLights(true)
-                it.lightColor = Color.RED
-                it.enableVibration(true)
-                it.vibrationPattern = longArrayOf(100, 200, 300, 400, 500, 400, 300, 200, 400)
-                it
-            }
+            )
             notificationManager.createNotificationChannel(channel)
         }
 
@@ -156,12 +144,11 @@ class LocationService : Service() {
             ) else Notification.Builder(this)
 
         return builder
-            .setContentTitle("Monitoramento ativo")
-            .setContentText("A localização está sendo enviada. Clique aqui para gerenciar.")
+            .setContentTitle("Envio da localização ativo")
+            .setContentText(" Clique aqui para gerenciar.")
             .setContentIntent(pendingIntent)
-            .setSmallIcon(R.mipmap.ic_default_user)
+            .setSmallIcon(R.drawable.ic_location)
             .setOngoing(true)
-            .setPriority(Notification.PRIORITY_HIGH) // for under android 26 compatibility
             .build()
     }
 }

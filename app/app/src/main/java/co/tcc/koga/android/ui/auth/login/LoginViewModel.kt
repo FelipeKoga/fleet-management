@@ -75,17 +75,18 @@ class LoginViewModel @Inject constructor(
         })
     }
 
+    fun isLocationEnabled() = repository.user().locationEnabled
 
     private fun getUser() = viewModelScope.launch {
         try {
-            compositeDisposable.add(repository.getCurrentUser().subscribe {
-                println("USER: $it")
-                _authenticationStatus.value = AUTH_STATUS.LOGGED_IN
+            compositeDisposable.add(repository.getCurrentUser(true).subscribe {
+                runOnUiThread {
+                    _authenticationStatus.value = AUTH_STATUS.LOGGED_IN
+                }
             })
         } catch (e: Exception) {
             println(e)
         }
-
     }
 
 }

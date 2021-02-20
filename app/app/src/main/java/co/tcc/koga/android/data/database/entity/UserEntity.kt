@@ -19,5 +19,9 @@ data class UserEntity(
     val name: String? = "",
     val status: String = "OFFLINE",
     val locationUpdate: Int? = null,
-    val color: String = ""
+    val color: String = "",
+    val role: String = "EMPLOYEE",
+    var notificationEnabled: Boolean = false,
+    var pushToTalkEnabled: Boolean = false,
+    var locationEnabled: Boolean = false
 ) : Parcelable

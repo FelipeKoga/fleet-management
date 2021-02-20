@@ -51,10 +51,6 @@ class ChatsFragment : Fragment(R.layout.chats_fragment) {
         setupRecyclerView()
         loadUserAvatar()
 
-    }
-
-    override fun onStart() {
-        super.onStart()
         viewModel.getAllChats()
         viewModel.observeChatUpdates()
         viewModel.observeUserUpdates()
@@ -77,8 +73,8 @@ class ChatsFragment : Fragment(R.layout.chats_fragment) {
                 showErrorToast()
             }
         }
-    }
 
+    }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.contacts_menu, menu)

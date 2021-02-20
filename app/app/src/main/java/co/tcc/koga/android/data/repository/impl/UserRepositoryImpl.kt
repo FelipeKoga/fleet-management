@@ -41,11 +41,7 @@ class UserRepositoryImpl @Inject constructor(
     }
 
     override suspend fun updateUser(userEntity: UserEntity): Observable<UserEntity> {
-//        println("INSERT IN DAO")
         userDao.insert(userEntity)
-//        println("passei")
-
-        println(userEntity)
         return service.updateUser(userEntity.companyId, userEntity.username, userEntity).doOnNext {
                 Client.getInstance().currentUser = it
             }

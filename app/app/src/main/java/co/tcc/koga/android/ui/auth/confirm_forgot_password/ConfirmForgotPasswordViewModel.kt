@@ -4,10 +4,16 @@ import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import co.tcc.koga.android.R
 import co.tcc.koga.android.data.repository.ClientRepository
 import co.tcc.koga.android.ui.auth.ForgotPasswordStatus
 import co.tcc.koga.android.ui.auth.RecoverPasswordForm
+import co.tcc.koga.android.utils.AUTH_STATUS
+import com.amazonaws.mobile.auth.core.internal.util.ThreadUtils
+import io.reactivex.disposables.CompositeDisposable
+import kotlinx.coroutines.launch
+import java.lang.Exception
 import javax.inject.Inject
 
 class ConfirmForgotPasswordViewModel @Inject constructor(
@@ -19,6 +25,7 @@ class ConfirmForgotPasswordViewModel @Inject constructor(
     val isLoading: LiveData<Boolean> get() = _isLoading
     val formFields = RecoverPasswordForm()
     val formErrors = MutableLiveData<MutableMap<String, String>>(mutableMapOf())
+    private val compositeDisposable: CompositeDisposable = CompositeDisposable()
 
     val passwordRecoverStatus = MutableLiveData(ForgotPasswordStatus.PENDING)
     var username: String = ""
@@ -56,8 +63,8 @@ class ConfirmForgotPasswordViewModel @Inject constructor(
         _isLoading.postValue(true)
         repository.confirmChangePassword(formFields.newPassword, formFields.code, fun() {
             repository.signIn(username, formFields.newPassword, fun() {
-                passwordRecoverStatus.postValue(ForgotPasswordStatus.SUCCESS)
-                _isLoading.postValue(false)
+                getUser()
+
             }, fun() {
                 passwordRecoverStatus.postValue(ForgotPasswordStatus.INTERNAL_ERROR)
                 _isLoading.postValue(false)
@@ -72,5 +79,18 @@ class ConfirmForgotPasswordViewModel @Inject constructor(
             passwordRecoverStatus.postValue(ForgotPasswordStatus.INTERNAL_ERROR)
             _isLoading.postValue(false)
         })
+    }
+
+    private fun getUser() = viewModelScope.launch {
+        try {
+            compositeDisposable.add(repository.getCurrentUser(true).subscribe {
+                ThreadUtils.runOnUiThread {
+                    _isLoading.postValue(false)
+                    passwordRecoverStatus.value = ForgotPasswordStatus.SUCCESS
+                }
+            })
+        } catch (e: Exception) {
+            println(e)
+        }
     }
 }

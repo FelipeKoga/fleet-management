@@ -15,6 +15,7 @@ import androidx.navigation.fragment.navArgs
 import co.tcc.koga.android.ui.MainActivity
 import co.tcc.koga.android.R
 import co.tcc.koga.android.ui.auth.ForgotPasswordStatus
+import com.amazonaws.mobile.auth.core.internal.util.ThreadUtils
 import javax.inject.Inject
 
 
@@ -66,11 +67,14 @@ class ConfirmForgotPasswordFragment : Fragment(R.layout.confirm_forgot_password_
         })
 
         viewModel.passwordRecoverStatus.observe(viewLifecycleOwner, { status ->
-            if (status === ForgotPasswordStatus.SUCCESS) {
-                findNavController().navigate(R.id.action_confirmForgotPasswordFragment_to_chatsFragment)
-            } else if (status === ForgotPasswordStatus.INTERNAL_ERROR) {
-                binding.textViewConfirmForgotPasswordError.visibility = View.VISIBLE
+            ThreadUtils.runOnUiThread {
+                if (status === ForgotPasswordStatus.SUCCESS) {
+                    findNavController().navigate(R.id.action_confirmForgotPasswordFragment_to_chatsFragment)
+                } else if (status === ForgotPasswordStatus.INTERNAL_ERROR) {
+                    binding.textViewConfirmForgotPasswordError.visibility = View.VISIBLE
+                }
             }
+
         })
     }
 

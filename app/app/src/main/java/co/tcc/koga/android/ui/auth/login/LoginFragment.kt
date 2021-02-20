@@ -1,6 +1,8 @@
 package co.tcc.koga.android.ui.auth.login
 
 import android.content.Context
+import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import androidx.fragment.app.Fragment
@@ -13,7 +15,11 @@ import androidx.navigation.fragment.findNavController
 import co.tcc.koga.android.ui.MainActivity
 import co.tcc.koga.android.R
 import co.tcc.koga.android.databinding.LoginFragmentBinding
+import co.tcc.koga.android.service.Actions
+import co.tcc.koga.android.service.LocationService
+import co.tcc.koga.android.service.requestLocationPermission
 import co.tcc.koga.android.utils.AUTH_STATUS
+import com.amazonaws.mobile.auth.core.internal.util.ThreadUtils
 import javax.inject.Inject
 
 
@@ -70,29 +76,34 @@ class LoginFragment : Fragment(R.layout.login_fragment) {
 
         viewModel.authenticationStatus.observe(viewLifecycleOwner, { authenticationStatus ->
             binding.textViewLoginError.visibility = View.GONE
-            when (authenticationStatus) {
-                AUTH_STATUS.LOGGED_IN -> {
-                    findNavController().navigate(
-                        LoginFragmentDirections.actionLoginFragmentToChatsFragment(),
-                    )
-                }
+            ThreadUtils.runOnUiThread {
+                when (authenticationStatus) {
+                    AUTH_STATUS.LOGGED_IN -> {
+                        if (viewModel.isLocationEnabled() && requestLocationPermission(requireContext())) {
+                            startService()
+                        }
 
-                AUTH_STATUS.UNAUTHORIZED -> {
-                   binding.textViewLoginError.apply {
-                       visibility = View.VISIBLE
-                       text = getString(R.string.unauthorized)
-                   }
-                }
-
-                AUTH_STATUS.ERROR -> {
-                    binding.textViewLoginError.apply {
-                        visibility = View.VISIBLE
-                        text = getString(R.string.loginError)
+                        findNavController().navigate(R.id.action_loginFragment_to_chatsFragment)
                     }
-                }
 
-                else -> getString(R.string.loginError)
+                    AUTH_STATUS.UNAUTHORIZED -> {
+                        binding.textViewLoginError.apply {
+                            visibility = View.VISIBLE
+                            text = getString(R.string.unauthorized)
+                        }
+                    }
+
+                    AUTH_STATUS.ERROR -> {
+                        binding.textViewLoginError.apply {
+                            visibility = View.VISIBLE
+                            text = getString(R.string.loginError)
+                        }
+                    }
+
+                    else -> getString(R.string.loginError)
+                }
             }
+
 
         })
     }
@@ -101,6 +112,16 @@ class LoginFragment : Fragment(R.layout.login_fragment) {
         findNavController().navigate(R.id.action_loginFragment_to_forgotPasswordFragment)
     }
 
+    private fun startService() {
+        Intent(requireContext(), LocationService::class.java).also {
+            it.action = Actions.START.name
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                activity?.startForegroundService(it)
+                return
+            }
+            activity?.startService(it)
+        }
+    }
 
     private fun clearError() {
         binding.apply {

@@ -10,5 +10,12 @@ enum class AUTH_STATUS {
     ERROR,
     UNAUTHORIZED,
     PENDING,
+    BLOCKED,
     LOGGED_OUT
+}
+
+enum class UserRole {
+    EMPLOYEE,
+    ADMIN,
+    OPERATOR
 }

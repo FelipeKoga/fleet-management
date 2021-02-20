@@ -16,10 +16,8 @@ import co.tcc.koga.android.App
 import co.tcc.koga.android.R
 import co.tcc.koga.android.service.Actions
 import co.tcc.koga.android.service.LocationService
-import co.tcc.koga.android.service.ServiceState
-import co.tcc.koga.android.service.getServiceState
+
 import co.tcc.koga.android.ui.di.MainComponent
-import co.tcc.koga.android.utils.log
 import javax.inject.Inject
 
 
@@ -62,7 +60,7 @@ class MainActivity : AppCompatActivity() {
                 AlertDialog.Builder(this)
                     .setTitle("Localização")
                     .setMessage("É necessário habilitar o envio da localização para prosseguir")
-                    .setPositiveButton(R.string.ok) { _, i -> //Prompt the user once explanation has been shown
+                    .setPositiveButton(R.string.ok) { _, _ -> //Prompt the user once explanation has been shown
                         ActivityCompat.requestPermissions(
                             this@MainActivity,
                             arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
@@ -116,7 +114,7 @@ class MainActivity : AppCompatActivity() {
                         == PackageManager.PERMISSION_GRANTED
                     ) {
 
-                        actionOnService(Actions.START)
+                        startLocationService()
                     }
                 }
                 return
@@ -124,16 +122,13 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun actionOnService(action: Actions) {
-        if (getServiceState(this) == ServiceState.STOPPED && action == Actions.STOP) return
+    private fun startLocationService() {
         Intent(this, LocationService::class.java).also {
-            it.action = action.name
+            it.action = Actions.START.name
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                log("Starting the service in >=26 Mode")
                 startForegroundService(it)
                 return
             }
-            log("Starting the service in < 26 Mode")
             startService(it)
         }
     }

@@ -16,7 +16,7 @@ interface ClientRepository {
         onError: () -> Unit
     )
 
-    fun getCurrentUser(): Observable<UserEntity>
+    fun getCurrentUser(networkOnly: Boolean): Observable<UserEntity>
 
     fun signIn(
         username: String,

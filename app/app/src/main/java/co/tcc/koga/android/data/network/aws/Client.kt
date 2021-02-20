@@ -17,6 +17,7 @@ import java.lang.Exception
 class Client {
 
     private val subject = PublishSubject.create<AUTH_STATUS>()
+    val subCurrentUser = PublishSubject.create<UserEntity>()
 
     lateinit var currentUser: UserEntity
     lateinit var tokenString: String
@@ -27,26 +28,27 @@ class Client {
     ) {
         AWSMobileClient.getInstance()
             .initialize(applicationContext,
-            object : Callback<UserStateDetails> {
-                override fun onResult(result: UserStateDetails?) {
-                    println(result?.userState)
-                    when (result?.userState) {
-                        UserState.SIGNED_OUT -> onInitSuccess(false)
-                        UserState.SIGNED_IN -> {
-                            tokenString = AWSMobileClient.getInstance().tokens.idToken.tokenString
-                            subject.onNext(AUTH_STATUS.LOGGED_IN)
-                            onInitSuccess(true)
+                object : Callback<UserStateDetails> {
+                    override fun onResult(result: UserStateDetails?) {
+                        println(result?.userState)
+                        when (result?.userState) {
+                            UserState.SIGNED_OUT -> onInitSuccess(false)
+                            UserState.SIGNED_IN -> {
+                                tokenString =
+                                    AWSMobileClient.getInstance().tokens.idToken.tokenString
+                                subject.onNext(AUTH_STATUS.LOGGED_IN)
+                                onInitSuccess(true)
+                            }
+                            else -> onInitError()
                         }
-                        else -> onInitError()
                     }
-                }
 
-                override fun onError(e: Exception?) {
-                    println(e)
-                    onInitError()
-                }
+                    override fun onError(e: Exception?) {
+                        println(e)
+                        onInitError()
+                    }
 
-            })
+                })
     }
 
     fun signIn(
@@ -83,6 +85,9 @@ class Client {
         return subject.hide()
     }
 
+    fun observeCurrentUser(): Observable<UserEntity> {
+        return subCurrentUser.hide()
+    }
 
     fun username(): String {
         return AWSMobileClient.getInstance().username
