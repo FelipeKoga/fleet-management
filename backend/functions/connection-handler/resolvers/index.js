@@ -41,7 +41,7 @@ async function deleteConnection(connectionId) {
         if (!hasConnectionActive.length) {
             user.status = 'OFFLINE';
             await Database.updateStatus(username, user.companyId, 'OFFLINE');
-
+            user.location = await Database.getLastLocation(username);
             await postMessage(user, 'USER_DISCONNECTED');
         }
     }
