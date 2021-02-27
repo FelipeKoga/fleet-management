@@ -46,7 +46,7 @@
     <button
       mat-mini-fab
       (click)="openBottomSheetMap()"
-      *ngIf="chat.user"
+      *ngIf="chat.user && chat.user.role == 'EMPLOYEE'"
       color="primary"
     >
       <mat-icon>map</mat-icon>

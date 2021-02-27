@@ -72,6 +72,13 @@ export class MessageComponent implements OnInit {
     return convertDate(timestamp, format);
   }
 
+  public convertAudioDuration(duration: number) {
+    var minutes = Math.floor(duration / 60000);
+    var seconds = ((duration % 60000) / 1000).toFixed(0);
+
+    return `0${minutes}`.slice(-2) + ":" + `0${seconds}`.slice(-2);
+  }
+
   public getName(username: string) {
     return this.chat.members.find((user) => user.username === username).name;
   }

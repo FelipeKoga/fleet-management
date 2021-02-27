@@ -14,6 +14,7 @@ export class Message {
   status: MessageStatus;
   hasAudio?: boolean;
   recipient?: string;
+  duration?: number;
 
   constructor({
     chatId,
@@ -23,6 +24,7 @@ export class Message {
     hasAudio,
     messageId = nanoid(),
     recipient = "",
+    duration = null,
   }: Omit<Message, "createdAt">) {
     this.chatId = chatId;
     this.message = message;
@@ -32,5 +34,6 @@ export class Message {
     this.hasAudio = hasAudio;
     this.messageId = messageId;
     this.recipient = recipient;
+    this.duration = duration;
   }
 }

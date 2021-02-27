@@ -24,9 +24,7 @@ import { convertDate } from "src/app/utils/date";
 import { MapBottomSheetComponent } from "../../map/map-bottom-sheet/map-bottom-sheet.component";
 declare var MediaRecorder: any;
 
-const mime = ["audio/wav", "audio/mpeg", "audio/webm", "audio/ogg"].filter(
-  MediaRecorder.isTypeSupported
-)[0];
+const mime = ["audio/wav"].filter(MediaRecorder.isTypeSupported)[0];
 @Component({
   selector: "app-chat",
 
@@ -156,18 +154,25 @@ export class ChatComponent implements OnInit {
         audio: true,
       })
       .then((stream) => {
-        this.mediaRecorder = new MediaRecorder(stream, {
-          mimeType: mime,
-        });
+        this.mediaRecorder = new MediaRecorder(stream);
         this.mediaRecorder.start();
         const audioChunks = [];
+        let duration: number;
+        this.mediaRecorder.addEventListener("start", () => {
+          duration = Date.now();
+        });
         this.mediaRecorder.addEventListener("dataavailable", (event) => {
           audioChunks.push(event.data);
         });
 
         this.mediaRecorder.addEventListener("stop", async () => {
           const audioBlob = new Blob(audioChunks);
-          this.uploadAudio(audioBlob);
+          duration = Date.now() - duration;
+
+          this.uploadAudio(
+            audioBlob.slice(0, audioBlob.size, "audio/wav"),
+            duration
+          );
         });
       });
   }
@@ -177,7 +182,7 @@ export class ChatComponent implements OnInit {
     this.mediaRecorder.stop();
   }
 
-  private uploadAudio(blob: Blob) {
+  private uploadAudio(blob: Blob, duration: number) {
     const key = `company/${this.user.companyId}/chat/${this.chat.id}/${
       this.user.username
     }/audios/${nanoid()}.wav`;
@@ -188,6 +193,7 @@ export class ChatComponent implements OnInit {
       status: MessageStatus.PROCESSING_AUDIO,
       message: "",
       hasAudio: true,
+      duration,
     });
     this.chatsService.addMessage(message);
     this.http
@@ -230,9 +236,10 @@ export class ChatComponent implements OnInit {
   public startRecordingPTT() {
     console.log("opa!@");
     this.recordingPTT = true;
+    const currentTime = Date.now();
     this.pttService.start(this.chat.id, this.user, (blob) => {
       console.log(blob);
-      this.uploadAudio(blob);
+      this.uploadAudio(blob, Date.now() - currentTime);
     });
   }
 

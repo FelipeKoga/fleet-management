@@ -57,7 +57,7 @@
               {{ state?.readableCurrentTime }}
             </ng-container>
             <ng-template #elseTemplate>
-              {{ state?.readableDuration }}
+              {{ convertAudioDuration(message.duration) }}
             </ng-template>
           </div>
           <div class="message-timestamp">
@@ -142,11 +142,11 @@
                   {{ state?.readableCurrentTime }}
                 </ng-container>
                 <ng-template #elseTemplate>
-                  {{ state?.readableDuration }}
+                  {{ convertAudioDuration(message.duration) }}
                 </ng-template>
               </div>
               <div class="message-timestamp">
-                {{ convertTimestamp(message.createdAt, "HH:mm:ss") }}
+                {{ convertTimestamp(message.createdAt, "HH:mm") }}
               </div>
             </div>
           </div>
