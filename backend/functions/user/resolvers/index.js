@@ -57,7 +57,7 @@ async function list(companyId) {
 async function create(data, companyId) {
     const password = generateRandomString(8);
     const color = randomColor({
-        luminosity: 'light',
+        luminosity: 'dark',
     });
 
     const newUser = {
