@@ -167,6 +167,7 @@ async function addMessage({
     message,
     messageId,
     hasAudio,
+    duration,
     recipient,
 }) {
     let id = chatId;
@@ -183,6 +184,7 @@ async function addMessage({
         createdAt: Date.now(),
         status: 'SENT',
         hasAudio,
+        duration,
     });
 
     if (hasAudio) {
@@ -229,10 +231,11 @@ async function addMessage({
 
 async function getMessages(chatId) {
     const messages = await Database.message.fetchMessages(chatId);
+    console.log(messages);
     return messages.map(message => {
         const item = { ...message };
-        if (item.hasAudio) {
-            item.message = S3.getObject(message.message);
+        if (item.hasAudio && item.message) {
+            item.message = S3.getObject(item.message);
         }
 
         return item;

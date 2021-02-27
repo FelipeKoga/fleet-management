@@ -45,6 +45,7 @@ async function addMessage({
     createdAt,
     status,
     hasAudio,
+    duration,
 }) {
     const payload = {
         partitionKey: `CHAT#${chatId}`,
@@ -54,6 +55,7 @@ async function addMessage({
         createdAt,
         status,
         hasAudio,
+        duration,
     };
     await insert(payload);
 
