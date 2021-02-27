@@ -1,10 +1,10 @@
 package co.tcc.koga.android.ui.chat
 
 import android.content.Context
-import android.media.AudioAttributes
 import android.media.AudioFormat
-import android.media.MediaPlayer
+import android.media.MediaMetadataRetriever
 import android.media.MediaRecorder
+import android.net.Uri
 import androidx.lifecycle.*
 import co.tcc.koga.android.data.database.entity.ChatEntity
 import co.tcc.koga.android.data.database.entity.MessageEntity
@@ -32,8 +32,6 @@ class ChatViewModel @Inject constructor(
     private val audioRepository: AudioRepository,
     private val context: Context,
 ) : ViewModel() {
-    private val compositeDisposable: CompositeDisposable = CompositeDisposable()
-
     private val _chat = MutableLiveData<ChatEntity>()
     private val _messages = MutableLiveData<MutableList<MessageEntity?>>()
     private val _isLoading = MutableLiveData(false)
@@ -47,58 +45,57 @@ class ChatViewModel @Inject constructor(
     val username = clientRepository.user().username
     private var file: File? = null
     private var recorder: MediaRecorder? = null
+    private var startRecorder: Long = System.currentTimeMillis()
+    private var stopRecorder: Long = System.currentTimeMillis()
+    lateinit var chatId: String
 
-    override fun onCleared() {
-        super.onCleared()
-        compositeDisposable.dispose()
-    }
 
-    fun getMessages(chatId: String) {
+    fun getMessages() = viewModelScope.launch {
         _isLoading.postValue(true)
-        compositeDisposable.add(repository.getMessages(chatId).subscribe({ response ->
+        repository.getMessages(chatId).subscribe({ response ->
             _isLoading.postValue(false)
             _error.postValue(false)
             _messages.postValue(response.data)
         }, {
             _isLoading.postValue(false)
             _error.postValue(true)
-        }))
-    }
-
-
-    private fun insertMessage(message: MessageEntity, chatId: String) = viewModelScope.launch {
-        chatsRepository.openChat(chatId)
-        repository.insertMessage(message)
-
-    }
-
-    fun observeMessageUpdates(chatId: String) = viewModelScope.launch {
-        compositeDisposable.add(repository.observeMessageUpdated().subscribe { update ->
-
-            if (update.action === MessageActions.NEW_MESSAGE) {
-                insertMessage(update.body, chatId)
-            }
-
-            if (update.action === MessageActions.MESSAGE_SENT) {
-                insertMessage(update.body, chatId)
-            }
         })
     }
 
-    fun observeChatUpdates(chat: ChatEntity) {
+
+    private fun insertMessage(message: MessageEntity) = viewModelScope.launch {
+        withContext(Dispatchers.IO) {
+            chatsRepository.openChat(chatId)
+            repository.insertMessage(message)
+        }
+    }
+
+    fun observeMessageUpdates() = viewModelScope.launch {
+        repository.observeMessageUpdated().subscribe { update ->
+            println("OBSEEEEERVE: ${update.body}")
+            if (update.action === MessageActions.NEW_MESSAGE) {
+                insertMessage(update.body)
+            }
+
+            if (update.action === MessageActions.MESSAGE_SENT) {
+                insertMessage(update.body)
+            }
+        }
+    }
+
+    fun observeChatUpdates(chat: ChatEntity) = viewModelScope.launch {
         _chat.postValue(chat)
-        compositeDisposable.add(chatsRepository.observeChatUpdates().subscribe { update ->
+        chatsRepository.observeChatUpdates().subscribe { update ->
             if (update.action == ChatActions.CHAT_UPDATED) {
                 if (chat.id == update.body.id) {
                     _chat.postValue(update.body)
                 }
             }
-
-        })
+        }
     }
 
-    fun observeUserUpdates() {
-        compositeDisposable.add(chatsRepository.observeUserUpdates().subscribe { update ->
+    fun observeUserUpdates() = viewModelScope.launch {
+        chatsRepository.observeUserUpdates().subscribe { update ->
             if (
                 (update.action === UserActions.USER_CONNECTED || update.action === UserActions.USER_DISCONNECTED)
                 && chat.value !== null
@@ -108,71 +105,63 @@ class ChatViewModel @Inject constructor(
                 newChat?.user = update.body
                 _chat.postValue(newChat)
             }
-        })
+        }
     }
 
-    fun openChat(chatId: String) = viewModelScope.launch {
+    fun openChat() = viewModelScope.launch {
         chatsRepository.openChat(chatId)
     }
 
     fun sendMessage(text: String, chatId: String) = viewModelScope.launch {
         try {
-            val message = MessageEntity(chatId, text, clientRepository.user().username, "", false)
+            val message = MessageEntity(chatId, text, clientRepository.user().username)
+            insertMessage(message)
             repository.sendMessage(message)
-            val chat = _chat.value
-            chat?.messages?.add(message)
-            _chat.postValue(chat)
-            chatsRepository.updateChat(chat as ChatEntity)
+//            chatsRepository.updateChat(chat.value as ChatEntity)
         } catch (e: Exception) {
-            println("ERROR SEND MESSAGES")
-            println(e)
         }
     }
 
-    fun playAudio(url: String) {
-        val mediaPlayer = MediaPlayer().apply {
-            setAudioAttributes(
-                AudioAttributes.Builder()
-                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                    .setUsage(AudioAttributes.USAGE_MEDIA)
-                    .build()
-            )
-            setDataSource(url)
-            prepare()
-            start()
-        }
-    }
 
     fun startRecording() {
         recorder = MediaRecorder().apply {
-            setAudioSource(MediaRecorder.AudioSource.MIC);
-            setOutputFormat(AudioFormat.ENCODING_PCM_16BIT);
-            setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
-            setAudioChannels(1);
-            setAudioEncodingBitRate(128000);
-            setAudioSamplingRate(48000);
-
+            setAudioSource(MediaRecorder.AudioSource.MIC)
+            setOutputFormat(AudioFormat.ENCODING_PCM_16BIT)
+            setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
             try {
-                val fileName = "audio${UUID.randomUUID().toString()}"
+                val fileName = "audio${UUID.randomUUID()}"
                 file = File.createTempFile(fileName, ".wav", context.cacheDir)
                 setOutputFile(file?.absolutePath)
                 prepare()
                 start()
+                startRecorder = System.currentTimeMillis()
             } catch (e: IOException) {
-                println(e)
-                println("prepare() failed")
             }
         }
+
     }
 
     fun stopRecording() {
         recorder?.stop()
         recorder?.release()
 
+        val audioMessageEntity = getNewAudioMessage()
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                repository.insertMessage(audioMessageEntity)
+            }
+        }
+
+        if (file == null) return
         val size = file!!.length().toInt()
-        println(size)
         val bytes = ByteArray(size)
         try {
+            val uri = Uri.parse(file?.absolutePath)
+            val mmr = MediaMetadataRetriever()
+            mmr.setDataSource(context,uri)
+            val durationStr = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
+            val millSecond = Integer.parseInt(durationStr)
+            audioMessageEntity.duration = millSecond.toLong()
             val buf = BufferedInputStream(FileInputStream(file))
             buf.read(bytes, 0, bytes.size)
             buf.close()
@@ -184,41 +173,43 @@ class ChatViewModel @Inject constructor(
 
 
 
-        uploadAudio(bytes)
-
+        uploadAudio(audioMessageEntity)
     }
 
-    private fun uploadAudio(byteArray: ByteArray) = viewModelScope.launch {
+    private fun uploadAudio(audioMessageEntity: MessageEntity) = viewModelScope.launch {
         val key = "company/${clientRepository.user().companyId}/chat/${chat.value?.id}/${
             clientRepository.user().username
         }/audios/${Math.random()}.wav"
 
         withContext(Dispatchers.IO) {
-            compositeDisposable.add(audioRepository.uploadUrl(key).subscribe { uploadResponse ->
-                println(uploadResponse)
-                audioRepository.uploadAudio(file as File, key).subscribe {
-                    sendAudio(uploadResponse.getURL)
+            repository.insertMessage(audioMessageEntity)
+            audioRepository.uploadUrl(key).subscribe { uploadResponse ->
+                audioRepository.uploadAudio(file as File, uploadResponse.putURL).subscribe {
+                    sendAudio(key, audioMessageEntity)
                 }
-            })
+            }
+        }
+    }
+
+    private fun sendAudio(getURL: String, audioMessageEntity: MessageEntity) =
+        viewModelScope.launch {
+            val chat = _chat.value
+            audioMessageEntity.message = getURL
+            println("sendAudio: ${audioMessageEntity}")
+
+            repository.sendMessage(audioMessageEntity)
+            if (chat != null) {
+                chatsRepository.updateChat(chat)
+            }
         }
 
-    }
-
-
-    private fun sendAudio(getURL: String) = viewModelScope.launch {
-        val message = MessageEntity(
-            chat.value?.id as String,
-            getURL,
+    private fun getNewAudioMessage(): MessageEntity {
+        return MessageEntity(
+            chatId,
+            "",
             clientRepository.user().username,
             "",
-            true
+            hasAudio = true
         )
-
-        repository.sendMessage(message)
-        val chat = _chat.value
-        chat?.messages?.add(message)
-        _chat.postValue(chat)
-        chatsRepository.updateChat(chat as ChatEntity)
     }
-
 }

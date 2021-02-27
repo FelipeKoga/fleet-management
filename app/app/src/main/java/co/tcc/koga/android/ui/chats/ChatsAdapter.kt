@@ -29,7 +29,7 @@ class ChatsAdapter(
 
         private fun getMessageHour(message: MessageEntity?): String {
             if (message === null) return ""
-            return getHour(message.createdAt)
+            return FormatterUtil.getHour(message.createdAt)
         }
 
         fun bind(

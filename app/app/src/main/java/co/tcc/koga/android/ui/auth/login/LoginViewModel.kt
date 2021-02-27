@@ -5,6 +5,7 @@ import androidx.lifecycle.*
 import co.tcc.koga.android.R
 import co.tcc.koga.android.data.repository.ClientRepository
 import co.tcc.koga.android.utils.AUTH_STATUS
+import co.tcc.koga.android.utils.UserRole
 import com.amazonaws.mobile.auth.core.internal.util.ThreadUtils.runOnUiThread
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.coroutines.launch
@@ -75,7 +76,7 @@ class LoginViewModel @Inject constructor(
         })
     }
 
-    fun isLocationEnabled() = repository.user().locationEnabled
+    fun isLocationEnabled() = repository.user().locationEnabled && repository.user().role == UserRole.EMPLOYEE.name
 
     private fun getUser() = viewModelScope.launch {
         try {

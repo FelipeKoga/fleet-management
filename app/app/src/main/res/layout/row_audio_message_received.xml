@@ -1,84 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<!--<layout xmlns:android="http://schemas.android.com/apk/res/android"-->
-<!--    xmlns:app="http://schemas.android.com/apk/res-auto"-->
-<!--    xmlns:tools="http://schemas.android.com/tools">-->
-
-<!--    <LinearLayout-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:padding="8dp"-->
-<!--        android:gravity="end"-->
-<!--        android:orientation="horizontal"-->
-<!--        tools:ignore="PrivateResource">-->
-
-<!--        <LinearLayout-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_marginEnd="4dp"-->
-<!--            android:background="@drawable/shape_message_received"-->
-<!--            android:orientation="horizontal"-->
-<!--            android:padding="8dp">-->
-
-<!--            <LinearLayout-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:orientation="vertical">-->
-
-<!--                <LinearLayout-->
-<!--                    android:layout_width="match_parent"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:layout_gravity="center"-->
-<!--                    android:gravity="center"-->
-<!--                    android:orientation="horizontal">-->
-
-<!--                    <ImageButton-->
-<!--                        android:id="@+id/ib_play"-->
-<!--                        android:layout_width="40dp"-->
-<!--                        android:scaleType="centerCrop"-->
-<!--                        android:layout_height="40dp"-->
-<!--                        android:layout_gravity="center"-->
-<!--                        android:background="@android:color/transparent"-->
-<!--                        android:visibility="visible"-->
-<!--                        app:srcCompat="@drawable/ic_round_play_arrow_24" />-->
-
-<!--                    <ProgressBar-->
-<!--                        android:id="@+id/pb_download_audio"-->
-<!--                        style="?android:attr/progressBarStyle"-->
-<!--                        android:layout_width="wrap_content"-->
-<!--                        android:layout_height="match_parent"-->
-<!--                        android:visibility="gone" />-->
-
-<!--                    <SeekBar-->
-<!--                        android:id="@+id/sb_audio"-->
-<!--                        android:layout_width="wrap_content"-->
-<!--                        android:layout_height="wrap_content"-->
-<!--                        android:thumbTint="#9e9e9e" />-->
-<!--                </LinearLayout>-->
-
-<!--                <RelativeLayout-->
-<!--                    android:layout_width="match_parent"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:orientation="horizontal">-->
-<!--                    <TextView-->
-<!--                        android:id="@+id/textView5"-->
-<!--                        android:layout_width="wrap_content"-->
-<!--                        android:layout_height="wrap_content"-->
-<!--                        android:layout_alignParentEnd="true"-->
-<!--                        android:layout_marginEnd="0dp"-->
-<!--                        android:text="12:30"-->
-<!--                        android:textSize="10sp" />-->
-<!--                </RelativeLayout>-->
-
-<!--            </LinearLayout>-->
-
-
-<!--        </LinearLayout>-->
-
-
-<!--    </LinearLayout>-->
-<!--</layout>-->
-
 
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -118,6 +39,16 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:orientation="vertical">
+                        <TextView
+                            android:id="@+id/text_view_user_name"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="8dp"
+                            android:layout_marginStart="4dp"
+                            android:layout_marginEnd="4dp"
+                            android:visibility="gone"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
                         <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -131,12 +62,21 @@
                                 android:scaleType="centerCrop"
                                 android:visibility="visible"
                                 app:srcCompat="@drawable/ic_round_play_arrow_24" />
+                            <ImageButton
+                                android:id="@+id/image_button_pause_audio"
+                                android:layout_width="40dp"
+                                android:layout_height="40dp"
+                                android:layout_gravity="center"
+                                android:background="@android:color/transparent"
+                                android:scaleType="centerCrop"
+                                android:visibility="gone"
+                                app:srcCompat="@drawable/ic_baseline_pause" />
                             <SeekBar
-                                android:id="@+id/sb_audio"
+                                android:id="@+id/seek_bar_audio"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="center"
-                                android:minWidth="240dp"
+                                android:minWidth="140dp"
                                 android:thumbTint="#9e9e9e" />
                         </LinearLayout>
                         <androidx.constraintlayout.widget.ConstraintLayout
@@ -148,13 +88,12 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="8dp"
-                                android:layout_marginTop="8dp"
                                 android:singleLine="true"
                                 android:text="12:20"
                                 android:textColor="?attr/textHint"
                                 android:textSize="10sp"
                                 app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toBottomOf="@+id/text_view_message_received"
+                                app:layout_constraintTop_toTopOf="parent"
                                 tools:ignore="SmallSp" />
 
                             <TextView

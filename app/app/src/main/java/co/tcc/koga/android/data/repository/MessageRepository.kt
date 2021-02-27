@@ -20,5 +20,5 @@ interface MessageRepository {
 
     fun observeMessageUpdated(): Observable<WebSocketMessage<MessageEntity, MessageActions>>
 
-    suspend fun insertMessage(message: MessageEntity)
+    suspend fun insertMessage(message: MessageEntity): Long
 }

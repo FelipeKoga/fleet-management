@@ -35,8 +35,12 @@ class UserRepositoryImpl @Inject constructor(
         return userDao.suspendGetAll(user.companyId, user.username)
     }
 
-    override fun sendLocation(latitude: Double, longitude: Double) {
+    override fun getUsers(): Observable<List<UserEntity>> {
+        val user = Client.getInstance().currentUser
+        return service.getUsers(user.companyId)
+    }
 
+    override fun sendLocation(latitude: Double, longitude: Double) {
         webSocketService.send(
             WebSocketPayload(
                 WebSocketActions.SEND_LOCATION,
@@ -62,8 +66,7 @@ class UserRepositoryImpl @Inject constructor(
         userDao.insert(userEntity)
     }
 
-    override fun getUploadPhotoUrl(key: String):
-            Observable<UploadResponse> {
+    override fun getUploadPhotoUrl(key: String): Observable<UploadResponse> {
         val payload = UploadUrlPayload(key)
         return service.uploadUrl(payload)
     }

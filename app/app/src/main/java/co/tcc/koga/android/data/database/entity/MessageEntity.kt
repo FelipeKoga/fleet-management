@@ -9,12 +9,13 @@ import java.util.UUID
 @Parcelize
 @Entity(tableName = "message")
 data class MessageEntity(
-    val chatId: String,
-    val message: String,
-    val username: String,
-    val status: String,
-    val hasAudio: Boolean,
-    val createdAt: Long = System.currentTimeMillis(),
+    var chatId: String,
+    var message: String,
+    var username: String,
+    var status: String = "",
+    var hasAudio: Boolean = false,
+    var duration: Long? = null,
+    var createdAt: Long = System.currentTimeMillis(),
     @PrimaryKey
-    val messageId: String = UUID.randomUUID().toString()
+    var messageId: String = UUID.randomUUID().toString()
 ) : Parcelable

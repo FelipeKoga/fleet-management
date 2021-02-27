@@ -10,13 +10,13 @@ import android.widget.TextView
 
 import androidx.recyclerview.widget.RecyclerView
 import co.tcc.koga.android.R
-import co.tcc.koga.android.dto.UserDTO
+import co.tcc.koga.android.data.database.entity.UserEntity
 import kotlinx.android.synthetic.main.row_select_user.view.*
 
 class SelectUserAdapter(
     var context: Context,
-    var users: ArrayList<UserDTO>,
-    var onUserSelect: (user: UserDTO) -> Unit
+    var users: ArrayList<UserEntity>,
+    var onUserSelect: (user: UserEntity) -> Unit
 ) :
     RecyclerView.Adapter<SelectUserAdapter.UserViewHolder>() {
 
@@ -27,7 +27,7 @@ class SelectUserAdapter(
         private val imageViewAvatar: ImageView = itemView.image_view_select_user_avatar
         private val checkBox: CheckBox = itemView.check_box_select_user
 
-        fun bindView(user: UserDTO, context: Context, onUserSelect: (user: UserDTO) -> Unit) {
+        fun bindView(user: UserEntity, context: Context, onUserSelect: (user: UserEntity) -> Unit) {
             textViewName.text = user.name
             textViewPhone.text = user.email
 //            checkBox.isChecked = user.isSelected
@@ -38,7 +38,7 @@ class SelectUserAdapter(
             bindAvatar(user, context)
         }
 
-        private fun bindAvatar(user: UserDTO, context: Context) {
+        private fun bindAvatar(user: UserEntity, context: Context) {
             println(user)
 //            Glide
 //                .with(context)

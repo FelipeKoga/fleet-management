@@ -2,9 +2,9 @@ package co.tcc.koga.android.ui.new_group
 
 import androidx.lifecycle.*
 import co.tcc.koga.android.data.database.entity.ChatEntity
+import co.tcc.koga.android.data.database.entity.UserEntity
 import co.tcc.koga.android.data.repository.ChatsRepository
 import co.tcc.koga.android.data.repository.UserRepository
-import co.tcc.koga.android.dto.UserDTO
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -15,11 +15,11 @@ class NewGroupViewModel @Inject constructor(
 ) :
     ViewModel() {
     private val _chatCreated = MutableLiveData<ChatEntity>()
-    private val _users = MutableLiveData<List<UserDTO>>()
-    private val _selectedUsers = MutableLiveData<List<UserDTO>>()
+    private val _users = MutableLiveData<List<UserEntity>>()
+    private val _selectedUsers = MutableLiveData<List<UserEntity>>()
 
-    val users: LiveData<List<UserDTO>> get() = _users
-    val selectedUsers: LiveData<List<UserDTO>> get() = _selectedUsers
+    val users: LiveData<List<UserEntity>> get() = _users
+    val selectedUsers: LiveData<List<UserEntity>> get() = _selectedUsers
     val chatCreated: LiveData<ChatEntity> get() = _chatCreated
 
     fun createChat(
@@ -43,7 +43,7 @@ class NewGroupViewModel @Inject constructor(
 
     }
 
-    fun handleSelectedUser(user: UserDTO) {
+    fun handleSelectedUser(user: UserEntity) {
         val users = _selectedUsers.value?.toMutableList()
 //        if (user.isSelected) {
 //            if (users.isNullOrEmpty()) {

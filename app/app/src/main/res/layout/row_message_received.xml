@@ -23,12 +23,11 @@
 
 
             <TextView
-                android:id="@+id/text_view_message_sender"
+                android:id="@+id/text_view_user_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Felipe Kosloski Koga Koga"
                 android:textColor="?textColor"
-
                 android:textStyle="bold"
                 android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -38,11 +37,11 @@
 
             <TextView
                 android:id="@+id/text_view_message_received"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:gravity="start"
-                android:text="Aeaeaeaeae"
+                android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer bibendum quis sem finibus consequat. Cras accumsan sem justo, nec vestibulum mauris interdum ut. Ut pulvinar lacus vitae ante tempor viverra. Quisque aliquam tellus non mauris dapibus, id imperdiet nunc semper. Aenean in sapien vitae metus venenatis euismod. Integer ut eleifend enim. Integer tincidunt sagittis fermentum. Etiam lobortis diam a sem condimentum, vel commodo nisi semper. Sed tempor metus tincidunt, faucibus nunc quis, vestibulum nibh. Nulla facilisi. Curabitur auctor orci eget tristique suscipit."
                 android:textColor="?attr/textColor"
                 android:textSize="16sp"
                 app:layout_constraintEnd_toEndOf="parent"

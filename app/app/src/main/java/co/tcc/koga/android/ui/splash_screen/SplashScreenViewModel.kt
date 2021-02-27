@@ -30,6 +30,7 @@ class SplashScreenViewModel @Inject constructor(private val repository: ClientRe
             },
 
             fun() {
+                println("OPA")
                 _uiState.value = SplashScreenUiState.Error
             })
     }
@@ -41,6 +42,7 @@ class SplashScreenViewModel @Inject constructor(private val repository: ClientRe
                 _uiState.value = SplashScreenUiState.LoggedIn
             },
             {
+                println(it)
                 _uiState.value = SplashScreenUiState.Error
             },
         )

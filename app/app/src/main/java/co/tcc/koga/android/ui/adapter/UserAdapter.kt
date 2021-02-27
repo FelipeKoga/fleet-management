@@ -9,7 +9,9 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import co.tcc.koga.android.R
 import co.tcc.koga.android.data.database.entity.UserEntity
+import co.tcc.koga.android.utils.Avatar
 import co.tcc.koga.android.utils.CONSTANTS
+import co.tcc.koga.android.utils.getUserAvatar
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import kotlinx.android.synthetic.main.row_user.view.*
@@ -28,23 +30,19 @@ class UserAdapter(
         private val textViewEmail: TextView = itemView.text_view_user_email
         private val imageViewAvatar: ImageView = itemView.image_view_user_avatar
 
-        fun bindView(user: UserEntity, context: Context, onUserClicked: (user: UserEntity) -> Unit) {
-            textViewName.text = user.fullName
+        fun bindView(
+            user: UserEntity,
+            context: Context,
+            onUserClicked: (user: UserEntity) -> Unit
+        ) {
+            textViewName.text = user.name
             textViewEmail.text = user.email
             view.setOnClickListener { onUserClicked(user) }
             bindAvatar(user, context)
         }
 
         private fun bindAvatar(user: UserEntity, context: Context) {
-            println(user)
-            Glide
-                .with(context)
-                .load(user.avatar)
-                .centerInside()
-                .apply(RequestOptions.circleCropTransform())
-                .error(R.drawable.ic_round_person)
-                .placeholder(R.drawable.ic_round_person)
-                .into(imageViewAvatar)
+            Avatar.loadImage(context, imageViewAvatar, user.avatarUrl ?: getUserAvatar(user), R.drawable.ic_round_person)
         }
     }
 

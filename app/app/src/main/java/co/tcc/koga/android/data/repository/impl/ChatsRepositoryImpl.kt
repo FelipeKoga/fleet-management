@@ -61,7 +61,7 @@ class ChatsRepositoryImpl @Inject constructor(
         val newChat = service.createChat(
             currentUser.username,
             currentUser.companyId,
-            NewChatPayload(member_username, true, "", "")
+            NewChatPayload(member_username)
         )
         chatDao.insert(newChat)
         return newChat

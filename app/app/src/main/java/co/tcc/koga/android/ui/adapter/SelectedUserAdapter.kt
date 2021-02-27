@@ -11,12 +11,12 @@ import android.widget.TextView
 
 import androidx.recyclerview.widget.RecyclerView
 import co.tcc.koga.android.R
-import co.tcc.koga.android.dto.UserDTO
+import co.tcc.koga.android.data.database.entity.UserEntity
 
 class SelectedUserAdapter(
     var context: Context,
-    var users: List<UserDTO>,
-    var onUserRemoved: (user: UserDTO) -> Unit
+    var users: List<UserEntity>,
+    var onUserRemoved: (user: UserEntity) -> Unit
 ) :
     RecyclerView.Adapter<SelectedUserAdapter.UserViewHolder>() {
 
@@ -26,7 +26,7 @@ class SelectedUserAdapter(
         private val textViewName: TextView = itemView.text_view_selected_user
         private val imageViewAvatar: ImageView = itemView.image_view_selected_user_avatar
 
-        fun bindView(user: UserDTO, context: Context, onUserRemoved: (user: UserDTO) -> Unit) {
+        fun bindView(user: UserEntity, context: Context, onUserRemoved: (user: UserEntity) -> Unit) {
             textViewName.text = user.name
             view.setOnClickListener {
 //                user.isSelected = false
@@ -35,7 +35,7 @@ class SelectedUserAdapter(
             bindAvatar(user, context)
         }
 
-        private fun bindAvatar(user: UserDTO, context: Context) {
+        private fun bindAvatar(user: UserEntity, context: Context) {
 //            Glide
 //                .with(context)
 //                .load(user.avatar)

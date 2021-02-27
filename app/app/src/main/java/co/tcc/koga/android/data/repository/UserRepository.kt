@@ -1,15 +1,13 @@
 package co.tcc.koga.android.data.repository
 
-import android.content.Context
 import co.tcc.koga.android.data.database.entity.UserEntity
 import co.tcc.koga.android.data.network.payload.UploadResponse
 import io.reactivex.Observable
-import kotlinx.coroutines.flow.Flow
 import okhttp3.ResponseBody
 import java.io.File
 
 interface UserRepository {
-    //    fun getUsers(): Observable<List<UserEntity>>
+    fun getUsers(): Observable<List<UserEntity>>
     suspend fun getLocalUsers(): List<UserEntity>
 
     fun sendLocation(

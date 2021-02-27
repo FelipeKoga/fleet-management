@@ -79,8 +79,10 @@ class LoginFragment : Fragment(R.layout.login_fragment) {
             ThreadUtils.runOnUiThread {
                 when (authenticationStatus) {
                     AUTH_STATUS.LOGGED_IN -> {
-                        if (viewModel.isLocationEnabled() && requestLocationPermission(requireContext())) {
-                            startService()
+                        if (viewModel.isLocationEnabled()) {
+                            if (requestLocationPermission(requireContext())) {
+                                startService()
+                            }
                         }
 
                         findNavController().navigate(R.id.action_loginFragment_to_chatsFragment)

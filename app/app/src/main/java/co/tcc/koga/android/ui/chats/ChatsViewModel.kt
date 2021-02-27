@@ -70,7 +70,6 @@ class ChatsViewModel @Inject constructor(
             }
 
             if (update.action === ChatActions.CHAT_CREATED) {
-
                 insertChat(update.body)
             }
         })

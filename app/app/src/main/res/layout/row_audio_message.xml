@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+        <RelativeLayout
+            android:id="@+id/relative_layout_message_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="6dp"
+            tools:ignore="PrivateResource">
+
+            <LinearLayout
+                android:id="@+id/linear_layout_message_container"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_marginTop="0dp"
+                android:minWidth="82dp"
+                android:orientation="horizontal"
+                android:paddingStart="0dp"
+
+                android:background="@drawable/shape_message_received"
+                android:paddingTop="4dp"
+                android:paddingEnd="8dp"
+                android:paddingBottom="4dp">
+
+
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/text_view_user_name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:layout_marginStart="4dp"
+                        android:layout_marginEnd="4dp"
+                        android:visibility="gone"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:orientation="horizontal">
+
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+
+                            <LinearLayout
+                                android:id="@+id/linear_layout_audio"
+                                android:visibility="gone"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal">
+
+                                <ImageButton
+                                    android:id="@+id/image_button_pause_audio"
+                                    android:layout_width="40dp"
+                                    android:layout_height="40dp"
+                                    android:layout_gravity="center"
+                                    android:background="@android:color/transparent"
+                                    android:scaleType="centerCrop"
+                                    android:visibility="gone"
+                                    app:srcCompat="@drawable/ic_baseline_pause" />
+
+                                <ImageButton
+                                    android:id="@+id/image_button_play_audio"
+                                    android:layout_width="40dp"
+                                    android:layout_height="40dp"
+                                    android:layout_gravity="center"
+                                    android:background="@android:color/transparent"
+                                    android:scaleType="centerCrop"
+                                    android:visibility="visible"
+                                    app:srcCompat="@drawable/ic_round_play_arrow_24" />
+
+                                <SeekBar
+                                    android:id="@+id/seek_bar_audio"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center"
+                                    android:minWidth="140dp"
+                                    android:thumbTint="#9e9e9e" />
+                            </LinearLayout>
+
+                            <TextView
+                                android:visibility="gone"
+                                android:id="@+id/text_view_message"
+                                android:layout_margin="4dp"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content" />
+
+                            <androidx.constraintlayout.widget.ConstraintLayout
+                                android:id="@+id/constraint_layout_message_hours"
+                                android:layout_width="match_parent"
+                                android:visibility="gone"
+                                android:layout_height="wrap_content">
+
+                                <TextView
+                                    android:id="@+id/text_view_message_duration"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="8dp"
+                                    android:singleLine="true"
+                                    android:text=""
+                                    android:textColor="?attr/textHint"
+                                    android:textSize="10sp"
+                                    app:layout_constraintStart_toStartOf="parent"
+                                    app:layout_constraintTop_toTopOf="parent"
+                                    tools:ignore="SmallSp" />
+
+                                <TextView
+                                    android:id="@+id/text_view_message_hour"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="end"
+                                    android:singleLine="true"
+                                    android:text="12:00"
+                                    android:layout_marginEnd="4dp"
+                                    android:textColor="?attr/textHint"
+                                    android:textSize="10sp"
+                                    app:layout_constraintEnd_toStartOf="@+id/image_view_message_status"
+                                    app:layout_constraintTop_toTopOf="parent"
+                                    tools:ignore="SmallSp" />
+
+                                <ImageView
+                                    android:visibility="gone"
+                                    android:id="@+id/image_view_message_status"
+                                    android:layout_width="14dp"
+                                    android:layout_height="14dp"
+                                    android:layout_gravity="bottom|center"
+                                    android:src="@drawable/ic_baseline_timer"
+                                    app:layout_constraintEnd_toEndOf="parent"
+                                    app:layout_constraintTop_toTopOf="parent" />
+                            </androidx.constraintlayout.widget.ConstraintLayout>
+
+                        </LinearLayout>
+                        <TextView
+                            android:id="@+id/text_view_system_message"
+                            android:layout_margin="4dp"
+                            android:textStyle="bold"
+                            android:textAlignment="center"
+                            android:text="dasdsadasdasdsadsa"
+                            android:textColor="?colorPrimaryDark"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" />
+
+                        <ProgressBar
+                            android:id="@+id/pb_download_audio"
+                            style="?android:attr/progressBarStyle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:visibility="gone" />
+
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+
+            </LinearLayout>
+
+        </RelativeLayout>
+
+</layout>

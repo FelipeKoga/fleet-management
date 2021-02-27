@@ -57,8 +57,8 @@ class MessageRepositoryImpl @Inject constructor(
         return message
     }
 
-    override suspend fun insertMessage(message: MessageEntity) {
-        messageDAO.insert(message)
+    override suspend fun insertMessage(message: MessageEntity): Long {
+        return messageDAO.insert(message)
     }
 
     override fun observeMessageUpdated(): Observable<WebSocketMessage<MessageEntity, MessageActions>> {

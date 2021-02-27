@@ -20,7 +20,7 @@ import co.tcc.koga.android.utils.show
 import kotlinx.android.synthetic.main.new_chat_fragment.*
 import javax.inject.Inject
 
-class NewChatFragment : Fragment() {
+class NewChatFragment : Fragment(R.layout.new_chat_fragment) {
     private lateinit var adapter: UserAdapter
     private lateinit var binding: NewChatFragmentBinding
 
@@ -36,52 +36,66 @@ class NewChatFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = NewChatFragmentBinding.inflate(inflater)
         binding.apply {
-            adapter = UserAdapter(requireContext(), listOf(), fun(user) {
-                progress_bar_create_chat.show()
-                viewModel.createChat(user.username)
-            })
-
-            recyclerViewUsers.layoutManager = LinearLayoutManager(container?.context)
-            recyclerViewUsers.adapter = adapter
-
             toolbarSearchContacts.setNavigationOnClickListener {
                 findNavController().popBackStack()
             }
+            adapter = UserAdapter(container?.context as Context, listOf(), fun(user) {
+                progressBarCreateChat.show()
+                viewModel.createChat(user.username)
+            })
+            recyclerViewUsers.layoutManager = LinearLayoutManager(requireContext())
+            recyclerViewUsers.adapter = adapter
 
             floatingButtonNewGroup.setOnClickListener {
-
                 findNavController().navigate(R.id.action_newChatFragment_to_newGroupFragment)
             }
 
-            viewModel.users.observe(viewLifecycleOwner, {
-                if (it.isNotEmpty()) {
-                    progressBarUsers.hide()
-                    recyclerViewUsers.show()
+            editTextSearchContact.setOnEditorActionListener { v, _, _ ->
+                if (v.text.isNotEmpty()) {
+                    viewModel.filterUsers(v.text.toString())
+                } else {
+                    viewModel.clearFilter()
                 }
-                adapter.users = it
-                adapter.notifyDataSetChanged()
-            })
 
-//            viewModel.getAllUsers().observe(viewLifecycleOwner, {
-//                if (it.status === Resource.Status.ERROR) {
-//                    println("Error!")
-//                }
-//            })
-
-            viewModel.chatCreated.observe(viewLifecycleOwner, {
-                findNavController().popBackStack()
-                findNavController().navigate(
-                    R.id.action_nav_chatsFragment_to_chatFragment,
-                    bundleOf("chat" to it)
-                )
-            })
+                true
+            }
 
         }
         return binding.root
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+
+        viewModel.users.observe(viewLifecycleOwner, { users ->
+            adapter.users = users
+            adapter.notifyDataSetChanged()
+        })
+
+        viewModel.filteredUsers.observe(viewLifecycleOwner) { filteredUsers ->
+            adapter.users = filteredUsers
+            adapter.notifyDataSetChanged()
+        }
+
+        viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
+            if (isLoading) binding.progressBarUsers.show() else binding.progressBarUsers.hide()
+        }
+
+        viewModel.chatCreated.observe(viewLifecycleOwner, {
+            println(it)
+            findNavController().popBackStack()
+            findNavController().navigate(
+                R.id.action_nav_chatsFragment_to_chatFragment,
+                bundleOf("chat" to it)
+            )
+        })
+
+        viewModel.getUsers()
+
+    }
 
 }

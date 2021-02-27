@@ -80,7 +80,7 @@
                         android:layout_height="0dp"
                         android:checked="true"
                         android:hint="?colorPrimary"
-                        android:text="Receber áudio instântaneo"
+                        android:text="Receber áudio instantâneo"
                         android:textSize="18sp"
                         android:thumbTint="?colorPrimary" />
 

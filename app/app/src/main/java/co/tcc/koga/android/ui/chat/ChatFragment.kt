@@ -4,7 +4,6 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
-import android.media.MediaRecorder
 import android.os.Bundle
 import android.view.*
 import android.widget.ImageView
@@ -22,8 +21,6 @@ import co.tcc.koga.android.data.database.entity.UserEntity
 import co.tcc.koga.android.databinding.ChatFragmentBinding
 import co.tcc.koga.android.ui.MainActivity
 import co.tcc.koga.android.utils.*
-import com.bumptech.glide.Glide
-import com.bumptech.glide.request.RequestOptions
 import kotlinx.android.synthetic.main.chat_fragment.*
 import java.io.*
 import javax.inject.Inject
@@ -36,7 +33,8 @@ class ChatFragment : Fragment(R.layout.chat_fragment) {
     private lateinit var binding: ChatFragmentBinding
     private val args: ChatFragmentArgs by navArgs()
     private val viewModel by viewModels<ChatViewModel> { viewModelFactory }
-    private lateinit var adapter: ChatAdapter
+
+    private lateinit var adapter: MessageAdapter
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -59,23 +57,22 @@ class ChatFragment : Fragment(R.layout.chat_fragment) {
         setupToolbar()
         setupViews()
         setupRecyclerView()
-        viewModel.openChat(args.chat.id)
-        viewModel.getMessages(args.chat.id)
+        viewModelObservers()
     }
 
-    override fun onStart() {
-        super.onStart()
+    private fun viewModelObservers() {
         viewModel.run {
-            observeMessageUpdates(args.chat.id)
+            chatId = args.chat.id
+            openChat()
+            getMessages()
+            observeMessageUpdates()
             observeChatUpdates(args.chat)
             observeUserUpdates()
 
-            adapter.load(args.chat.messages)
             messages.observe(viewLifecycleOwner) { messages ->
-                adapter.load(messages)
-                if (adapter.itemCount > 2) {
-                    binding.recyclerViewChatMessages.scrollToPosition(adapter.itemCount - 1)
-                }
+                println("MESSAGES")
+                adapter.submitList(messages)
+                binding.recyclerViewChatMessages.scrollToPosition(messages.size - 1)
             }
 
             chat.observe(viewLifecycleOwner) { chat ->
@@ -134,10 +131,15 @@ class ChatFragment : Fragment(R.layout.chat_fragment) {
     private fun setupRecyclerView() {
         val linearLayoutManager = LinearLayoutManager(context)
         linearLayoutManager.stackFromEnd = true
-        adapter = ChatAdapter(viewModel.username, args.chat.members)
+        adapter = MessageAdapter(viewModel.username, args.chat.members)
         binding.recyclerViewChatMessages.layoutManager = linearLayoutManager
         binding.recyclerViewChatMessages.adapter = adapter
+        binding.recyclerViewChatMessages.viewTreeObserver.addOnGlobalLayoutListener { scrollToEnd() }
     }
+
+    private fun scrollToEnd() =
+        (adapter.itemCount - 1).takeIf { it > 0 }
+            ?.let(binding.recyclerViewChatMessages::smoothScrollToPosition)
 
     private fun setupToolbar() {
         text_view_chat_title.text =
