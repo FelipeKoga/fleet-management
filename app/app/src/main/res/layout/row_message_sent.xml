@@ -19,38 +19,44 @@
             android:paddingTop="4dp"
             android:paddingEnd="8dp"
             android:paddingStart="8dp"
+            android:orientation="vertical"
             android:paddingBottom="4dp"
+            android:minWidth="80dp"
             android:layout_marginEnd="4dp">
 
             <TextView
                 android:id="@+id/text_view_message_sent"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="4dp"
-                android:layout_marginEnd="12dp"
-                android:layout_gravity="center"
-                android:gravity="center"
-                android:text=""
+                android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas malesuada tellus in eros volutpat vestibulum. Fusce a luctus elit. Nulla id turpis porta, ullamcorper ex ac, iaculis augue. Aliquam ac nisi aliquet, feugiat ligula at, euismod justo. Cras dictum quam nec ligula tincidunt, non pretium quam euismod. Nulla facilisi. Pellentesque vestibulum, mi ac pretium volutpat, sem massa euismod risus, id porta sem urna in orci. Nulla ac semper dolor. Etiam pellentesque ex nec vulputate malesuada. Ut nec pretium tortor, interdum efficitur justo. Donec pulvinar est vitae augue cursus, eget efficitur elit ullamcorper. Suspendisse nec risus sit amet lacus pretium euismod a at ipsum. Pellentesque ut semper purus. Maecenas euismod porttitor nisl, quis imperdiet ligula rutrum et. Nullam finibus imperdiet nunc ac suscipit. In non venenatis justo."
                 android:textColor="?attr/textColor"
                 android:textSize="16sp" />
 
-            <TextView
-                android:id="@+id/text_view_message_sent_date"
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="4dp"
-                android:layout_gravity="bottom|center"
-                android:text="12:20"
-                android:textColor="?attr/textHint"
-                android:textSize="12sp"
-                tools:ignore="SmallSp" />
-            <ImageView
-                android:id="@+id/image_view_message_status"
-                android:layout_width="14dp"
-                android:layout_height="14dp"
-                android:layout_marginEnd="4dp"
-                android:layout_gravity="bottom|center"
-                android:src="@drawable/ic_baseline_timer" />
+                android:layout_gravity="end"
+                android:layout_marginTop="8dp"
+                android:orientation="horizontal">
+                <TextView
+                    android:id="@+id/text_view_message_sent_date"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="4dp"
+                    android:layout_gravity="end"
+                    android:text="12:20"
+                    android:textColor="?attr/textHint"
+                    android:textSize="12sp"
+                    tools:ignore="SmallSp" />
+                <ImageView
+                    android:id="@+id/image_view_message_status"
+                    android:layout_width="14dp"
+                    android:layout_height="14dp"
+                    android:layout_marginEnd="4dp"
+                    android:layout_gravity="bottom|center"
+                    android:src="@drawable/ic_baseline_timer" />
+            </LinearLayout>
+
         </LinearLayout>
     </RelativeLayout>
 </layout>

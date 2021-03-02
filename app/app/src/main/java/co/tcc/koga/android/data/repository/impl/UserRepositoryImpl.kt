@@ -11,9 +11,8 @@ import co.tcc.koga.android.data.network.socket.WebSocketActions
 import co.tcc.koga.android.data.network.socket.WebSocketPayload
 import co.tcc.koga.android.data.network.socket.WebSocketService
 import co.tcc.koga.android.data.repository.UserRepository
-import co.tcc.koga.android.utils.CONSTANTS
+import co.tcc.koga.android.utils.Constants
 import io.reactivex.Observable
-import kotlinx.coroutines.withContext
 import okhttp3.*
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -82,7 +81,7 @@ class UserRepositoryImpl @Inject constructor(
                     .addNetworkInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
                     .retryOnConnectionFailure(true).build()
             )
-            .baseUrl(CONSTANTS.API_URL)
+            .baseUrl(Constants.ApiURL)
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .addConverterFactory(GsonConverterFactory.create())
             .build()

@@ -1,4 +1,4 @@
-package co.tcc.koga.android.ui.chat.viewholder
+package co.tcc.koga.android.ui.chats.chat.viewholder
 
 import android.view.LayoutInflater
 import android.view.ViewGroup

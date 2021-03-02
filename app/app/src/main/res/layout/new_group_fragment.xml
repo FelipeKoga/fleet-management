@@ -6,7 +6,7 @@
         android:layout_width="match_parent"
         android:background="?backgroundColor"
         android:layout_height="match_parent"
-        tools:context=".ui.new_group.NewGroupFragment">
+        tools:context=".ui.chats.new_group.NewGroupFragment">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar_new_group"

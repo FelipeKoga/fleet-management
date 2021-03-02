@@ -9,10 +9,6 @@ import com.tinder.scarlet.ws.Send
 import io.reactivex.Observable
 
 interface WebSocketService {
-
-    @Receive
-    fun observeWebSocketEvent(): Observable<WebSocket.Event>
-
     @Send
     fun send(message: WebSocketPayload)
 

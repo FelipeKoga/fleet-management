@@ -2,7 +2,7 @@ package co.tcc.koga.android.data.repository
 
 
 import co.tcc.koga.android.data.database.entity.UserEntity
-import co.tcc.koga.android.utils.AUTH_STATUS
+import co.tcc.koga.android.utils.Constants
 import io.reactivex.Observable
 
 import java.util.*
@@ -38,7 +38,8 @@ interface ClientRepository {
 
     fun user(): UserEntity
 
-    fun observeAuthStatus(): Observable<AUTH_STATUS>
+    fun observeAuthStatus(): Observable<Constants.AuthStatus>
+    fun observeCurrentUser(): Observable<UserEntity>
 
     suspend fun signOut()
 

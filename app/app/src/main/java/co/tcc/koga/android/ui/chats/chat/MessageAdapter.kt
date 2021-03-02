@@ -1,20 +1,22 @@
-package co.tcc.koga.android.ui.chat
+package co.tcc.koga.android.ui.chats.chat
 
+import android.content.Context
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import co.tcc.koga.android.data.database.entity.MessageEntity
 import co.tcc.koga.android.data.database.entity.UserEntity
-import co.tcc.koga.android.ui.chat.utils.AudioUtil
-import co.tcc.koga.android.ui.chat.utils.MessageType
-import co.tcc.koga.android.ui.chat.viewholder.*
+import co.tcc.koga.android.ui.chats.chat.utils.AudioUtil
+import co.tcc.koga.android.ui.chats.chat.utils.MessageType
+import co.tcc.koga.android.ui.chats.chat.viewholder.*
 import com.amazonaws.mobile.auth.core.internal.util.ThreadUtils
 
 
 class MessageAdapter(
     val username: String, val members:
-    List<UserEntity>?
+    List<UserEntity>?,
+    val context: Context
 ) :
     ListAdapter<MessageEntity, RecyclerView.ViewHolder>(DIFF_CALLBACK) {
     private val audioUtil = AudioUtil()
@@ -86,23 +88,22 @@ class MessageAdapter(
         }
 
         currentHolder = holder
-
-//        currentHolder?.showLoading()
-        audioUtil.start(messageEntity.message, {
+        audioUtil.start(messageEntity.message, context, {
             currentHolder?.playAudio()
+
+            Thread {
+                while (audioUtil.isPlaying()) {
+                    Thread.sleep(1)
+                    ThreadUtils.runOnUiThread {
+                        currentHolder?.setProgress(audioUtil.getCurrentPosition())
+                    }
+                }
+            }.start()
         }) {
             currentHolder?.stopAudio()
             currentHolder = null
         }
 
-        Thread {
-            while (audioUtil.isPlaying()) {
-                Thread.sleep(1)
-                ThreadUtils.runOnUiThread {
-                    currentHolder?.setProgress(audioUtil.getCurrentPosition())
-                }
-            }
-        }.start()
     }
 
     private fun pause() {

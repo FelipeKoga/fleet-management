@@ -9,7 +9,12 @@ class FormatterUtil {
         fun getHour(timestamp: Long): String {
             val sdf = SimpleDateFormat("HH:mm", Locale("pt", "BR"))
             val netDate = Date(timestamp)
+            return sdf.format(netDate)
+        }
 
+        fun getFullDate(timestamp: Long): String {
+            val sdf = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale("pt", "BR"))
+            val netDate = Date(timestamp)
             return sdf.format(netDate)
         }
 

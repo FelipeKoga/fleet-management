@@ -1,7 +1,31 @@
 package co.tcc.koga.android.utils
 
-import co.tcc.koga.android.data.database.entity.UserEntity
+import android.content.Context
+import android.graphics.drawable.Drawable
+import android.widget.ImageView
+import co.tcc.koga.android.R
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.RequestOptions
+import com.bumptech.glide.request.target.Target
 
-fun getUserAvatar(userEntity: UserEntity, size: Int = 200): String {
-    return "${CONSTANTS.AVATAR_BASE_URL}&name=${userEntity.name}&background=${userEntity.color}&size=$size"
+class Avatar {
+    companion object {
+        fun load(
+            context: Context,
+            imageView: ImageView,
+            url: String?,
+            placeholder: Int,
+        ) {
+            Glide
+                .with(context)
+                .load(url)
+                .centerInside()
+                .apply(RequestOptions.circleCropTransform())
+                .placeholder(placeholder)
+                .into(imageView)
+        }
+    }
 }

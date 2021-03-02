@@ -1,21 +1,19 @@
 package co.tcc.koga.android.ui
 
 import android.Manifest
-import android.app.AlertDialog
-import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import co.tcc.koga.android.App
 import co.tcc.koga.android.R
 import co.tcc.koga.android.service.Actions
 import co.tcc.koga.android.service.LocationService
+import co.tcc.koga.android.service.requestLocationPermission
 
 import co.tcc.koga.android.ui.di.MainComponent
 import javax.inject.Inject
@@ -36,63 +34,15 @@ class MainActivity : AppCompatActivity() {
         setTheme(R.style.SplashScreenTheme)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        viewModel.observeAuthStatus()
+        viewModel.observeUserStatus()
         viewModel.isSignIn.observe(this) { isSignIn ->
             if (isSignIn) {
-                checkLocationPermission()
-            }
-        }
-    }
-
-    private fun checkLocationPermission(): Boolean {
-        return if (ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            )
-            != PackageManager.PERMISSION_GRANTED
-        ) {
-
-            if (ActivityCompat.shouldShowRequestPermissionRationale(
-                    this,
-                    Manifest.permission.ACCESS_FINE_LOCATION
-                )
-            ) {
-                AlertDialog.Builder(this)
-                    .setTitle("Localização")
-                    .setMessage("É necessário habilitar o envio da localização para prosseguir")
-                    .setPositiveButton(R.string.ok) { _, _ -> //Prompt the user once explanation has been shown
-                        ActivityCompat.requestPermissions(
-                            this@MainActivity,
-                            arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                            1000
-                        )
+                if (viewModel.isLocationEnabled()) {
+                    if (requestLocationPermission(this)) {
+                        startLocationService()
                     }
-                    .create()
-                    .show()
-            } else {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    ActivityCompat.requestPermissions(
-                        this,
-                        arrayOf(
-                            Manifest.permission.ACCESS_FINE_LOCATION,
-                            Manifest.permission.ACCESS_COARSE_LOCATION,
-                            Manifest.permission.ACCESS_BACKGROUND_LOCATION
-                        ),
-                        1000
-                    )
-                } else {
-                    ActivityCompat.requestPermissions(
-                        this, arrayOf(
-                            Manifest.permission.ACCESS_FINE_LOCATION,
-                            Manifest.permission.ACCESS_COARSE_LOCATION
-                        ),
-                        1000
-                    )
                 }
             }
-            false
-        } else {
-            true
         }
     }
 

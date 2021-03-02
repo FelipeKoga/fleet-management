@@ -12,7 +12,7 @@ import co.tcc.koga.android.utils.*
 
 class ChatsAdapter(
     var onLoadAvatar: (avatar: String?, isGroup: Boolean, imageView: ImageView) -> Unit,
-    var onContactClicked: (chat: ChatEntity) -> Unit
+    var onChatClicked: (chat: ChatEntity) -> Unit
 ) :
     RecyclerView.Adapter<ChatsAdapter.ChatsViewHolder>() {
 
@@ -35,7 +35,7 @@ class ChatsAdapter(
         fun bind(
             chat: ChatEntity,
             onLoadAvatar: (avatar: String?, isGroup: Boolean, imageView: ImageView) -> Unit,
-            onContactClicked: (chat: ChatEntity) -> Unit
+            onChatClicked: (chat: ChatEntity) -> Unit
         ) {
 
 
@@ -46,7 +46,8 @@ class ChatsAdapter(
                 }
 
                 if (chat.user !== null) {
-                    if (chat.user?.status == "ONLINE") {
+                    val user = chat.user as UserEntity
+                    if (user.status == "ONLINE") {
                         imageViewUserStatusOnline.show()
                         imageViewUserStatusOffline.hide()
                     } else {
@@ -54,13 +55,11 @@ class ChatsAdapter(
                         imageViewUserStatusOffline.show()
                     }
                     onLoadAvatar(
-                        if (chat.user?.avatarUrl != "") chat.user?.avatarUrl else getUserAvatar(
-                            chat.user as UserEntity
-                        ),
+                        user.avatarUrl ?: Constants.getAvatarURL(user.name, user.color, 42),
                         false,
                         imageViewAvatar
                     )
-                    textViewName.text = chat.user?.name
+                    textViewName.text = user.name
                 } else {
                     onLoadAvatar(chat.avatar, true, imageViewAvatar)
                     textViewName.text = chat.groupName
@@ -74,7 +73,7 @@ class ChatsAdapter(
                     textViewNewMessages.hide()
                 }
 
-                linearLayoutRowChat.setOnClickListener { onContactClicked.invoke(chat) }
+                linearLayoutRowChat.setOnClickListener { onChatClicked.invoke(chat) }
             }
         }
     }
@@ -88,7 +87,7 @@ class ChatsAdapter(
     }
 
     override fun onBindViewHolder(holder: ChatsViewHolder, position: Int) {
-        holder.bind(chats[position], onLoadAvatar, onContactClicked)
+        holder.bind(chats[position], onLoadAvatar, onChatClicked)
     }
 
     fun load(items: List<ChatEntity>) {

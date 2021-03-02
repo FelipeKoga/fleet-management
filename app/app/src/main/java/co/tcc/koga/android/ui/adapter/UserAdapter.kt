@@ -10,8 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import co.tcc.koga.android.R
 import co.tcc.koga.android.data.database.entity.UserEntity
 import co.tcc.koga.android.utils.Avatar
-import co.tcc.koga.android.utils.CONSTANTS
-import co.tcc.koga.android.utils.getUserAvatar
+import co.tcc.koga.android.utils.Constants
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import kotlinx.android.synthetic.main.row_user.view.*
@@ -42,7 +41,12 @@ class UserAdapter(
         }
 
         private fun bindAvatar(user: UserEntity, context: Context) {
-            Avatar.loadImage(context, imageViewAvatar, user.avatarUrl ?: getUserAvatar(user), R.drawable.ic_round_person)
+            Avatar.load(
+                context,
+                imageViewAvatar,
+                user.avatarUrl ?: Constants.getAvatarURL(user.name, user.color, 42),
+                R.drawable.ic_round_person
+            )
         }
     }
 

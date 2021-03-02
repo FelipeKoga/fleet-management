@@ -1,4 +1,4 @@
-package co.tcc.koga.android.ui.chat.viewholder
+package co.tcc.koga.android.ui.chats.chat.viewholder
 
 interface IAudioViewHolder {
     fun playAudio()

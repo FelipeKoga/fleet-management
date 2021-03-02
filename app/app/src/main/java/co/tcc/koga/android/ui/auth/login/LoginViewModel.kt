@@ -4,8 +4,7 @@ import android.content.Context
 import androidx.lifecycle.*
 import co.tcc.koga.android.R
 import co.tcc.koga.android.data.repository.ClientRepository
-import co.tcc.koga.android.utils.AUTH_STATUS
-import co.tcc.koga.android.utils.UserRole
+import co.tcc.koga.android.utils.Constants
 import com.amazonaws.mobile.auth.core.internal.util.ThreadUtils.runOnUiThread
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.coroutines.launch
@@ -24,12 +23,12 @@ class LoginViewModel @Inject constructor(
         var password: String = "",
     ) : Serializable
 
-    private val _authenticationStatus = MutableLiveData<AUTH_STATUS>()
+    private val _authenticationStatus = MutableLiveData<Constants.AuthStatus>()
     private val _isLoading = MutableLiveData(false)
     private val compositeDisposable: CompositeDisposable = CompositeDisposable()
 
     val formFields = LoginForm()
-    val authenticationStatus: LiveData<AUTH_STATUS> get() = _authenticationStatus
+    val authenticationStatus: LiveData<Constants.AuthStatus> get() = _authenticationStatus
     val isLoading: LiveData<Boolean> get() = _isLoading
     val formErrors = MutableLiveData<MutableMap<String, String>>(mutableMapOf())
 
@@ -58,31 +57,30 @@ class LoginViewModel @Inject constructor(
 
     fun authenticate() {
         if (!isFormValid()) return
-        _authenticationStatus.value = AUTH_STATUS.PENDING
+        _authenticationStatus.value = Constants.AuthStatus.PENDING
         _isLoading.postValue(true)
         repository.signIn(formFields.username, formFields.password, fun() {
             getUser()
         }, fun() {
             runOnUiThread {
                 _isLoading.value = false
-                _authenticationStatus.value = AUTH_STATUS.UNAUTHORIZED
+                _authenticationStatus.value = Constants.AuthStatus.UNAUTHORIZED
             }
 
         }, fun() {
             runOnUiThread {
                 _isLoading.value = false
-                _authenticationStatus.value = AUTH_STATUS.ERROR
+                _authenticationStatus.value = Constants.AuthStatus.ERROR
             }
         })
     }
-
-    fun isLocationEnabled() = repository.user().locationEnabled && repository.user().role == UserRole.EMPLOYEE.name
 
     private fun getUser() = viewModelScope.launch {
         try {
             compositeDisposable.add(repository.getCurrentUser(true).subscribe {
                 runOnUiThread {
-                    _authenticationStatus.value = AUTH_STATUS.LOGGED_IN
+                    println(it)
+                    _authenticationStatus.value = Constants.AuthStatus.LOGGED_IN
                 }
             })
         } catch (e: Exception) {

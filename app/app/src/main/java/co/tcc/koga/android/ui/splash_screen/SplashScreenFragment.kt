@@ -41,10 +41,6 @@ class SplashScreenFragment : Fragment(R.layout.splash_screen_fragment) {
         viewModel.uiState.asLiveData().observe(viewLifecycleOwner) { state ->
             when (state) {
                 SplashScreenUiState.LoggedIn -> {
-                    if (viewModel.isLocationEnabled() && requestLocationPermission(requireContext())) {
-                        startService()
-                    }
-
                     findNavController().navigate(
                         R.id.action_splashScreenFragment_to_chatsFragment,
                     )
@@ -56,17 +52,6 @@ class SplashScreenFragment : Fragment(R.layout.splash_screen_fragment) {
                 else -> Log.e("Splashscreen", "inicializando o app...")
             }
 
-        }
-    }
-
-    private fun startService() {
-        Intent(requireContext(), LocationService::class.java).also {
-            it.action = Actions.START.name
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                activity?.startForegroundService(it)
-                return
-            }
-            activity?.startService(it)
         }
     }
 

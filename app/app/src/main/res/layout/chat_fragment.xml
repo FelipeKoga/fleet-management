@@ -10,13 +10,13 @@
 
         <variable
             name="viewModel"
-            type="co.tcc.koga.android.ui.chat.ChatViewModel" />
+            type="co.tcc.koga.android.ui.chats.chat.ChatViewModel" />
     </data>
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="?backgroundColor"
-        tools:context=".ui.chat.ChatFragment">
+        tools:context=".ui.chats.chat.ChatFragment">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar_chat"

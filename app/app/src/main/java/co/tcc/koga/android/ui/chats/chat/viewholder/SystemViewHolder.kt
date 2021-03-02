@@ -1,10 +1,9 @@
-package co.tcc.koga.android.ui.chat.viewholder
+package co.tcc.koga.android.ui.chats.chat.viewholder
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import co.tcc.koga.android.data.database.entity.MessageEntity
-import co.tcc.koga.android.databinding.RowMessageSentBinding
 import co.tcc.koga.android.databinding.RowSystemMessageBinding
 
 class SystemViewHolder(private val binding: RowSystemMessageBinding) :

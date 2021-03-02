@@ -10,12 +10,8 @@ import co.tcc.koga.android.R
 import co.tcc.koga.android.data.database.entity.UserEntity
 import co.tcc.koga.android.data.repository.ClientRepository
 import co.tcc.koga.android.data.repository.UserRepository
-import co.tcc.koga.android.ui.auth.login.LoginViewModel
-import co.tcc.koga.android.utils.UserRole
-import co.tcc.koga.android.utils.getUserAvatar
-import io.reactivex.Observable
+import co.tcc.koga.android.utils.Constants
 import io.reactivex.Observer
-import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -45,16 +41,16 @@ class ProfileViewModel @Inject constructor(
 
 
     fun getAvatar(): String {
-        return currentUser.avatarUrl ?: getUserAvatar(
-            currentUser
+        return currentUser.avatarUrl ?: Constants.getAvatarURL(
+            currentUser.name, currentUser.color
         )
     }
 
     fun getRole(): String {
-        return when(currentUser.role) {
-            UserRole.EMPLOYEE.name -> "Funcionário"
-            UserRole.ADMIN.name -> "Administrador"
-            UserRole.EMPLOYEE.name -> "Operador"
+        return when (currentUser.role) {
+            Constants.UserRole.EMPLOYEE.name -> "Funcionário"
+            Constants.UserRole.ADMIN.name -> "Administrador"
+            Constants.UserRole.EMPLOYEE.name -> "Operador"
             else -> "Funcionário"
         }
     }
@@ -109,12 +105,13 @@ class ProfileViewModel @Inject constructor(
         }
     }
 
-    private fun uploadToS3(file: File, key: String, url: String)  = viewModelScope.launch{
+    private fun uploadToS3(file: File, key: String, url: String) = viewModelScope.launch {
         withContext(Dispatchers.IO) {
             userRepository.uploadPhoto(file, url).subscribe(object : Observer<ResponseBody> {
                 override fun onComplete() {
                     updateUserAvatar(key)
                 }
+
                 override fun onSubscribe(d: Disposable) {}
                 override fun onNext(i: ResponseBody) {}
                 override fun onError(e: Throwable) {

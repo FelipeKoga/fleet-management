@@ -14,12 +14,11 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import co.tcc.koga.android.R
-import co.tcc.koga.android.databinding.LoginFragmentBinding
 import co.tcc.koga.android.databinding.SettingsFragmentBinding
 import co.tcc.koga.android.service.Actions
 import co.tcc.koga.android.service.LocationService
 import co.tcc.koga.android.ui.MainActivity
-import co.tcc.koga.android.utils.UserRole
+import co.tcc.koga.android.utils.Constants
 
 import javax.inject.Inject
 
@@ -51,7 +50,7 @@ class SettingsFragment : Fragment(R.layout.settings_fragment) {
         super.onViewCreated(view, savedInstanceState)
         binding.apply {
             linearLayoutLocationUpdate .visibility =
-                if (viewModel.currentUser.role == UserRole.EMPLOYEE.name) View.VISIBLE else View.GONE
+                if (viewModel.currentUser.role == Constants.UserRole.EMPLOYEE.name) View.VISIBLE else View.GONE
             switchLocation.isChecked = viewModel.location
             switchPushToTalk.isChecked = viewModel.pushToTalk
             switchNotification.isChecked = viewModel.notification

@@ -1,16 +1,18 @@
-package co.tcc.koga.android.ui.chat.utils
+package co.tcc.koga.android.ui.chats.chat.utils
 
+import android.content.Context
 import android.media.AudioAttributes
 import android.media.MediaPlayer
+import android.net.Uri
 import java.util.*
 
 class AudioUtil {
-    private lateinit var mediaPlayer: MediaPlayer
+    private var mediaPlayer: MediaPlayer = MediaPlayer()
     private var currentURL: String = ""
     private var isPlaying: Boolean = false
 
 
-    fun start(url: String, onStarted: () -> Unit, onCompletion: () -> Unit) {
+    fun start(url: String, context: Context,  onStarted: () -> Unit, onCompletion: () -> Unit) {
         if (currentURL == url) {
             this.isPlaying = true
             mediaPlayer.start()
@@ -26,12 +28,13 @@ class AudioUtil {
                     AudioAttributes.Builder()
                         .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
                         .setUsage(AudioAttributes.USAGE_MEDIA)
+
                         .build()
                 )
-                setDataSource(url)
+                setDataSource(context, Uri.parse(url))
                 prepare()
-                start()
                 setOnPreparedListener {
+                    start()
                     this@AudioUtil.isPlaying = true
                     onStarted()
                 }
@@ -41,7 +44,7 @@ class AudioUtil {
                     this@AudioUtil.isPlaying = false
                 }
             }
-        } catch(e: Exception) {
+        } catch (e: Exception) {
             println(e)
         }
 

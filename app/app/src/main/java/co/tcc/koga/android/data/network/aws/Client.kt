@@ -2,7 +2,7 @@ package co.tcc.koga.android.data.network.aws
 
 import android.content.Context
 import co.tcc.koga.android.data.database.entity.UserEntity
-import co.tcc.koga.android.utils.AUTH_STATUS
+import co.tcc.koga.android.utils.Constants
 import com.amazonaws.mobile.client.AWSMobileClient
 import com.amazonaws.mobile.client.Callback
 import com.amazonaws.mobile.client.UserState
@@ -11,12 +11,11 @@ import com.amazonaws.mobile.client.results.ForgotPasswordResult
 import com.amazonaws.mobile.client.results.SignInResult
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
-import kotlinx.coroutines.runBlocking
 import java.lang.Exception
 
 class Client {
 
-    private val subject = PublishSubject.create<AUTH_STATUS>()
+    private val subject = PublishSubject.create<Constants.AuthStatus>()
     val subCurrentUser = PublishSubject.create<UserEntity>()
 
     lateinit var currentUser: UserEntity
@@ -36,7 +35,7 @@ class Client {
                             UserState.SIGNED_IN -> {
                                 tokenString =
                                     AWSMobileClient.getInstance().tokens.idToken.tokenString
-                                subject.onNext(AUTH_STATUS.LOGGED_IN)
+                                subject.onNext(Constants.AuthStatus.LOGGED_IN)
                                 onInitSuccess(true)
                             }
                             else -> onInitError()
@@ -63,7 +62,7 @@ class Client {
             null,
             object : Callback<SignInResult> {
                 override fun onResult(result: SignInResult?) {
-                    subject.onNext(AUTH_STATUS.LOGGED_IN)
+                    subject.onNext(Constants.AuthStatus.LOGGED_IN)
                     tokenString = AWSMobileClient.getInstance().tokens.idToken.tokenString
                     onSignInSuccess()
                 }
@@ -77,11 +76,11 @@ class Client {
     }
 
     fun signOut() {
-        subject.onNext(AUTH_STATUS.LOGGED_OUT)
+        subject.onNext(Constants.AuthStatus.LOGGED_OUT)
         AWSMobileClient.getInstance().signOut()
     }
 
-    fun authStatus(): Observable<AUTH_STATUS> {
+    fun authStatus(): Observable<Constants.AuthStatus> {
         return subject.hide()
     }
 

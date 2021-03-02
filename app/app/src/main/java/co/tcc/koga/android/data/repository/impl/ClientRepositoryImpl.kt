@@ -7,7 +7,7 @@ import co.tcc.koga.android.data.database.entity.UserEntity
 import co.tcc.koga.android.data.network.aws.Client
 import co.tcc.koga.android.data.network.retrofit.Service
 import co.tcc.koga.android.data.repository.ClientRepository
-import co.tcc.koga.android.utils.AUTH_STATUS
+import co.tcc.koga.android.utils.Constants
 import com.amazonaws.mobile.auth.core.internal.util.ThreadUtils
 import com.amazonaws.services.cognitoidentityprovider.model.InvalidParameterException
 import com.amazonaws.services.cognitoidentityprovider.model.NotAuthorizedException
@@ -56,9 +56,10 @@ class ClientRepositoryImpl @Inject constructor(
         )
             .subscribeOn(Schedulers.newThread())
             .doOnNext { user ->
-                userDao.setCurrentUser(user)
                 Client.getInstance().subCurrentUser.onNext(user)
                 Client.getInstance().currentUser = user
+                userDao.setCurrentUser(user)
+
             }.subscribeOn(Schedulers.computation())
 
     }
@@ -111,8 +112,12 @@ class ClientRepositoryImpl @Inject constructor(
         })
     }
 
-    override fun observeAuthStatus(): Observable<AUTH_STATUS> {
+    override fun observeAuthStatus(): Observable<Constants.AuthStatus> {
         return Client.getInstance().authStatus()
+    }
+
+    override fun observeCurrentUser(): Observable<UserEntity> {
+        return Client.getInstance().observeCurrentUser()
     }
 
 

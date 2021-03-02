@@ -2,7 +2,6 @@ package co.tcc.koga.android.ui.splash_screen
 
 import androidx.lifecycle.*
 import co.tcc.koga.android.data.repository.ClientRepository
-import co.tcc.koga.android.utils.UserRole
 
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -39,6 +38,7 @@ class SplashScreenViewModel @Inject constructor(private val repository: ClientRe
     private fun getUser() = viewModelScope.launch {
         val disposable = repository.getCurrentUser(false).subscribe(
             {
+                println(repository.user())
                 _uiState.value = SplashScreenUiState.LoggedIn
             },
             {
@@ -48,8 +48,6 @@ class SplashScreenViewModel @Inject constructor(private val repository: ClientRe
         )
         compositeDisposable.add(disposable)
     }
-
-    fun isLocationEnabled() = repository.user().locationEnabled && repository.user().role == UserRole.EMPLOYEE.name
 
     override fun onCleared() {
         super.onCleared()

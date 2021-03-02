@@ -1,4 +1,4 @@
-package co.tcc.koga.android.ui.chat.utils
+package co.tcc.koga.android.ui.chats.chat.utils
 
 
 

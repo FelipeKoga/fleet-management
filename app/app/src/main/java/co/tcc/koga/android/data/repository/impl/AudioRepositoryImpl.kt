@@ -5,7 +5,7 @@ import co.tcc.koga.android.data.network.payload.UploadResponse
 import co.tcc.koga.android.data.network.payload.UploadUrlPayload
 import co.tcc.koga.android.data.network.retrofit.Service
 import co.tcc.koga.android.data.repository.AudioRepository
-import co.tcc.koga.android.utils.CONSTANTS
+import co.tcc.koga.android.utils.Constants
 import com.amazonaws.auth.CognitoCachingCredentialsProvider
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferListener
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferState
@@ -46,7 +46,7 @@ class AudioRepositoryImpl @Inject constructor(val service: Service, private val 
                     .addNetworkInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
                     .retryOnConnectionFailure(true).build()
             )
-            .baseUrl(CONSTANTS.API_URL)
+            .baseUrl(Constants.ApiURL)
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .addConverterFactory(GsonConverterFactory.create())
             .build()

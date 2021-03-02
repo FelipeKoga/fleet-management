@@ -1,4 +1,4 @@
-package co.tcc.koga.android.ui.new_group
+package co.tcc.koga.android.ui.chats.new_group
 
 import android.content.Context
 import android.os.Bundle

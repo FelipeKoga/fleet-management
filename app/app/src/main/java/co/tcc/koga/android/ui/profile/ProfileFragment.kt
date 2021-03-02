@@ -150,7 +150,7 @@ class ProfileFragment : Fragment(R.layout.profile_fragment) {
 
     private fun loadUserAvatar() {
         val avatar = viewModel.getAvatar()
-        Avatar.loadImage(
+        Avatar.load(
             requireContext(),
             binding.imageViewProfilePhoto,
             avatar,

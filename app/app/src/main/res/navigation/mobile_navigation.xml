@@ -17,20 +17,18 @@
     </fragment>
     <fragment
         android:id="@+id/chatFragment"
-        android:name="co.tcc.koga.android.ui.chat.ChatFragment"
+        android:name="co.tcc.koga.android.ui.chats.chat.ChatFragment"
         android:label="chat_fragment"
         tools:layout="@layout/chat_fragment">
         <argument
             android:name="chat"
             app:argType="co.tcc.koga.android.data.database.entity.ChatEntity" />
-    </fragment>
-    <fragment
-        android:id="@+id/searchContactsFragment"
-        android:name="co.tcc.koga.android.ui.contacts.SearchContactsFragment"
-        android:label="SearchContactsFragment">
         <action
-            android:id="@+id/action_searchContactsFragment_to_chatFragment"
-            app:destination="@id/chatFragment" />
+            android:id="@+id/action_chatFragment_to_groupDetailsFragment"
+            app:destination="@id/groupDetailsFragment" />
+        <action
+            android:id="@+id/action_chatFragment_to_userDetailsFragment"
+            app:destination="@id/userDetailsFragment" />
     </fragment>
     <fragment
         android:id="@+id/settingsFragment"
@@ -45,7 +43,7 @@
     </fragment>
     <fragment
         android:id="@+id/newGroupFragment"
-        android:name="co.tcc.koga.android.ui.new_group.NewGroupFragment"
+        android:name="co.tcc.koga.android.ui.chats.new_group.NewGroupFragment"
         android:label="NewGroupFragment">
         <action
             android:id="@+id/action_newGroupFragment_to_chatFragment"
@@ -58,9 +56,6 @@
         <action
             android:id="@+id/action_nav_chatsFragment_to_chatFragment"
             app:destination="@id/chatFragment" />
-        <action
-            android:id="@+id/action_chatsFragment_to_searchContactsFragment"
-            app:destination="@id/searchContactsFragment" />
         <action
             android:id="@+id/action_chatsFragment_to_profileFragment"
             app:destination="@id/profileFragment" />
@@ -98,7 +93,7 @@
     </fragment>
     <fragment
         android:id="@+id/newChatFragment"
-        android:name="co.tcc.koga.android.ui.new_chat.NewChatFragment"
+        android:name="co.tcc.koga.android.ui.chats.new_chat.NewChatFragment"
         android:label="NewChatFragment">
         <action
             android:id="@+id/action_newChatFragment_to_chatFragment"
@@ -127,5 +122,24 @@
             app:destination="@id/chatsFragment"
             app:popUpTo="@id/confirmForgotPasswordFragment"
             app:popUpToInclusive="true" />
+    </fragment>
+    <fragment
+        android:id="@+id/userDetailsFragment"
+        android:name="co.tcc.koga.android.ui.details.user.UserDetailsFragment"
+        android:label="UserDetailsFragment">
+        <argument
+            android:name="user"
+            app:argType="co.tcc.koga.android.data.database.entity.UserEntity" />
+    </fragment>
+    <fragment
+        android:id="@+id/groupDetailsFragment"
+        android:name="co.tcc.koga.android.ui.details.group.GroupDetailsFragment"
+        android:label="GroupDetailsFragment" >
+        <argument
+            android:name="chat"
+            app:argType="co.tcc.koga.android.data.database.entity.ChatEntity" />
+        <action
+            android:id="@+id/action_groupDetailsFragment_to_userDetailsFragment"
+            app:destination="@id/userDetailsFragment" />
     </fragment>
 </navigation>

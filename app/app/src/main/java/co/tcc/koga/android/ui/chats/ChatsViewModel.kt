@@ -2,14 +2,13 @@ package co.tcc.koga.android.ui.chats
 
 import androidx.lifecycle.*
 import co.tcc.koga.android.data.database.entity.ChatEntity
-import co.tcc.koga.android.data.database.entity.UserEntity
 import co.tcc.koga.android.data.network.socket.ChatActions
 import co.tcc.koga.android.data.network.socket.MessageActions
 import co.tcc.koga.android.data.network.socket.UserActions
 import co.tcc.koga.android.data.repository.ChatsRepository
 import co.tcc.koga.android.data.repository.ClientRepository
 import co.tcc.koga.android.data.repository.MessageRepository
-import co.tcc.koga.android.utils.getUserAvatar
+import co.tcc.koga.android.utils.Constants
 import io.reactivex.disposables.CompositeDisposable
 
 import kotlinx.coroutines.launch
@@ -51,9 +50,8 @@ class ChatsViewModel @Inject constructor(
     }
 
     fun getAvatar(): String {
-        return if (clientRepository.user().avatarUrl != null) clientRepository.user().avatarUrl as String else getUserAvatar(
-            clientRepository.user()
-        )
+        val user = clientRepository.user()
+        return user.avatarUrl ?:  Constants. getAvatarURL(user.name, user.color)
     }
 
     fun observeChatUpdates() {

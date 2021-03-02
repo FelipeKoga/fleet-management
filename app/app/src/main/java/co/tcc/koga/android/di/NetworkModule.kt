@@ -3,7 +3,7 @@ package co.tcc.koga.android.di
 import co.tcc.koga.android.data.network.aws.Client
 import co.tcc.koga.android.data.network.retrofit.Service
 import co.tcc.koga.android.data.network.socket.WebSocketService
-import co.tcc.koga.android.utils.CONSTANTS
+import co.tcc.koga.android.utils.Constants
 import com.tinder.scarlet.Scarlet
 import com.tinder.scarlet.lifecycle.LifecycleRegistry
 import com.tinder.scarlet.messageadapter.moshi.MoshiMessageAdapter
@@ -29,7 +29,7 @@ class NetworkModule {
     fun providesRetrofit(okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
             .client(okHttpClient)
-            .baseUrl(CONSTANTS.API_URL)
+            .baseUrl(Constants.ApiURL)
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .addConverterFactory(GsonConverterFactory.create())
             .build()

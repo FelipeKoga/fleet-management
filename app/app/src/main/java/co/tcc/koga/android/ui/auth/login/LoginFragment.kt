@@ -18,7 +18,7 @@ import co.tcc.koga.android.databinding.LoginFragmentBinding
 import co.tcc.koga.android.service.Actions
 import co.tcc.koga.android.service.LocationService
 import co.tcc.koga.android.service.requestLocationPermission
-import co.tcc.koga.android.utils.AUTH_STATUS
+import co.tcc.koga.android.utils.Constants
 import com.amazonaws.mobile.auth.core.internal.util.ThreadUtils
 import javax.inject.Inject
 
@@ -78,24 +78,18 @@ class LoginFragment : Fragment(R.layout.login_fragment) {
             binding.textViewLoginError.visibility = View.GONE
             ThreadUtils.runOnUiThread {
                 when (authenticationStatus) {
-                    AUTH_STATUS.LOGGED_IN -> {
-                        if (viewModel.isLocationEnabled()) {
-                            if (requestLocationPermission(requireContext())) {
-                                startService()
-                            }
-                        }
-
+                    Constants.AuthStatus.LOGGED_IN -> {
                         findNavController().navigate(R.id.action_loginFragment_to_chatsFragment)
                     }
 
-                    AUTH_STATUS.UNAUTHORIZED -> {
+                    Constants.AuthStatus.UNAUTHORIZED -> {
                         binding.textViewLoginError.apply {
                             visibility = View.VISIBLE
                             text = getString(R.string.unauthorized)
                         }
                     }
 
-                    AUTH_STATUS.ERROR -> {
+                    Constants.AuthStatus.ERROR -> {
                         binding.textViewLoginError.apply {
                             visibility = View.VISIBLE
                             text = getString(R.string.loginError)
@@ -112,17 +106,6 @@ class LoginFragment : Fragment(R.layout.login_fragment) {
 
     private fun goToForgotPassword() {
         findNavController().navigate(R.id.action_loginFragment_to_forgotPasswordFragment)
-    }
-
-    private fun startService() {
-        Intent(requireContext(), LocationService::class.java).also {
-            it.action = Actions.START.name
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                activity?.startForegroundService(it)
-                return
-            }
-            activity?.startService(it)
-        }
     }
 
     private fun clearError() {

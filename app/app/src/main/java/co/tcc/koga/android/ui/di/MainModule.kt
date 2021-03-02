@@ -5,11 +5,13 @@ import co.tcc.koga.android.ui.MainViewModel
 import co.tcc.koga.android.di.ViewModelKey
 import co.tcc.koga.android.ui.auth.confirm_forgot_password.ConfirmForgotPasswordViewModel
 import co.tcc.koga.android.ui.auth.forgot_password.ForgotPasswordViewModel
-import co.tcc.koga.android.ui.chat.ChatViewModel
+import co.tcc.koga.android.ui.chats.chat.ChatViewModel
 import co.tcc.koga.android.ui.chats.ChatsViewModel
 import co.tcc.koga.android.ui.auth.login.LoginViewModel
-import co.tcc.koga.android.ui.new_chat.NewChatViewModel
-import co.tcc.koga.android.ui.new_group.NewGroupViewModel
+import co.tcc.koga.android.ui.chats.new_chat.NewChatViewModel
+import co.tcc.koga.android.ui.chats.new_group.NewGroupViewModel
+import co.tcc.koga.android.ui.details.group.GroupDetailsViewModel
+import co.tcc.koga.android.ui.details.user.UserDetailsViewModel
 import co.tcc.koga.android.ui.profile.ProfileViewModel
 import co.tcc.koga.android.ui.settings.SettingsViewModel
 import co.tcc.koga.android.ui.splash_screen.SplashScreenViewModel
@@ -75,4 +77,12 @@ interface MainModule {
     @ViewModelKey(ProfileViewModel::class)
     fun bindProfileViewModel(viewModel: ProfileViewModel): ViewModel
 
+    @Binds
+    @IntoMap
+    @ViewModelKey(UserDetailsViewModel::class)
+    fun bindUserDetailsViewModel(viewModel: UserDetailsViewModel): ViewModel
+    @Binds
+    @IntoMap
+    @ViewModelKey(GroupDetailsViewModel::class)
+    fun bindGroupDetailsViewModel(viewModel: GroupDetailsViewModel): ViewModel
 }

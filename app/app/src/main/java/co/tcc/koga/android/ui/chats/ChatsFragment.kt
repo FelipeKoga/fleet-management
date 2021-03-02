@@ -84,9 +84,9 @@ class ChatsFragment : Fragment(R.layout.chats_fragment) {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.item_search -> {
-                findNavController().navigate(
-                    R.id.action_chatsFragment_to_searchContactsFragment
-                )
+//                findNavController().navigate(
+//                    R.id.action_chatsFragment_to_searchContactsFragment
+//                )
                 true
             }
             else -> super.onOptionsItemSelected(item)
@@ -123,7 +123,7 @@ class ChatsFragment : Fragment(R.layout.chats_fragment) {
 
     private fun setupRecyclerView() {
         adapter = ChatsAdapter({ avatar, isGroup, imageView ->
-            Avatar.loadImage(
+            Avatar.load(
                 requireContext(),
                 imageView,
                 avatar,
@@ -140,7 +140,7 @@ class ChatsFragment : Fragment(R.layout.chats_fragment) {
 
     private fun loadUserAvatar() {
         val avatar = viewModel.getAvatar()
-        Avatar.loadImage(
+        Avatar.load(
             requireContext(),
             binding.imageViewUserPhoto,
             avatar,

@@ -4,11 +4,12 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.tinder.scarlet.lifecycle.LifecycleRegistry
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import co.tcc.koga.android.data.repository.ClientRepository
-import co.tcc.koga.android.utils.AUTH_STATUS
+import co.tcc.koga.android.utils.Constants
 import com.tinder.scarlet.Lifecycle
 import com.tinder.scarlet.ShutdownReason
-import io.reactivex.disposables.CompositeDisposable
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class MainViewModel @Inject constructor(
@@ -17,25 +18,23 @@ class MainViewModel @Inject constructor(
 ) :
     ViewModel() {
     private val _isSignIn = MutableLiveData(false)
-    private val compositeDisposable: CompositeDisposable = CompositeDisposable()
     val isSignIn: LiveData<Boolean> get() = _isSignIn
 
-    fun observeAuthStatus() {
-        compositeDisposable.add(repository.observeAuthStatus().subscribe { status ->
-            if (status === AUTH_STATUS.LOGGED_OUT) {
+    fun observeUserStatus() = viewModelScope.launch {
+        repository.observeCurrentUser().subscribe { user ->
+            if (user !== null) {
                 _isSignIn.postValue(false)
-
                 lifecycleRegistry.onNext(Lifecycle.State.Stopped.WithReason(ShutdownReason.GRACEFUL))
-            }
-
-            if (status === AUTH_STATUS.LOGGED_IN) {
+            } else {
                 _isSignIn.postValue(true)
                 lifecycleRegistry.onNext(Lifecycle.State.Started)
             }
-        })
+        }
     }
 
-    override fun onCleared() {
-        compositeDisposable.clear()
+    fun isLocationEnabled(): Boolean {
+        return repository.user().locationEnabled && repository.user().role == Constants.UserRole.EMPLOYEE.name
     }
+
+
 }

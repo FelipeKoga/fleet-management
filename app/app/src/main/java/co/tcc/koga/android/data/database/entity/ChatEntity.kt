@@ -9,11 +9,11 @@ import kotlinx.android.parcel.Parcelize
 data class ChatEntity(
     @PrimaryKey
     var id: String,
-    var newMessages: Long = 0L,
+    var newMessages: Int = 0,
     var groupName: String? = "",
     var avatar: String? = "",
     var avatarUrl: String? = "",
-    var createdAt: String? = "",
+    var createdAt: Long? = null,
     var admin: String? = "",
     var user: UserEntity? = null,
     var members: List<UserEntity>? = null,

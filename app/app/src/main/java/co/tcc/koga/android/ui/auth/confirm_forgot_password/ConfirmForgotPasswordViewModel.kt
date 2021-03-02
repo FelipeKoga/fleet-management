@@ -9,7 +9,6 @@ import co.tcc.koga.android.R
 import co.tcc.koga.android.data.repository.ClientRepository
 import co.tcc.koga.android.ui.auth.ForgotPasswordStatus
 import co.tcc.koga.android.ui.auth.RecoverPasswordForm
-import co.tcc.koga.android.utils.AUTH_STATUS
 import com.amazonaws.mobile.auth.core.internal.util.ThreadUtils
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.coroutines.launch
