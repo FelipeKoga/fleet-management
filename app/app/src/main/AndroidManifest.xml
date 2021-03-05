@@ -23,8 +23,7 @@
         android:usesCleartextTraffic="true"
         android:name=".App"
         android:theme="@style/MainTheme"
-        android:roundIcon="@mipmap/ic_launcher_round"
-        android:supportsRtl="true">
+        android:roundIcon="@mipmap/ic_launcher_round">
         <service
             android:exported="false"
             android:name=".service.LocationService"

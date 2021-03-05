@@ -56,7 +56,7 @@ class UserDetailsFragment : Fragment() {
             Avatar.load(
                 requireContext(),
                 imageViewChatDetailAvatar,
-                args.user.avatarUrl ?: Constants.getAvatarURL(args.user.name, args.user.color, 120),
+                args.user.avatar ?: Constants.getAvatarURL(args.user.name, args.user.color, 120),
                 R.drawable.ic_round_person
             )
             textViewUserName.text = args.user.name

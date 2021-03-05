@@ -31,7 +31,7 @@ class GroupMembersAdapter(private val currentUsername: String) :
                 textViewName.text = member.name
                 textViewEmail.text = member.email
                 onLoadAvatar?.invoke(
-                    member.avatarUrl ?: Constants.getAvatarURL(
+                    member.avatar ?: Constants.getAvatarURL(
                         member.name,
                         member.color
                     ), imageViewAvatar

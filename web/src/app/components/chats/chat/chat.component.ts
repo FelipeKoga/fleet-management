@@ -24,7 +24,7 @@ import { convertDate } from "src/app/utils/date";
 import { MapBottomSheetComponent } from "../../map/map-bottom-sheet/map-bottom-sheet.component";
 declare var MediaRecorder: any;
 
-const mime = ["audio/wav"].filter(MediaRecorder.isTypeSupported)[0];
+const mime = ["audio/ogg"].filter(MediaRecorder.isTypeSupported)[0];
 @Component({
   selector: "app-chat",
 
@@ -170,7 +170,7 @@ export class ChatComponent implements OnInit {
           duration = Date.now() - duration;
 
           this.uploadAudio(
-            audioBlob.slice(0, audioBlob.size, "audio/wav"),
+            audioBlob.slice(0, audioBlob.size, "audio/ogg"),
             duration
           );
         });
@@ -185,7 +185,7 @@ export class ChatComponent implements OnInit {
   private uploadAudio(blob: Blob, duration: number) {
     const key = `company/${this.user.companyId}/chat/${this.chat.id}/${
       this.user.username
-    }/audios/${nanoid()}.wav`;
+    }/audios/${nanoid()}.oga`;
 
     const message = new Message({
       chatId: this.chat.id,

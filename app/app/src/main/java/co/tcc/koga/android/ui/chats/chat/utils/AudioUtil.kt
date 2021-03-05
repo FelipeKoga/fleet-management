@@ -16,6 +16,7 @@ class AudioUtil {
         if (currentURL == url) {
             this.isPlaying = true
             mediaPlayer.start()
+            onStarted()
             return
         }
 

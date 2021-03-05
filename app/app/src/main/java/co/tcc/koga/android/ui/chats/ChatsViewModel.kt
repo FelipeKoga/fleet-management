@@ -31,12 +31,12 @@ class ChatsViewModel @Inject constructor(
 
     override fun onCleared() {
         super.onCleared()
-        compositeDisposable.dispose()
+        compositeDisposable.clear()
     }
 
-    fun getAllChats() {
+    fun getAllChats() = viewModelScope.launch {
         _isLoading.postValue(true)
-        compositeDisposable.add(repository.getChats().subscribe({ response ->
+        repository.getChats().subscribe({ response ->
             if (response.data.isNotEmpty() || !response.fromCache) {
                 _isLoading.postValue(false)
                 _error.postValue(false)
@@ -45,13 +45,13 @@ class ChatsViewModel @Inject constructor(
         }, {
             _isLoading.postValue(false)
             _error.postValue(true)
-        }))
+        })
 
     }
 
     fun getAvatar(): String {
         val user = clientRepository.user()
-        return user.avatarUrl ?:  Constants. getAvatarURL(user.name, user.color)
+        return user.avatar ?: Constants.getAvatarURL(user.name, user.color)
     }
 
     fun observeChatUpdates() {
@@ -90,7 +90,7 @@ class ChatsViewModel @Inject constructor(
         })
     }
 
-    fun observeMessageUpdates() {
+    fun observeMessageUpdates() = viewModelScope.launch {
         compositeDisposable.add(messagesRepository.observeMessageUpdated().subscribe { update ->
             if (update.action === MessageActions.NEW_MESSAGE) {
                 val foundChat = _chats.value?.find { chat -> chat.id == update.body.chatId }
@@ -113,7 +113,6 @@ class ChatsViewModel @Inject constructor(
             }
         })
     }
-
 
     private fun insertChat(chat: ChatEntity) = viewModelScope.launch {
         repository.insertChat(chat)

@@ -4,6 +4,7 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
+
     <data>
 
         <import type="android.view.View" />
@@ -12,6 +13,7 @@
             name="viewModel"
             type="co.tcc.koga.android.ui.chats.chat.ChatViewModel" />
     </data>
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -29,11 +31,12 @@
             android:elevation="1dp"
             android:gravity="end"
             app:navigationIcon="@drawable/ic_arrow_back_black">
+
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="center"
                 android:layout_marginEnd="12dp"
+                android:gravity="center"
                 android:orientation="vertical">
 
                 <ImageView
@@ -48,25 +51,25 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
+
                 <ImageView
-                    android:visibility="gone"
                     android:id="@+id/image_view_user_status_online"
                     android:layout_width="12dp"
                     android:layout_height="12dp"
+                    android:background="@drawable/shape_online"
+                    android:visibility="gone"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    android:background="@drawable/shape_online" />
+                    app:layout_constraintEnd_toEndOf="parent" />
 
                 <ImageView
-                    android:visibility="gone"
                     android:id="@+id/image_view_user_status_offline"
                     android:layout_width="12dp"
                     android:layout_height="12dp"
                     android:background="@drawable/shape_offline"
+                    android:visibility="gone"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent" />
             </androidx.constraintlayout.widget.ConstraintLayout>
-
 
 
             <LinearLayout
@@ -219,13 +222,14 @@
 
                     <ImageButton
                         android:id="@+id/image_button_send_message"
+
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:backgroundTint="@android:color/transparent"
                         android:src="@drawable/ic_round_send"
                         android:tint="?colorPrimary"
-                        android:visibility="visible"
+                        android:visibility="gone"
                         app:borderWidth="0dp" />
 
                     <ImageButton
@@ -238,10 +242,10 @@
                         android:tint="?colorPrimary"
                         android:visibility="visible"
                         app:borderWidth="0dp" />
-
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>
+
 
 
         <androidx.recyclerview.widget.RecyclerView

@@ -80,7 +80,7 @@ class GroupDetailsFragment : Fragment() {
             Avatar.load(
                 requireContext(),
                 imageViewChatDetailAvatar,
-                args.chat.avatarUrl,
+                args.chat.avatar,
                 R.drawable.ic_round_group
             )
 

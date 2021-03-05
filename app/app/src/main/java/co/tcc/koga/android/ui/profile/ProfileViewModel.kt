@@ -41,7 +41,7 @@ class ProfileViewModel @Inject constructor(
 
 
     fun getAvatar(): String {
-        return currentUser.avatarUrl ?: Constants.getAvatarURL(
+        return currentUser.avatar ?: Constants.getAvatarURL(
             currentUser.name, currentUser.color
         )
     }

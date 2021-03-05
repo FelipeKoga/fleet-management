@@ -1,12 +1,18 @@
 package co.tcc.koga.android.di
 
+import android.content.Context
 import co.tcc.koga.android.data.network.aws.Client
 import co.tcc.koga.android.data.network.retrofit.Service
 import co.tcc.koga.android.data.network.socket.WebSocketService
 import co.tcc.koga.android.utils.Constants
+import com.amazonaws.mobile.auth.core.internal.util.ThreadUtils
+import com.amazonaws.mobile.client.AWSMobileClient
+import com.tinder.scarlet.Lifecycle
 import com.tinder.scarlet.Scarlet
 import com.tinder.scarlet.lifecycle.LifecycleRegistry
+import com.tinder.scarlet.lifecycle.android.AndroidLifecycle
 import com.tinder.scarlet.messageadapter.moshi.MoshiMessageAdapter
+import com.tinder.scarlet.retry.ExponentialWithJitterBackoffStrategy
 import com.tinder.scarlet.streamadapter.rxjava2.RxJava2StreamAdapterFactory
 import com.tinder.scarlet.websocket.okhttp.newWebSocketFactory
 import dagger.Module
@@ -43,20 +49,20 @@ class NetworkModule {
 
     @Singleton
     @Provides
-    fun providesWSLifecycle(): LifecycleRegistry  = LifecycleRegistry(0)
+    fun providesWSLifecycle(): LifecycleRegistry = LifecycleRegistry(0)
 
-    @Singleton
+
     @Provides
+    @Singleton
     fun providesScarletInstance(
         okHttpClient: OkHttpClient,
         lifecycleRegistry: LifecycleRegistry
     ): WebSocketService {
+        lifecycleRegistry.onNext(Lifecycle.State.Started)
         val scarletInstance = Scarlet.Builder()
             .webSocketFactory(
                 okHttpClient.newWebSocketFactory(
-                    "wss://87davwn2wl.execute-api.us-east-1.amazonaws.com/dev?username=${
-                        Client.getInstance().username()
-                    }"
+                    "${Constants.WebsocketURL}?username=kosloski.fkoga@gmail.com"
                 )
             )
             .lifecycle(lifecycleRegistry)

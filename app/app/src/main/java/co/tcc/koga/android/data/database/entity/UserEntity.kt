@@ -15,7 +15,6 @@ data class UserEntity(
     var fullName: String? = "",
     var phone: String = "",
     var avatar: String? = "",
-    var avatarUrl: String? = "",
     var name: String = "",
     var customName: String? = "",
     var status: String = "OFFLINE",

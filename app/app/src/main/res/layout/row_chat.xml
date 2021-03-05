@@ -60,7 +60,7 @@
                         android:layout_marginEnd="8dp"
                         android:layout_gravity="center"
                         android:layout_weight="1"
-                        android:layout_marginStart="12dp"
+                        android:layout_marginStart="8dp"
                         android:text=""
                         android:textColor="?attr/textColor"
                         android:textStyle="bold"
@@ -80,6 +80,14 @@
                     android:layout_width="match_parent"
                     android:layout_marginTop="4dp"
                     android:layout_height="wrap_content">
+                    <ImageView
+                        android:visibility="visible"
+                        android:id="@+id/image_view_message_status"
+                        android:layout_width="14dp"
+                        android:layout_height="14dp"
+                        android:layout_marginStart="4dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_baseline_timer" />
                     <TextView
                         android:id="@+id/text_view_last_message"
                         android:layout_width="0dp"
@@ -87,12 +95,14 @@
                         android:layout_marginEnd="8dp"
                         android:layout_gravity="start"
                         android:layout_weight="1"
-                        android:layout_marginStart="12dp"
+                        android:layout_marginStart="8dp"
                         android:text=""
                         android:singleLine="true"
                         android:layout_marginTop="4dp"
                         android:textColor="?attr/textColor"
                         android:textSize="16sp" />
+
+
                     <TextView
                         android:visibility="gone"
                         android:id="@+id/text_view_new_messages"

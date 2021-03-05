@@ -65,7 +65,7 @@ class ChatsFragment : Fragment(R.layout.chats_fragment) {
         }
 
         viewModel.chats.observe(viewLifecycleOwner) { chats ->
-            adapter.load(chats)
+            adapter.submitList(chats)
         }
 
         viewModel.error.observe(viewLifecycleOwner) { error ->
@@ -122,17 +122,19 @@ class ChatsFragment : Fragment(R.layout.chats_fragment) {
     }
 
     private fun setupRecyclerView() {
-        adapter = ChatsAdapter({ avatar, isGroup, imageView ->
-            Avatar.load(
-                requireContext(),
-                imageView,
-                avatar,
-                if (isGroup) R.drawable.ic_round_group else R.drawable.ic_round_person
-            )
-        }, { chat ->
-            redirectToChat(chat)
-        })
-
+        adapter = ChatsAdapter().apply {
+            onLoadAvatar = { avatar, isGroup, imageView ->
+                Avatar.load(
+                    requireContext(),
+                    imageView,
+                    avatar,
+                    if (isGroup) R.drawable.ic_round_group else R.drawable.ic_round_person
+                )
+            }
+            onChatClicked = { chat ->
+                redirectToChat(chat)
+            }
+        }
         binding.recyclerViewChats.layoutManager = LinearLayoutManager(requireContext())
         binding.recyclerViewChats.adapter = adapter
     }

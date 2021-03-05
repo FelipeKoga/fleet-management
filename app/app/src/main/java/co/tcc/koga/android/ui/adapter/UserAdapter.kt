@@ -44,7 +44,7 @@ class UserAdapter(
             Avatar.load(
                 context,
                 imageViewAvatar,
-                user.avatarUrl ?: Constants.getAvatarURL(user.name, user.color, 42),
+                user.avatar ?: Constants.getAvatarURL(user.name, user.color),
                 R.drawable.ic_round_person
             )
         }

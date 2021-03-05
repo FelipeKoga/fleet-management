@@ -14,7 +14,6 @@ import io.reactivex.subjects.PublishSubject
 import java.lang.Exception
 
 class Client {
-
     private val subject = PublishSubject.create<Constants.AuthStatus>()
     val subCurrentUser = PublishSubject.create<UserEntity>()
 
@@ -29,7 +28,6 @@ class Client {
             .initialize(applicationContext,
                 object : Callback<UserStateDetails> {
                     override fun onResult(result: UserStateDetails?) {
-                        println(result?.userState)
                         when (result?.userState) {
                             UserState.SIGNED_OUT -> onInitSuccess(false)
                             UserState.SIGNED_IN -> {

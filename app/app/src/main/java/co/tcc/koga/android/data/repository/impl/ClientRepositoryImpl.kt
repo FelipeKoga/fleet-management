@@ -6,6 +6,7 @@ import co.tcc.koga.android.data.database.dao.UserDAO
 import co.tcc.koga.android.data.database.entity.UserEntity
 import co.tcc.koga.android.data.network.aws.Client
 import co.tcc.koga.android.data.network.retrofit.Service
+import co.tcc.koga.android.data.network.socket.WebSocketService
 import co.tcc.koga.android.data.repository.ClientRepository
 import co.tcc.koga.android.utils.Constants
 import com.amazonaws.mobile.auth.core.internal.util.ThreadUtils
