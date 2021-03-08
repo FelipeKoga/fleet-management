@@ -4,14 +4,18 @@ import androidx.lifecycle.*
 import co.tcc.koga.android.data.database.entity.ChatEntity
 import co.tcc.koga.android.data.database.entity.UserEntity
 import co.tcc.koga.android.data.repository.ChatsRepository
+import co.tcc.koga.android.data.repository.ClientRepository
 import co.tcc.koga.android.data.repository.UserRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 
 class NewGroupViewModel @Inject constructor(
     private val userRepository: UserRepository,
-    private val chatsRepository: ChatsRepository
+    private val chatsRepository: ChatsRepository,
+    private val clientRepository: ClientRepository
 ) :
     ViewModel() {
     private val _chatCreated = MutableLiveData<ChatEntity>()
@@ -39,27 +43,28 @@ class NewGroupViewModel @Inject constructor(
     }
 
     fun getUsers() = viewModelScope.launch {
-        val users = userRepository.getLocalUsers()
-
+        withContext(Dispatchers.IO) {
+            userRepository.getUsers().subscribe { users ->
+                _users.postValue(users.filter { it.username != clientRepository.user().username })
+            }
+        }
     }
 
-    fun handleSelectedUser(user: UserEntity) {
-        val users = _selectedUsers.value?.toMutableList()
-//        if (user.isSelected) {
-//            if (users.isNullOrEmpty()) {
-//                _selectedUsers.postValue(listOf(user))
-//            } else {
-//                users.add(user)
-//                _selectedUsers.postValue(users)
-//            }
-//        } else {
-//            if (users.isNullOrEmpty()) _selectedUsers.postValue(listOf())
-//            else
-//                _selectedUsers.postValue(users.filter {
-//                    it.username !== user.username
-//                })
-//        }
 
-        _users.postValue(_users.value?.map { if (user.username === it.username) user else it })
+    fun handleUserSelected(user: UserEntity) {
+        var users = _selectedUsers.value?.toMutableList()
+        val found = users?.find { it.username == user.username }
+        if (found != null) {
+            users?.remove(user)
+        } else {
+            if (users.isNullOrEmpty()) {
+                users = mutableListOf(user)
+            } else {
+                users.add(user)
+            }
+        }
+
+        println(users)
+        _selectedUsers.postValue(users)
     }
 }

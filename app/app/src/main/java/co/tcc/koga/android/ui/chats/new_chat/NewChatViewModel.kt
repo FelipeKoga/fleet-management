@@ -32,7 +32,7 @@ class NewChatViewModel @Inject constructor(
     fun getUsers() = viewModelScope.launch {
         withContext(Dispatchers.IO) {
             userRepository.getUsers().subscribe { users ->
-                _users.postValue(users.filter { it.username == clientRepository.user().username })
+                _users.postValue(users.filter { it.username != clientRepository.user().username })
             }
         }
     }
@@ -58,6 +58,4 @@ class NewChatViewModel @Inject constructor(
             println(e)
         }
     }
-
-
 }

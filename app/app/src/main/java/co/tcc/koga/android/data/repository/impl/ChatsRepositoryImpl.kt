@@ -10,6 +10,7 @@ import co.tcc.koga.android.data.network.payload.OpenChatPayload
 import co.tcc.koga.android.data.network.socket.*
 import co.tcc.koga.android.data.repository.ChatsRepository
 import co.tcc.koga.android.data.domain.ChatsResponse
+import co.tcc.koga.android.data.network.payload.NewGroupPayload
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -32,7 +33,8 @@ class ChatsRepositoryImpl @Inject constructor(
             return@Comparator (chat2.messages.last()?.createdAt?.minus(chat1.messages.last()?.createdAt!!))!!.toInt();
         }
         return chatDao.getAll().subscribeOn(Schedulers.computation()).map { chats ->
-            ChatsResponse(chats.sortedWith(comparator), true)
+            ChatsResponse(chats.filter { chat -> chat.messages.isNotEmpty() }
+                .sortedWith(comparator), true)
         }
     }
 
@@ -69,22 +71,19 @@ class ChatsRepositoryImpl @Inject constructor(
     }
 
     override suspend fun createGroup(
-        members: List<Any>,
+        members: List<UserEntity>,
         groupName: String,
         avatar: String,
     ): ChatEntity {
-//        val currentUser = Client.getInstance().currentUser
-//        val usersEntity = members.map {
-//            UserEntity(it.username, it.email, it.fullName, it.phone, it.companyId, it.avatar)
-//        }
-//        val newChat = service.createChat(
-//            currentUser.username,
-//            currentUser.companyId,
-//            NewChatPayload("", false, groupName, avatar, currentUser.username, usersEntity)
-//        )
-//        chatDao.insert(newChat)
-        return ChatEntity("", 0)
+        val currentUser = Client.getInstance().currentUser
+        val newChat = service.createGroup(
+            currentUser.username,
+            currentUser.companyId,
+            NewGroupPayload(groupName, members.map { user -> user.username })
+        )
 
+        chatDao.insert(newChat)
+        return newChat
     }
 
     override suspend fun openChat(chatId: String) {

@@ -4,6 +4,7 @@ import co.tcc.koga.android.data.database.entity.ChatEntity
 import co.tcc.koga.android.data.database.entity.MessageEntity
 import co.tcc.koga.android.data.database.entity.UserEntity
 import co.tcc.koga.android.data.network.payload.NewChatPayload
+import co.tcc.koga.android.data.network.payload.NewGroupPayload
 import co.tcc.koga.android.data.network.payload.UploadResponse
 import co.tcc.koga.android.data.network.payload.UploadUrlPayload
 import io.reactivex.Observable
@@ -34,6 +35,13 @@ interface Service {
         @Path("username") username: String,
         @Path("companyId") companyId: String,
         @Body newChatPayload: NewChatPayload,
+    ): ChatEntity
+
+    @POST("company/{companyId}/users/{username}/group ")
+    suspend fun createGroup(
+        @Path("username") username: String,
+        @Path("companyId") companyId: String,
+        @Body newGroupPayload: NewGroupPayload,
     ): ChatEntity
 
     @GET("company/{companyId}/users/{username}/chats/{chatId}/messages")

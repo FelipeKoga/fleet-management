@@ -51,7 +51,7 @@ class GroupDetailsFragment : Fragment() {
             }
 
             recyclerViewGroupMembers.layoutManager = LinearLayoutManager(requireContext())
-            val adapter = GroupMembersAdapter(viewModel.user.username).apply {
+            val adapter = GroupMembersAdapter(args.chat, viewModel.user.username).apply {
                 onLoadAvatar = { avatar, imageView ->
                     Avatar.load(
                         requireContext(),
@@ -84,6 +84,7 @@ class GroupDetailsFragment : Fragment() {
                 R.drawable.ic_round_group
             )
 
+            toolbarChatDetails.title = args.chat.groupName
             textViewGroupCreatedAt.text = FormatterUtil.getFullDate(args.chat.createdAt as Long)
             textViewGroupAdmin.text =
                 args.chat.members?.find { it.username == viewModel.user.username }?.name

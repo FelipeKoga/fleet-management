@@ -15,6 +15,7 @@ import co.tcc.koga.android.ui.MainActivity
 import co.tcc.koga.android.R
 import co.tcc.koga.android.databinding.NewChatFragmentBinding
 import co.tcc.koga.android.ui.adapter.UserAdapter
+import co.tcc.koga.android.utils.Avatar
 import co.tcc.koga.android.utils.hide
 import co.tcc.koga.android.utils.show
 import kotlinx.android.synthetic.main.new_chat_fragment.*
@@ -38,18 +39,70 @@ class NewChatFragment : Fragment(R.layout.new_chat_fragment) {
         savedInstanceState: Bundle?
     ): View {
         binding = NewChatFragmentBinding.inflate(inflater)
-        binding.apply {
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        setupViews()
+        setupRecyclerView()
+        setupViewModel()
+    }
+
+    private fun setupRecyclerView() {
+        adapter = UserAdapter().apply {
+            onLoadAvatar = { avatar, imageView ->
+                Avatar.load(
+                    requireContext(),
+                    imageView,
+                    avatar,
+                    R.drawable.ic_round_person
+                )
+            }
+
+            onUserClicked = { user ->
+                viewModel.createChat(user.username)
+            }
+        }
+
+        binding.run {
+            recyclerViewUsers.layoutManager = LinearLayoutManager(requireContext())
+            recyclerViewUsers.adapter = adapter
+        }
+    }
+
+    private fun setupViewModel() {
+        viewModel.users.observe(viewLifecycleOwner, { users ->
+            adapter.submitList(users)
+        })
+
+        viewModel.filteredUsers.observe(viewLifecycleOwner) { filteredUsers ->
+            adapter.submitList(filteredUsers)
+        }
+
+        viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
+            if (isLoading) binding.progressBarUsers.show() else binding.progressBarUsers.hide()
+        }
+
+        viewModel.chatCreated.observe(viewLifecycleOwner, { chat ->
+            findNavController().popBackStack()
+            findNavController().navigate(
+                R.id.action_nav_chatsFragment_to_chatFragment,
+                bundleOf("chat" to chat)
+            )
+        })
+
+        viewModel.getUsers()
+    }
+
+    private fun setupViews() {
+        binding.run {
             toolbarSearchContacts.setNavigationOnClickListener {
                 findNavController().popBackStack()
             }
-            adapter = UserAdapter(container?.context as Context, listOf(), fun(user) {
-                progressBarCreateChat.show()
-                viewModel.createChat(user.username)
-            })
-            recyclerViewUsers.layoutManager = LinearLayoutManager(requireContext())
-            recyclerViewUsers.adapter = adapter
 
             floatingButtonNewGroup.setOnClickListener {
+
                 findNavController().navigate(R.id.action_newChatFragment_to_newGroupFragment)
             }
 
@@ -59,42 +112,9 @@ class NewChatFragment : Fragment(R.layout.new_chat_fragment) {
                 } else {
                     viewModel.clearFilter()
                 }
-
                 true
             }
-
         }
-        return binding.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-
-        viewModel.users.observe(viewLifecycleOwner, { users ->
-            adapter.users = users
-            adapter.notifyDataSetChanged()
-        })
-
-        viewModel.filteredUsers.observe(viewLifecycleOwner) { filteredUsers ->
-            adapter.users = filteredUsers
-            adapter.notifyDataSetChanged()
-        }
-
-        viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
-            if (isLoading) binding.progressBarUsers.show() else binding.progressBarUsers.hide()
-        }
-
-        viewModel.chatCreated.observe(viewLifecycleOwner, {
-            println(it)
-            findNavController().popBackStack()
-            findNavController().navigate(
-                R.id.action_nav_chatsFragment_to_chatFragment,
-                bundleOf("chat" to it)
-            )
-        })
-
-        viewModel.getUsers()
 
     }
 

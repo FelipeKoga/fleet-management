@@ -56,7 +56,7 @@ class ChatsAdapter : ListAdapter<ChatEntity, ChatsAdapter.ChatsViewHolder>(DIFF_
                     imageViewMessageStatus.hide()
                     if (chat.messages.isNotEmpty()) {
                         imageViewMessageStatus.show()
-                        if (chat.messages[0]?.status == "SENT") {
+                        if (chat.messages.last()?.status == "SENT") {
                             imageViewMessageStatus.setImageResource(R.drawable.ic_baseline_check)
                         } else {
                             imageViewMessageStatus.setImageResource(R.drawable.ic_baseline_timer)
@@ -73,6 +73,7 @@ class ChatsAdapter : ListAdapter<ChatEntity, ChatsAdapter.ChatsViewHolder>(DIFF_
                     onLoadAvatar?.invoke(chat.avatar, true, imageViewAvatar)
                     textViewName.text = chat.groupName
                     imageViewUserStatusOffline.hide()
+                    imageViewMessageStatus.hide()
                 }
 
                 if (chat.newMessages > 0) {

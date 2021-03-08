@@ -18,13 +18,12 @@ interface ChatsRepository {
 
 
     suspend fun createGroup(
-        members: List<Any>,
+        members: List<UserEntity>,
         groupName: String,
         avatar: String,
     ): ChatEntity
 
     suspend fun openChat(chatId: String)
-
 
     suspend fun insertChat(chat: ChatEntity)
 

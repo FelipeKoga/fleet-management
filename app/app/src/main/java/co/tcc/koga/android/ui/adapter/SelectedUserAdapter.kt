@@ -8,60 +8,64 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 
 import androidx.recyclerview.widget.RecyclerView
 import co.tcc.koga.android.R
 import co.tcc.koga.android.data.database.entity.UserEntity
+import co.tcc.koga.android.databinding.RowSelectedUserBinding
+import co.tcc.koga.android.databinding.RowUserBinding
+import co.tcc.koga.android.utils.Constants
 
-class SelectedUserAdapter(
-    var context: Context,
-    var users: List<UserEntity>,
-    var onUserRemoved: (user: UserEntity) -> Unit
-) :
-    RecyclerView.Adapter<SelectedUserAdapter.UserViewHolder>() {
+class SelectedUserAdapter :
+    ListAdapter<UserEntity, SelectedUserAdapter.SelectedUserViewHolder>(DIFF_CALLBACK) {
 
-    class UserViewHolder(itemView: View) :
-        RecyclerView.ViewHolder(itemView) {
-        private val view = itemView
-        private val textViewName: TextView = itemView.text_view_selected_user
-        private val imageViewAvatar: ImageView = itemView.image_view_selected_user_avatar
 
-        fun bindView(user: UserEntity, context: Context, onUserRemoved: (user: UserEntity) -> Unit) {
-            textViewName.text = user.name
-            view.setOnClickListener {
-//                user.isSelected = false
-                onUserRemoved(user)
+    var onLoadAvatar: ((avatar: String?, imageView: ImageView) -> Unit)? = null
+    var onUserClicked: ((user: UserEntity) -> Unit)? = null
+
+    class SelectedUserViewHolder(val binding: RowSelectedUserBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+
+        fun bindView(
+            user: UserEntity,
+            onUserClicked: ((user: UserEntity) -> Unit)?,
+            onLoadAvatar: ((avatar: String?, imageView: ImageView) -> Unit)?
+        ) {
+            binding.run {
+                textViewSelectedUser.text = user.name
+                imageViewRemoveSelected.setOnClickListener { onUserClicked?.invoke(user) }
+                onLoadAvatar?.invoke(
+                    user.avatar ?: Constants.getAvatarURL(user.name, user.color),
+                    imageViewSelectedUserAvatar
+                )
             }
-            bindAvatar(user, context)
-        }
-
-        private fun bindAvatar(user: UserEntity, context: Context) {
-//            Glide
-//                .with(context)
-//                .load(user.avatar)
-//                .centerInside()
-//                .apply(RequestOptions.circleCropTransform())
-//                .error(R.drawable.ic_round_person)
-//                .placeholder(R.drawable.ic_round_person)
-//                .into(imageViewAvatar)
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UserViewHolder {
-        return UserViewHolder(
-            LayoutInflater.from(parent.context)
-                .inflate(R.layout.row_selected_user, parent, false)
-        )
-    }
-
-    override fun getItemCount(): Int {
-        return users.size
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SelectedUserViewHolder {
+        return SelectedUserViewHolder(RowSelectedUserBinding.inflate(LayoutInflater.from(parent.context)))
     }
 
 
-    override fun onBindViewHolder(holder: UserViewHolder, position: Int) {
-        val users = users[position]
-        holder.bindView(users, context, onUserRemoved)
+    override fun onBindViewHolder(holder: SelectedUserViewHolder, position: Int) {
+        holder.bindView(getItem(position), onUserClicked, onLoadAvatar)
+    }
+
+    companion object {
+        private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<UserEntity>() {
+            override fun areItemsTheSame(oldItem: UserEntity, newItem: UserEntity): Boolean {
+                return oldItem.username == newItem.username
+            }
+
+            override fun areContentsTheSame(
+                oldItem: UserEntity,
+                newItem: UserEntity
+            ): Boolean {
+                return oldItem == newItem
+            }
+        }
     }
 
 }

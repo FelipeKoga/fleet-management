@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
     <color name="online">#32cd32</color>
-    <color name="offline">#9a001a</color>
-    <color name="occupied">#ffcc00</color>
     <color name="mtrl_textinput_default_box_stroke_color" tools:override="true">#1a237e</color>
     <color name="primaryColor">#2c4ebd</color>
-
 </resources>

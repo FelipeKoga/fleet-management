@@ -6,22 +6,24 @@ import android.widget.ImageView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import co.tcc.koga.android.data.database.entity.ChatEntity
 import co.tcc.koga.android.data.database.entity.UserEntity
-import co.tcc.koga.android.databinding.RowGroupMemberBinding
+import co.tcc.koga.android.databinding.RowUserBinding
 import co.tcc.koga.android.utils.Constants
 import co.tcc.koga.android.utils.show
 
 
-class GroupMembersAdapter(private val currentUsername: String) :
+class GroupMembersAdapter(private val chat: ChatEntity, private val currentUsername: String) :
     ListAdapter<UserEntity, GroupMembersAdapter.GroupMemberViewHolder>(DIFF_CALLBACK) {
 
     var onLoadAvatar: ((avatar: String?, imageView: ImageView) -> Unit)? = null
     var onMemberClicked: ((member: UserEntity) -> Unit)? = null
 
-    class GroupMemberViewHolder(val binding: RowGroupMemberBinding) :
+    class GroupMemberViewHolder(val binding: RowUserBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(
+            chat: ChatEntity,
             member: UserEntity,
             currentUsername: String,
             onLoadAvatar: ((avatar: String?, imageView: ImageView) -> Unit)?,
@@ -37,10 +39,15 @@ class GroupMembersAdapter(private val currentUsername: String) :
                     ), imageViewAvatar
                 )
 
+                if (chat.admin == currentUsername && member.username != currentUsername) {
+                    imageViewRemove.show()
+                }
+
                 if (member.username == currentUsername) {
                     textViewAdmin.show()
                 }
-                linearLayoutRowGroupMember.setOnClickListener {
+
+                linearLayoutUserContainer.setOnClickListener {
                     if (member.username != currentUsername) {
                         onMemberClicked?.invoke(member)
                     }
@@ -50,11 +57,11 @@ class GroupMembersAdapter(private val currentUsername: String) :
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GroupMemberViewHolder {
-        return GroupMemberViewHolder(RowGroupMemberBinding.inflate(LayoutInflater.from(parent.context)))
+        return GroupMemberViewHolder(RowUserBinding.inflate(LayoutInflater.from(parent.context)))
     }
 
     override fun onBindViewHolder(holder: GroupMemberViewHolder, position: Int) {
-        holder.bind(getItem(position), currentUsername, onLoadAvatar, onMemberClicked)
+        holder.bind(chat, getItem(position), currentUsername, onLoadAvatar, onMemberClicked)
     }
 
     companion object {

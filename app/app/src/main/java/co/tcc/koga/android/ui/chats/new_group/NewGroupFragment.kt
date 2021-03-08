@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -14,17 +15,17 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import co.tcc.koga.android.ui.MainActivity
 import co.tcc.koga.android.R
 import co.tcc.koga.android.databinding.NewGroupFragmentBinding
-import co.tcc.koga.android.ui.adapter.SelectUserAdapter
 import co.tcc.koga.android.ui.adapter.SelectedUserAdapter
+import co.tcc.koga.android.ui.adapter.UserAdapter
+import co.tcc.koga.android.utils.Avatar
 import co.tcc.koga.android.utils.hide
 import co.tcc.koga.android.utils.show
 import javax.inject.Inject
 
 
 class NewGroupFragment : Fragment() {
-    private lateinit var selectAdapter: SelectUserAdapter
+    private lateinit var selectAdapter: UserAdapter
     private lateinit var selectedAdapter: SelectedUserAdapter
-
     private lateinit var binding: NewGroupFragmentBinding
 
     @Inject
@@ -39,31 +40,75 @@ class NewGroupFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = NewGroupFragmentBinding.inflate(inflater)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         setupRecyclerViews()
+        setupViewModel()
 
-        viewModel.getUsers()
-        viewModel.users.observe(viewLifecycleOwner, {
+        binding.floatingButtonCreateGroup.setOnClickListener {
+            viewModel.createChat(binding.textFieldGroupName.text.toString(), "")
+        }
+    }
 
-//            selectAdapter.users = it
-            selectAdapter.notifyDataSetChanged()
-        })
+    private fun setupRecyclerViews() {
+        binding.apply {
+            selectAdapter = UserAdapter().apply {
+                onLoadAvatar = { avatar, imageView ->
+                    loadAvatar(avatar, imageView)
+                }
 
-        viewModel.selectedUsers.observe(viewLifecycleOwner, {
-            if (it.isNullOrEmpty()) {
-                binding.recyclerViewSelectedUsers.hide()
-                binding.floatingButtonCreateGroup.hide()
-            } else {
-                if (it.isNotEmpty()) binding.floatingButtonCreateGroup.show()
-                binding.recyclerViewSelectedUsers.show()
-                selectedAdapter.users = it
-                selectedAdapter.notifyDataSetChanged()
+
+                onUserClicked = { user ->
+                    viewModel.handleUserSelected(user)
+                }
             }
 
-        })
 
-        viewModel.chatCreated.observe(viewLifecycleOwner, {
+            selectedAdapter = SelectedUserAdapter().apply {
+                onUserClicked = { user ->
+                    viewModel.handleUserSelected(user)
+                }
+
+                onLoadAvatar = { avatar, imageView ->
+                    loadAvatar(avatar, imageView)
+                }
+            }
+
+            recyclerViewUsersNewGroup.layoutManager = LinearLayoutManager(requireContext())
+            recyclerViewUsersNewGroup.adapter = selectAdapter
+
+            val layoutManager =
+                LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+            recyclerViewSelectedUsers.layoutManager = layoutManager
+            recyclerViewSelectedUsers.adapter = selectedAdapter
+        }
+    }
+
+    private fun setupViewModel() {
+        viewModel.users.observe(viewLifecycleOwner) { users ->
+            selectAdapter.submitList(users)
+        }
+
+        viewModel.selectedUsers.observe(viewLifecycleOwner) {
+            binding.run {
+                if (it.isNullOrEmpty()) {
+                    recyclerViewSelectedUsers.hide()
+                    floatingButtonCreateGroup.hide()
+                } else {
+                    if (it.isNotEmpty()) floatingButtonCreateGroup.show()
+                    recyclerViewSelectedUsers.show()
+                }
+            }
+
+            selectedAdapter.submitList(it)
+        }
+
+        viewModel.chatCreated.observe(viewLifecycleOwner) {
             println("Chat created")
             findNavController().popBackStack()
             findNavController().popBackStack()
@@ -71,30 +116,18 @@ class NewGroupFragment : Fragment() {
                 R.id.action_nav_chatsFragment_to_chatFragment,
                 bundleOf("chat" to it)
             )
-        })
-
-        binding.floatingButtonCreateGroup.setOnClickListener {
-            viewModel.createChat(binding.textFieldGroupName.text.toString(), "")
         }
 
-        return binding.root
+        viewModel.getUsers()
     }
 
-    private fun setupRecyclerViews() {
-        binding.apply {
-//            selectAdapter = SelectUserAdapter(requireContext(), listOf(), fun(user) {
-//                viewModel.handleSelectedUser(user)
-//            })
-            selectedAdapter = SelectedUserAdapter(requireContext(), listOf(), fun(user) {
-                viewModel.handleSelectedUser(user)
-            })
-            recyclerViewUsersNewGroup.layoutManager = LinearLayoutManager(requireContext())
-            val layoutManager =
-                LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
-            recyclerViewUsersNewGroup.adapter = selectAdapter
-            recyclerViewSelectedUsers.layoutManager = layoutManager
-            recyclerViewSelectedUsers.adapter = selectedAdapter
-        }
-    }
 
+    private fun loadAvatar(avatar: String?, imageView: ImageView) {
+        Avatar.load(
+            requireContext(),
+            imageView,
+            avatar,
+            R.drawable.ic_round_person
+        )
+    }
 }
