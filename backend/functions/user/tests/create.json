@@ -3,11 +3,12 @@
     "pathParameters": {
         "companyId": "1"
     },
+    "resource": "",
     "body": {
-        "name": "Teste 1",
-        "email": "teste1@gmail.com",
-        "password": "123@1234",
-        "customName": "Koguinha",
+        "name": "Felipe Koga",
+        "email": "kosloski.fkoga@gmail.com",
+        "username": "kosloski.fkoga@gmail.com",
+        "customName": "Koga",
         "status": "OFFLINE",
         "role": "ADMIN",
         "phone": "42999991093"

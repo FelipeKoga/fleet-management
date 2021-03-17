@@ -2,7 +2,7 @@ const { getByPK, fetchBySK, insert, update } = require('./query');
 const { removeConnectionIds } = require('./connection');
 
 const ProjectionExpression =
-    'username, #name, email, avatar, #status, #role, phone, companyId, customName, locationUpdate, color, locationEnabled, notificationEnabled, pushToTalkEnabled';
+    'username, #name, email, avatar, avatarKey, avatarExpiration, #status, #role, phone, companyId, customName, locationUpdate, color, locationEnabled, notificationEnabled, pushToTalkEnabled';
 
 async function getUser(username, companyId) {
     return getByPK({
@@ -55,6 +55,8 @@ async function updateUser(
         role,
         status,
         avatar,
+        avatarKey,
+        avatarExpiration,
         locationEnabled,
         pushToTalkEnabled,
         notificationEnabled,
@@ -68,15 +70,17 @@ async function updateUser(
             sortKey: `CONFIG#${companyId}`,
         },
         UpdateExpression:
-            'set customName = :customName, phone = :phone, email = :email, #role = :role, #status = :status, #name = :name, #avatar = :avatar, #locationEnabled = :locationEnabled, #pushToTalkEnabled = :pushToTalkEnabled, #notificationEnabled = :notificationEnabled',
+            'set customName = :customName, phone = :phone, email = :email, #role = :role, #status = :status, #name = :name, #avatar = :avatar, #avatarKey = :avatarKey, #avatarExpiration = :avatarExpiration,#locationEnabled = :locationEnabled, #pushToTalkEnabled = :pushToTalkEnabled, #notificationEnabled = :notificationEnabled',
         ExpressionAttributeNames: {
             '#status': 'status',
             '#role': 'role',
             '#name': 'name',
             '#avatar': 'avatar',
+            '#avatarExpiration': 'avatarExpiration',
             '#locationEnabled': 'locationEnabled',
             '#pushToTalkEnabled': 'pushToTalkEnabled',
             '#notificationEnabled': 'notificationEnabled',
+            '#avatarKey': 'avatarKey',
         },
         ExpressionAttributeValues: {
             ':customName': customName,
@@ -86,9 +90,11 @@ async function updateUser(
             ':status': status,
             ':name': name,
             ':avatar': avatar,
+            ':avatarExpiration': avatarExpiration,
             ':locationEnabled': locationEnabled,
             ':pushToTalkEnabled': pushToTalkEnabled,
             ':notificationEnabled': notificationEnabled,
+            ':avatarKey': avatarKey,
         },
     });
 }

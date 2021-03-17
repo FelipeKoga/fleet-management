@@ -1,6 +1,6 @@
 const randomColor = require('randomcolor');
+const { isBefore, setMinutes, isAfter } = require('date-fns');
 const { Cognito, Database, Lambda, S3, Email } = require('../services');
-const { getObject } = require('../services/s3');
 
 const generateRandomString = length => {
     const characters =
@@ -29,10 +29,13 @@ async function postMessage(user, action) {
 
 async function get(username, companyId) {
     const user = await Database.user.getUser(username, companyId);
-    if (user.avatar) {
-        user.avatarUrl = S3.getObject(user.avatar);
+    console.log(user);
+    if (user.avatarKey) {
+        console.log(isAfter(user.avatarExpiration, Date.now()));
+        if (isBefore(user.avatarExpiration, Date.now())) {
+            user.avatar = S3.getObject(user.avatarKey);
+        }
     }
-
     user.location = await Database.location.getLastLocation(username);
 
     return user;
@@ -43,13 +46,7 @@ async function list(companyId) {
 
     return Promise.all(
         users.map(async user => {
-            return {
-                ...user,
-                avatarUrl: user.avatar ? S3.getObject(user.avatar) : undefined,
-                location: await Database.location.getLastLocation(
-                    user.username,
-                ),
-            };
+            return get(user.username, companyId);
         }),
     );
 }
@@ -79,16 +76,20 @@ async function create(data, companyId) {
 
 async function update(data, username, companyId) {
     const user = await get(username, companyId);
-    if (user.status === 'DISABLED') {
-        await Cognito.enable(username);
-    }
-    const payload = { ...data };
-    if (payload.avatar) {
-        payload.avatarUrl = getObject(data.avatar);
+    const payload = { ...user, ...data };
+
+    if (payload.avatar || payload.avatarKey) {
+        payload.avatarKey = !payload.avatarKey
+            ? payload.avatar
+            : payload.avatarKey;
+        payload.avatar = S3.getObject(payload.avatarKey);
+        payload.avatarExpiration = +setMinutes(Date.now(), 604800);
     }
 
+    console.log(payload);
+
     await Database.user.updateUser(payload, username, companyId);
-    await postMessage(user, 'USER_UPDATED');
+    await postMessage(payload, 'USER_UPDATED');
     return { ...user, ...payload };
 }
 
