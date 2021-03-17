@@ -73,7 +73,7 @@ async function getUser(username) {
             '#name': 'name',
         },
         ProjectionExpression:
-            'username, #name, email, avatar, #status, #role, phone, companyId, color, locationUpdate, locationEnabled, notificationEnabled, pushToTalkEnabled',
+            'username, #name, email, avatar, avatarKey, #status, #role, phone, companyId, color, locationUpdate, locationEnabled, notificationEnabled, pushToTalkEnabled',
     });
 }
 
