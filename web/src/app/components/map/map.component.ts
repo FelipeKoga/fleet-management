@@ -70,7 +70,7 @@ export class MapComponent implements OnInit {
               latitude: +user.location.latitude,
               longitude: +user.location.longitude,
               icon: {
-                url: user.avatarUrl ? user.avatarUrl : this.getUserAvatar(user),
+                url: user.avatar ? user.avatar : this.getUserAvatar(user),
               },
               user,
             });

@@ -22,7 +22,6 @@ export class User {
   customName: string;
   companyId: string;
   avatar: string;
-  avatarUrl?: string;
   location?: Location;
   locationUpdate: number;
   color: string;
@@ -37,7 +36,6 @@ export class User {
     companyId = "",
     username = email,
     avatar = "",
-    avatarUrl = "",
     location = null,
     locationUpdate = 0,
     color = "#2196f3",
@@ -51,7 +49,6 @@ export class User {
     this.username = username;
     this.companyId = companyId;
     this.avatar = avatar;
-    this.avatarUrl = avatarUrl;
     this.location = location;
     this.locationUpdate = locationUpdate;
     this.color = color;

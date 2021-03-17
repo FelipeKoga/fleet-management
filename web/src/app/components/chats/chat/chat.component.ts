@@ -237,10 +237,22 @@ export class ChatComponent implements OnInit {
     console.log("opa!@");
     this.recordingPTT = true;
     const currentTime = Date.now();
-    this.pttService.start(this.chat.id, this.user, (blob) => {
-      console.log(blob);
-      this.uploadAudio(blob, Date.now() - currentTime);
-    });
+
+    const members = this.chat.members
+      ? this.chat.members.map((member) => member.username)
+      : null;
+    const receiver = this.chat.user ? this.chat.user : null;
+    console.log(this.chat.id, this.user, receiver, members);
+    this.pttService.start(
+      this.chat.id,
+      this.user,
+      receiver,
+      members,
+      (blob) => {
+        console.log(blob);
+        this.uploadAudio(blob, Date.now() - currentTime);
+      }
+    );
   }
 
   public stopRecordingPTT() {

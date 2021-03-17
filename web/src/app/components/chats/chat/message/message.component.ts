@@ -46,7 +46,7 @@ export class MessageComponent implements OnInit {
       this.message.hasAudio &&
       this.message.status !== MessageStatus.PROCESSING_AUDIO
     ) {
-      this.audioService.loadAudio(this.message.message);
+      this.audioService.loadAudio(this.message.message, this.message.duration);
     }
   }
 

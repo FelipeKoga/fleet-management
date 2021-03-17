@@ -38,23 +38,23 @@ export class AudioService extends StateService<StreamState> {
     this.audioState$ = this.select((state) => state);
   }
 
-  public loadAudio(url: string) {
+  public loadAudio(url: string, duration: number) {
     this.audio.src = url;
     this.audio.load();
 
     this.audio.addEventListener("canplay", (e) => {
       this.setState({
         ...this.state,
-        duration: this.audio.duration,
-        readableDuration: this.formatTime(this.audio.duration),
+        duration: duration,
+        readableDuration: this.formatTime(duration),
       });
     });
 
     this.audio.addEventListener("loadedmetadata", (e) => {
       this.setState({
         ...this.state,
-        duration: this.audio.duration,
-        readableDuration: this.formatTime(this.audio.duration),
+        duration: duration,
+        readableDuration: this.formatTime(duration),
       });
     });
 
@@ -63,8 +63,8 @@ export class AudioService extends StateService<StreamState> {
       () => {
         this.setState({
           ...this.state,
-          duration: this.audio.duration,
-          readableDuration: this.formatTime(this.audio.duration),
+          duration: duration,
+          readableDuration: this.formatTime(duration),
         });
       },
       false
@@ -86,7 +86,7 @@ export class AudioService extends StateService<StreamState> {
     });
   }
 
-  public play({ messageId, message }: Message) {
+  public play({ messageId, message, duration }: Message) {
     this.setState({
       ...this.state,
       playing: false,
@@ -97,7 +97,7 @@ export class AudioService extends StateService<StreamState> {
     }
 
     if (this.audio.src !== message) {
-      this.loadAudio(message);
+      this.loadAudio(message, duration);
     }
 
     this.setState({

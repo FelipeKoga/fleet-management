@@ -45,7 +45,7 @@
               <div *ngIf="chat.private" class="user-photo-wrapper">
                 <img
                   class="user-photo"
-                  [src]="chat.user.avatarUrl || getUserAvatar(chat.user)"
+                  [src]="chat.user.avatar || getUserAvatar(chat.user)"
                 />
                 <div
                   [ngClass]="
@@ -57,10 +57,10 @@
               </div>
 
               <div *ngIf="!chat.private">
-                <ng-container *ngIf="chat.avatarUrl; else elseTemplate">
+                <ng-container *ngIf="chat.avatar; else elseTemplate">
                   <img
                     class="user-photo"
-                    [src]="chat.avatarUrl"
+                    [src]="chat.avatar"
                     onerror="this.src='assets/default_group.png';"
                   />
                 </ng-container>

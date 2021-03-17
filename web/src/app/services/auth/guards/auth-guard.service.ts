@@ -28,27 +28,19 @@ export class AuthGuard implements CanActivate {
       this.authService.authStore().subscribe((authStore) => {
         if (authStore.isLoading) return;
 
-        console.log(_router.data);
-        if (authStore.isLoggedIn) {
-          if (_state.url === "/login") {
-            this.router.navigate(["/map"]);
-          }
-
+        if (!authStore.isLoggedIn) {
+          this.router.navigate(["/login"]);
+          observer.next(false);
+        } else {
           if (
             _router.data.roles.find(
               (role: string) => role === authStore.user.role
             )
           ) {
             observer.next(true);
+          } else {
+            observer.next(false);
           }
-        } else {
-          if (
-            _state.url !== AuthStack.LOGIN &&
-            _state.url !== AuthStack.FORGOT_PASSWORD
-          ) {
-            this.router.navigate(["/login"]);
-          }
-          observer.next(false);
         }
 
         observer.complete();

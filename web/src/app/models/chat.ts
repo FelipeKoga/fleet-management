@@ -11,6 +11,5 @@ export class Chat {
   user?: User;
   createdAt: number;
   avatar?: string;
-  avatarUrl?: string;
   members?: User[];
 }

@@ -3,7 +3,7 @@
   <h4>Selecione um funcionário para adicionar no grupo.</h4>
   <div (click)="addMember(user)" *ngFor="let user of users" class="user-item">
     <div style="display: flex">
-      <img class="user-avatar" [src]="user.avatarUrl || getUserAvatar(user)" />
+      <img class="user-avatar" [src]="user.avatar || getUserAvatar(user)" />
       <div>
         <div style="font-weight: 500">{{ user.name }}</div>
         <div>{{ user.email }}</div>

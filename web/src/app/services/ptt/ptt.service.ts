@@ -9,7 +9,6 @@ declare var MediaRecorder: any;
 const mime = ["audio/wav", "audio/mpeg", "audio/webm", "audio/ogg"].filter(
   MediaRecorder.isTypeSupported
 )[0];
-
 @Injectable({
   providedIn: "root",
 })
@@ -19,7 +18,10 @@ export class PttService {
   private source: MediaStreamAudioSourceNode;
   private chatId: string;
   private user: User;
+  private members: string[];
+  private receiver: User;
   private mediaRecorder;
+  private variable: AudioWorkletNode;
 
   private audioProcessingListener: (
     this: ScriptProcessorNode,
@@ -32,13 +34,25 @@ export class PttService {
   constructor(
     private webSocketService: WebsocketService,
     private http: HttpClient
-  ) {
-    this.context = new AudioContext({ sampleRate: 8000 });
-  }
+  ) {}
 
-  public async start(chatId: string, user: User, onStop: (blob: Blob) => void) {
+  public async start(
+    chatId: string,
+    user: User,
+    receiver: User,
+    members: string[],
+    onStop: (blob: Blob) => void
+  ) {
+    console.log("START PUSH TO TALK...");
     this.user = user;
     this.chatId = chatId;
+    this.members = members;
+    this.receiver = receiver;
+    this.context = new AudioContext({
+      sampleRate: 8000,
+    });
+    this.processor = this.context.createScriptProcessor(0, 1, 1);
+
     this.recording$.next(true);
     this.webSocketService.sendMessage({
       action: Actions.PUSH_TO_TALK,
@@ -46,15 +60,16 @@ export class PttService {
         type: Actions.START_PUSH_TO_TALK,
         chatId,
         username: this.user.username,
+        members,
+        receiver: this.receiver.username,
       },
     });
 
     const stream = await navigator.mediaDevices.getUserMedia({
       audio: true,
     });
-
-    this.source = this.context.createMediaStreamSource(stream);
     this.audioProcessingListener = (e) => {
+      console.log("AUDIO PROCESSING", e);
       this.webSocketService.sendMessage({
         action: Actions.PUSH_TO_TALK,
         body: {
@@ -62,37 +77,46 @@ export class PttService {
           username: this.user.username,
           inputData: e.inputBuffer.getChannelData(0).toString(),
           length: e.inputBuffer.length,
+          members,
+          receiver: receiver.username,
         },
       });
     };
-    this.processor = this.context.createScriptProcessor(1024, 1, 1);
+
+    this.source = this.context.createMediaStreamSource(stream);
     this.source.connect(this.processor);
-    this.processor.connect(this.context.destination);
     this.processor.addEventListener(
       "audioprocess",
       this.audioProcessingListener
     );
-    this.startMediaRecorder(stream, onStop);
+    this.processor.connect(this.context.destination);
+
+    // this.startMediaRecorder(stream, onStop);
   }
 
   public stop() {
-    this.recording$.next(false);
-    this.mediaRecorder.stop();
-    this.processor.removeEventListener(
-      "audioprocess",
-      this.audioProcessingListener,
-      true
-    );
-    this.processor.disconnect(this.context.destination);
-    this.source.disconnect();
-    this.webSocketService.sendMessage({
-      action: Actions.PUSH_TO_TALK,
-      body: {
-        type: Actions.STOP_PUSH_TO_TALK,
-        chatId: this.chatId,
-        username: this.user.username,
-      },
-    });
+    console.log("STOP!");
+    if (this.recording$.value) {
+      this.recording$.next(false);
+      // this.mediaRecorder.stop();
+      this.processor.removeEventListener(
+        "audioprocess",
+        this.audioProcessingListener,
+        true
+      );
+      this.processor.disconnect(this.context.destination);
+      this.source.disconnect();
+      this.webSocketService.sendMessage({
+        action: Actions.PUSH_TO_TALK,
+        body: {
+          type: Actions.STOP_PUSH_TO_TALK,
+          chatId: this.chatId,
+          username: this.user.username,
+          members: this.members,
+          receiver: this.receiver.username,
+        },
+      });
+    }
   }
 
   public playAudio(audioBufferString: string, length: number) {
@@ -101,10 +125,12 @@ export class PttService {
       .map((value: string) => +value);
 
     const buf = this.context.createBuffer(1, length, 8000);
+    console.log(parsedAudioBuffer);
     buf.copyToChannel(new Float32Array(parsedAudioBuffer), 0);
     const player = this.context.createBufferSource();
     player.buffer = buf;
     player.connect(this.context.destination);
+    console.log("START!");
     player.start(0);
   }
 
@@ -155,7 +181,9 @@ export class PttService {
 
   public startReceivingPushToTalk(chatId: string) {
     if (this.busy(chatId)) return;
-
+    this.context = new AudioContext({
+      sampleRate: 8000,
+    });
     this.chatId = chatId;
     this.receiving$.next(true);
   }

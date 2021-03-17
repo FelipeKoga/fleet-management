@@ -33,7 +33,7 @@
           <img
             onerror="this.src='assets/default_user.png';"
             class="user-photo"
-            [src]="user.avatarUrl || getUserAvatar(user)"
+            [src]="user.avatar || getUserAvatar(user)"
           />
         </div>
         <agm-info-window #infoWindow>
@@ -49,7 +49,7 @@
                 <img
                   onerror="this.src='assets/default_user.png';"
                   class="user-photo"
-                  [src]="user.avatarUrl || getAvatar(user.name)"
+                  [src]="user.avatar || getAvatar(user.name)"
                 />
               </div>
             </div>

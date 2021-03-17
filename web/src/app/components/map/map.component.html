@@ -73,7 +73,7 @@
             <div class="user-photo-wrapper">
               <img
                 class="user-photo"
-                [src]="user.avatarUrl || getUserAvatar(user)"
+                [src]="user.avatar || getUserAvatar(user)"
               />
               <div
                 [ngClass]="
@@ -182,9 +182,7 @@
                 <div class="user-photo-wrapper">
                   <img
                     class="user-photo"
-                    [src]="
-                      selectedUser.avatarUrl || getUserAvatar(selectedUser)
-                    "
+                    [src]="selectedUser.avatar || getUserAvatar(selectedUser)"
                   />
                 </div>
               </div>

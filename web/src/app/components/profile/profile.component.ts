@@ -71,7 +71,7 @@ export class ProfileComponent implements OnInit {
     this.file = file.target.files[0];
     if (!this.file) return;
     this.isLoadingAvatar = true;
-    const key = `company/${this.user.companyId}/user/${this.user.username}/avatar.jpg`;
+    const key = `company/${this.user.companyId}/user/${this.user.username}/avatar.jpeg`;
     this.http
       .post(
         `https://2p8b6trvua.execute-api.us-east-1.amazonaws.com/dev/files`,

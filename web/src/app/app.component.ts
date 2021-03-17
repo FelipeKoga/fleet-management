@@ -47,6 +47,7 @@ export class AppComponent implements OnInit {
           }
 
           if (message.action === Actions.STARTED_PUSH_TO_TALK) {
+            console.log("START RECEIVED PTT");
             this.pttService.startReceivingPushToTalk(message.body.chatId);
             this.snackbar.openFromComponent(PttSnackbarComponent, {
               data: new User({ name: "Koga" }),
@@ -57,6 +58,7 @@ export class AppComponent implements OnInit {
           }
 
           if (message.action === Actions.RECEIVED_PUSH_TO_TALK) {
+            console.log(message);
             this.pttService.playAudio(
               message.body.inputData,
               message.body.length
@@ -64,6 +66,7 @@ export class AppComponent implements OnInit {
           }
 
           if (message.action === Actions.STOPPED_PUSH_TO_TALK) {
+            console.log("STOOOOOOP!!");
             this.snackbar.dismiss();
             this.pttService.stopReceivingPushToTalk();
           }

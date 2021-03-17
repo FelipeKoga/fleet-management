@@ -35,7 +35,7 @@
             object-fit: cover;
             height: 100%;
           "
-          [src]="chat.user.avatarUrl || getUserAvatar(chat.user)"
+          [src]="chat.user.avatar || getUserAvatar(chat.user)"
         />
       </div>
 
@@ -76,7 +76,7 @@
               background-color: #c0c0c0;
             "
             onerror="this.src='assets/default_group.png';"
-            [src]="chat.avatarUrl"
+            [src]="chat.avatar"
           />
           <input
             type="file"

@@ -62,7 +62,7 @@ export class DetailsComponent implements OnInit {
     }
 
     if (!this.chat.private) {
-      this.members = [...this.chat.members, this.user];
+      this.members = [...this.chat.members];
       this.administratorForm
         .get("admin")
         .setValue(
