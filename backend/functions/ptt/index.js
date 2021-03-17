@@ -1,16 +1,13 @@
 const { sendMessage } = require('./invoke');
-const { fetchConnectionIds, fetchChatUsers } = require('./database');
+const { fetchConnectionIds } = require('./database');
 
 const merge = array => array.reduce((a, b) => a.concat(b), []);
-async function getChatUsers(chatId, username) {
-    const chatUsers = await fetchChatUsers(chatId);
 
+async function getConnectionIds(receivers) {
     const promises = [];
-    chatUsers
-        .filter(chatUser => chatUser !== username)
-        .forEach(chatUser => {
-            promises.push(fetchConnectionIds(chatUser));
-        });
+    receivers.forEach(receiver => {
+        promises.push(fetchConnectionIds(receiver));
+    });
 
     const connectionIdsArrays = await Promise.all(promises);
 
@@ -24,14 +21,25 @@ exports.handler = async event => {
         type,
         chatId,
         username,
+        receiver,
+        receivers,
         inputData,
         outputData,
         length,
     } = payload.body;
 
-    const connectionIds = await getChatUsers(chatId, username);
+    console.log(payload.body);
+
+    let connectionIds = [];
+    if (receiver) {
+        connectionIds = merge(await fetchConnectionIds(receiver));
+    } else {
+        connectionIds = await getConnectionIds(receivers);
+    }
 
     console.log(connectionIds);
+    console.log(type);
+
     let body;
     let action;
     if (type === 'START_PUSH_TO_TALK') {
