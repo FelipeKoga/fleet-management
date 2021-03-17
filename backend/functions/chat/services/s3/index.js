@@ -9,7 +9,7 @@ const getObject = key => {
     return s3.getSignedUrl('getObject', {
         Bucket: 'tcc-project-assets',
         Key: key,
-        Expires: 3600,
+        Expires: 604800,
     });
 };
 

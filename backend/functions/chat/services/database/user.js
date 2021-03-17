@@ -1,4 +1,4 @@
-const { getByPK, fetchByPK } = require('./query');
+const { getByPK, fetchByPK, update } = require('./query');
 
 async function getUser(username) {
     return getByPK(
@@ -10,6 +10,25 @@ async function getUser(username) {
         },
         false,
     );
+}
+
+async function updateUserAvatar(user, avatar, expiration) {
+    return update({
+        Key: {
+            partitionKey: `USER#${user.username}`,
+            sortKey: `CONFIG#${user.companyId}`,
+        },
+        UpdateExpression:
+            'set #avatar = :avatar, #avatarExpiration = :avatarExpiration',
+        ExpressionAttributeNames: {
+            '#avatar': 'avatar',
+            '#avatarExpiration': 'avatarExpiration',
+        },
+        ExpressionAttributeValues: {
+            ':avatar': avatar,
+            ':avatarExpiration': expiration,
+        },
+    });
 }
 
 async function fetchConnectionIds(username) {
@@ -30,4 +49,5 @@ async function fetchConnectionIds(username) {
 module.exports = {
     getUser,
     fetchConnectionIds,
+    updateUserAvatar,
 };

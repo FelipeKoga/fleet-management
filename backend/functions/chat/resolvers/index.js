@@ -1,14 +1,11 @@
+const { setMinutes, isBefore } = require('date-fns');
 const { nanoid } = require('nanoid');
 const Database = require('../services/database');
 const Lambda = require('../services/lambda');
 const S3 = require('../services/s3');
 
 async function getUser(username) {
-    const user = await Database.user.getUser(username);
-    if (user.avatar) {
-        user.avatarUrl = S3.getObject(user.avatar);
-    }
-    return user;
+    return Database.user.getUser(username);
 }
 
 async function sendWebSocketMessage(username, body, action) {
@@ -23,24 +20,28 @@ async function getChat(chatId, username, member) {
         username,
     );
     chat.user = member ? await getUser(member) : null;
+
+    if (chat.user && chat.user.avatar) {
+        if (isBefore(chat.user.avatarExpiration, Date.now())) {
+            chat.user.avatar = S3.getObject(chat.user.avatarKey);
+            await Database.user.updateUserAvatar(
+                chat.user,
+                chat.user.avatar,
+                +setMinutes(Date.now(), 604800),
+            );
+        }
+    }
+
     const lastMessage = await Database.message.getLastMessage(chatId);
 
     if (lastMessage && lastMessage.hasAudio) {
         lastMessage.message = S3.getObject(lastMessage.message);
     }
 
-    if (chat.avatar) {
-        chat.avatarUrl = S3.getObject(chat.avatar);
-    }
-
     if (!chat.private) {
         const users = await Database.chat.fetchChatUsers(chatId);
         const promises = [];
-
-        users
-            .filter(user => user !== username)
-            .forEach(user => promises.push(Database.user.getUser(user)));
-
+        users.forEach(user => promises.push(Database.user.getUser(user)));
         chat.members = await Promise.all(promises);
     }
 
@@ -255,6 +256,8 @@ async function viewedMessages({ chatId, username }) {
           )
         : await getChat(chatId, username);
 
+    console.log(chat);
+
     await sendWebSocketMessage(username, chat, 'CHAT_UPDATED');
 }
 
@@ -345,7 +348,7 @@ async function updateGroup(chatId, username, { groupName, admin }) {
 }
 
 async function addGroupAvatar(chatId, username, avatar) {
-    await Database.chat.updateGroupAvatar(chatId, avatar);
+    await Database.chat.updateGroupAvatar(chatId, S3.getObject(avatar));
     const chat = await getChat(chatId, username);
     const users = await Database.chat.fetchChatUsers(chatId);
 
