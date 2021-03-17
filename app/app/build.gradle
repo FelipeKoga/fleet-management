@@ -10,6 +10,8 @@ apply plugin: 'kotlin-kapt'
 
 apply plugin: "androidx.navigation.safeargs.kotlin"
 
+apply plugin: 'com.google.gms.google-services'
+
 android {
     compileSdkVersion 29
     buildToolsVersion "29.0.3"
@@ -105,6 +107,7 @@ dependencies {
     implementation "com.tinder.scarlet:lifecycle-android:0.1.11"
     implementation "com.tinder.scarlet:websocket-okhttp:0.1.11"
 
+    implementation platform('com.google.firebase:firebase-bom:26.6.0')
 
     implementation 'com.google.android.gms:play-services-maps:17.0.0'
     implementation 'com.google.android.gms:play-services-location:17.1.0'

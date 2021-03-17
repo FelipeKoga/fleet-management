@@ -2,48 +2,54 @@ package co.tcc.koga.android.ui.chats.chat
 
 import android.content.Context
 import android.media.AudioFormat
+import android.media.AudioRecord
 import android.media.MediaMetadataRetriever
 import android.media.MediaRecorder
 import android.net.Uri
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import co.tcc.koga.android.data.database.entity.ChatEntity
 import co.tcc.koga.android.data.database.entity.MessageEntity
 import co.tcc.koga.android.data.network.socket.ChatActions
 import co.tcc.koga.android.data.network.socket.MessageActions
 import co.tcc.koga.android.data.network.socket.UserActions
-import co.tcc.koga.android.data.repository.AudioRepository
-import co.tcc.koga.android.data.repository.ChatsRepository
-import co.tcc.koga.android.data.repository.ClientRepository
-import co.tcc.koga.android.data.repository.MessageRepository
-import kotlinx.coroutines.Dispatchers
-
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import co.tcc.koga.android.data.repository.*
+import co.tcc.koga.android.ui.chats.chat.utils.PushToTalkMetadata
+import kotlinx.coroutines.*
 import java.io.*
-import java.lang.Exception
 import java.util.*
 import javax.inject.Inject
+
 
 class ChatViewModel @Inject constructor(
     private val repository: MessageRepository,
     private val chatsRepository: ChatsRepository,
     private val clientRepository: ClientRepository,
     private val audioRepository: AudioRepository,
-    private val context: Context,
-) : ViewModel() {
+    private val context: Context, private val pushToTalkRepository: PushToTalkRepository,
+
+    ) : ViewModel() {
     private val _chat = MutableLiveData<ChatEntity>()
     private val _messages = MutableLiveData<MutableList<MessageEntity?>>()
     private val _isLoading = MutableLiveData(false)
     private val _error = MutableLiveData(false)
+    private val _isRecordingPushToTalk = MutableLiveData(false)
 
     val chat: LiveData<ChatEntity> get() = _chat
     val messages: LiveData<MutableList<MessageEntity?>> get() = _messages
     val isLoading: LiveData<Boolean> get() = _isLoading
     val error: LiveData<Boolean> get() = _error
+    val isRecordingPushToTalk: LiveData<Boolean> get() = _isRecordingPushToTalk
+
+    @Volatile
+    var isRecording: Boolean = false
 
     val username = clientRepository.user().username
     private var file: File? = null
     private var recorder: MediaRecorder? = null
+    private lateinit var pushToTalkRecorder: AudioRecord
     private var startRecorder: Long = System.currentTimeMillis()
     private var stopRecorder: Long = System.currentTimeMillis()
     lateinit var chatId: String
@@ -143,7 +149,6 @@ class ChatViewModel @Inject constructor(
     fun stopRecording() {
         recorder?.stop()
         recorder?.release()
-
         val audioMessageEntity = getNewAudioMessage()
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
@@ -157,7 +162,7 @@ class ChatViewModel @Inject constructor(
         try {
             val uri = Uri.parse(file?.absolutePath)
             val mmr = MediaMetadataRetriever()
-            mmr.setDataSource(context,uri)
+            mmr.setDataSource(context, uri)
             val durationStr = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
             val millSecond = Integer.parseInt(durationStr)
             audioMessageEntity.duration = millSecond.toLong()
@@ -169,9 +174,6 @@ class ChatViewModel @Inject constructor(
         } catch (e: IOException) {
             e.printStackTrace()
         }
-
-
-
         uploadAudio(audioMessageEntity)
     }
 
@@ -209,6 +211,57 @@ class ChatViewModel @Inject constructor(
             clientRepository.user().username,
             "",
             hasAudio = true
+        )
+    }
+
+    var receiver = chat.value?.user?.username
+    var receivers =
+        if (chat.value?.members != null) chat.value?.members?.map { it.username } else null
+
+
+    fun startPushToTalk() {
+        _isRecordingPushToTalk.postValue(true)
+
+        receiver = chat.value?.user?.username
+        receivers =
+            if (chat.value?.members != null) chat.value?.members?.map { it.username } else null
+
+        initRecorder()
+
+        isRecording = true
+        pushToTalkRecorder.startRecording()
+        pushToTalkRepository.start(chatId, receiver, receivers)
+        Thread {
+            while (isRecording) {
+                val data = FloatArray(1024)
+                pushToTalkRecorder.read(data, 0, data.size, AudioRecord.READ_BLOCKING)
+                pushToTalkRepository.send(chatId, receiver, receivers, data.joinToString(), 1024)
+            }
+        }.start()
+
+    }
+
+
+    fun stopPushToTalk() {
+//        println("STOP PUSH TO TALK!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+        isRecording = false
+        pushToTalkRecorder.stop()
+        pushToTalkRepository.stop(chatId, receiver, receivers)
+        _isRecordingPushToTalk.postValue(false)
+    }
+
+    private val metadata = PTTMetadata()
+
+    private fun initRecorder() {
+        val min = AudioRecord.getMinBufferSize(
+            metadata.sampleRate,
+            metadata.channel,
+            metadata.encoding
+        )
+        metadata.bufferSize = min
+        pushToTalkRecorder = AudioRecord(
+            MediaRecorder.AudioSource.MIC, metadata.sampleRate,
+            metadata.channel, metadata.encoding, min
         )
     }
 }

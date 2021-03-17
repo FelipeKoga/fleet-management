@@ -40,6 +40,7 @@ class UserRepositoryImpl @Inject constructor(
     }
 
     override fun sendLocation(latitude: Double, longitude: Double) {
+        println("SEND LOCATION")
         webSocketService.send(
             WebSocketPayload(
                 WebSocketActions.SEND_LOCATION,

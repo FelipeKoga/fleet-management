@@ -33,6 +33,15 @@ fun setServiceState(context: Context, state: ServiceState) {
 //}
 
 fun requestLocationPermission(context: Context): Boolean {
+    println("OPA")
+    println(ActivityCompat.checkSelfPermission(
+        context,
+        Manifest.permission.ACCESS_FINE_LOCATION
+    ) == PackageManager.PERMISSION_GRANTED)
+    println(ActivityCompat.checkSelfPermission(
+        context,
+        Manifest.permission.ACCESS_COARSE_LOCATION
+    ) == PackageManager.PERMISSION_GRANTED)
     if (ActivityCompat.checkSelfPermission(
             context,
             Manifest.permission.ACCESS_FINE_LOCATION

@@ -33,7 +33,7 @@ class ChatsRepositoryImpl @Inject constructor(
             return@Comparator (chat2.messages.last()?.createdAt?.minus(chat1.messages.last()?.createdAt!!))!!.toInt();
         }
         return chatDao.getAll().subscribeOn(Schedulers.computation()).map { chats ->
-            ChatsResponse(chats.filter { chat -> chat.messages.isNotEmpty() }
+            ChatsResponse(chats.filter { chat -> chat.messages.isNotEmpty() || chat.user == null }
                 .sortedWith(comparator), true)
         }
     }

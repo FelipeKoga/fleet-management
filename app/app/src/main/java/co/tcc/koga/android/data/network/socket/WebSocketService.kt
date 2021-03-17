@@ -3,6 +3,7 @@ package co.tcc.koga.android.data.network.socket
 import co.tcc.koga.android.data.database.entity.ChatEntity
 import co.tcc.koga.android.data.database.entity.MessageEntity
 import co.tcc.koga.android.data.database.entity.UserEntity
+import co.tcc.koga.android.data.network.payload.PushToTalkResponse
 import com.tinder.scarlet.WebSocket
 import com.tinder.scarlet.ws.Receive
 import com.tinder.scarlet.ws.Send
@@ -21,4 +22,6 @@ interface WebSocketService {
     @Receive
     fun observeUser(): Observable<WebSocketMessage<UserEntity, UserActions>>
 
+    @Receive
+    fun observePushToTalk(): Observable<WebSocketMessage<PushToTalkResponse, PushToTalkActions>>
 }

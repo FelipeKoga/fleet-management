@@ -67,6 +67,7 @@ class NetworkModule {
             )
             .lifecycle(lifecycleRegistry)
             .addMessageAdapterFactory(MoshiMessageAdapter.Factory())
+
             .addStreamAdapterFactory(RxJava2StreamAdapterFactory())
             .build()
 

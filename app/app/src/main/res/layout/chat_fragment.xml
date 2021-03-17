@@ -128,7 +128,7 @@
                 android:gravity="center"
                 android:orientation="vertical"
                 android:padding="0dp"
-                android:visibility="gone">
+                android:visibility="visible">
 
                 <View
                     android:id="@+id/divider2"
@@ -137,18 +137,19 @@
                     android:layout_marginBottom="14dp"
                     android:background="?android:attr/listDivider" />
 
-                <ImageView
-                    android:id="@+id/animation_view"
+                <ImageButton
+                    android:id="@+id/image_button_push_to_talk"
                     android:layout_width="180dp"
                     android:layout_height="180dp"
                     android:layout_marginBottom="12dp"
-                    android:background="@drawable/shape_rounded_mic"
+                    android:background="@drawable/shape_rounded_mic_blue"
                     android:elevation="2dp"
                     android:scaleType="centerCrop"
-                    app:srcCompat="@drawable/ic_round_mic_none_200"
+                    app:srcCompat="@drawable/ic_big_mic_grey"
                     app:tint="?colorPrimary" />
 
                 <TextView
+                    android:id="@+id/text_view_push_to_talk"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="2dp"
@@ -165,7 +166,7 @@
                 android:layout_marginEnd="8dp"
                 android:layout_marginBottom="4dp"
                 android:orientation="horizontal"
-                android:visibility="visible">
+                android:visibility="gone">
 
                 <LinearLayout
                     android:layout_width="0dp"
@@ -192,33 +193,33 @@
                         android:visibility="visible"
                         tools:ignore="NestedWeights" />
 
-                    <!--                    <LinearLayout-->
-                    <!--                        android:layout_width="wrap_content"-->
-                    <!--                        android:layout_height="wrap_content"-->
-                    <!--                        android:id="@+id/linear_layout_keyboard_action"-->
-                    <!--                        android:orientation="horizontal">-->
-                    <!--                        <ImageButton-->
-                    <!--                            android:id="@+id/image_button_attach"-->
-                    <!--                            android:layout_width="wrap_content"-->
-                    <!--                            android:layout_height="wrap_content"-->
-                    <!--                            android:layout_gravity="center"-->
-                    <!--                            android:tint="?colorPrimary"-->
-                    <!--                            android:backgroundTint="@android:color/transparent"-->
-                    <!--                            android:src="@drawable/ic_round_attach_file"-->
-                    <!--                            android:visibility="visible"-->
-                    <!--                            app:borderWidth="0dp" />-->
+<!--                                        <LinearLayout-->
+<!--                                            android:layout_width="wrap_content"-->
+<!--                                            android:layout_height="wrap_content"-->
+<!--                                            android:id="@+id/linear_layout_keyboard_action"-->
+<!--                                            android:orientation="horizontal">-->
+<!--                                            <ImageButton-->
+<!--                                                android:id="@+id/image_button_attach"-->
+<!--                                                android:layout_width="wrap_content"-->
+<!--                                                android:layout_height="wrap_content"-->
+<!--                                                android:layout_gravity="center"-->
+<!--                                                android:tint="?colorPrimary"-->
+<!--                                                android:backgroundTint="@android:color/transparent"-->
+<!--                                                android:src="@drawable/ic_round_attach_file"-->
+<!--                                                android:visibility="visible"-->
+<!--                                                app:borderWidth="0dp" />-->
 
-                    <!--                        <ImageButton-->
-                    <!--                            android:id="@+id/image_button_show_audio"-->
-                    <!--                            android:layout_width="wrap_content"-->
-                    <!--                            android:layout_height="wrap_content"-->
-                    <!--                            android:layout_gravity="center"-->
-                    <!--                            android:backgroundTint="@android:color/transparent"-->
-                    <!--                            android:src="@drawable/ic_round_camera"-->
-                    <!--                            android:visibility="visible"-->
-                    <!--                            android:tint="?colorPrimary"-->
-                    <!--                            app:borderWidth="0dp" />-->
-                    <!--                    </LinearLayout>-->
+<!--                                            <ImageButton-->
+<!--                                                android:id="@+id/image_button_show_audio"-->
+<!--                                                android:layout_width="wrap_content"-->
+<!--                                                android:layout_height="wrap_content"-->
+<!--                                                android:layout_gravity="center"-->
+<!--                                                android:backgroundTint="@android:color/transparent"-->
+<!--                                                android:src="@drawable/ic_round_camera"-->
+<!--                                                android:visibility="visible"-->
+<!--                                                android:tint="?colorPrimary"-->
+<!--                                                app:borderWidth="0dp" />-->
+<!--                                        </LinearLayout>-->
 
                     <ImageButton
                         android:id="@+id/image_button_send_message"

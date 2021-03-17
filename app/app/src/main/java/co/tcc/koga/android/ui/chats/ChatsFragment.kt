@@ -55,6 +55,7 @@ class ChatsFragment : Fragment(R.layout.chats_fragment) {
         viewModel.observeChatUpdates()
         viewModel.observeUserUpdates()
         viewModel.observeMessageUpdates()
+        viewModel.observePushToTalk()
 
         viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
             if (isLoading) {

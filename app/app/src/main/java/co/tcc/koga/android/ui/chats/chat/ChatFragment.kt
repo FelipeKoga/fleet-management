@@ -3,7 +3,9 @@ package co.tcc.koga.android.ui.chats.chat
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.media.*
 import android.os.Bundle
 import android.view.*
 import android.widget.ImageView
@@ -18,7 +20,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import co.tcc.koga.android.R
-import co.tcc.koga.android.data.database.entity.ChatEntity
 import co.tcc.koga.android.data.database.entity.UserEntity
 import co.tcc.koga.android.databinding.ChatFragmentBinding
 import co.tcc.koga.android.ui.MainActivity
@@ -91,6 +92,18 @@ class ChatFragment : Fragment(R.layout.chat_fragment) {
                         textViewChatTitle.text = chat.groupName
                     }
                 }
+            }
+
+            isRecordingPushToTalk.observe(viewLifecycleOwner) { isRecording ->
+                binding.imageButtonPushToTalk.run {
+                    if (isRecording) {
+                        setImageResource(R.drawable.ic_big_mic_grey)
+                        setBackgroundResource(R.drawable.shape_rounded_mic_green)
+                    } else {
+                        setImageResource(R.drawable.ic_big_mic_blue)
+                        setBackgroundResource(R.drawable.shape_rounded_mic_blue)
+                    }
+                }
 
             }
         }
@@ -157,8 +170,7 @@ class ChatFragment : Fragment(R.layout.chat_fragment) {
                     true
                 }
                 setNavigationOnClickListener {
-                    if (findNavController().popBackStack(R.id.chatsFragment, false)) {
-                    } else {
+                    if (!findNavController().popBackStack(R.id.chatsFragment, false)) {
                         findNavController().navigate(R.id.chatsFragment)
                     }
                 }
@@ -173,7 +185,7 @@ class ChatFragment : Fragment(R.layout.chat_fragment) {
     private fun loadChatAvatar(imageView: ImageView) {
         val url: String? = if (args.chat.user !== null) {
             val user = args.chat.user as UserEntity
-            user.avatar ?: Constants.getAvatarURL(user.name,user.color)
+            user.avatar ?: Constants.getAvatarURL(user.name, user.color)
         } else {
             args.chat.avatar
         }
@@ -208,20 +220,8 @@ class ChatFragment : Fragment(R.layout.chat_fragment) {
             }
 
             imageButtonSendAudio.setOnLongClickListener {
-                if (ContextCompat.checkSelfPermission(
-                        requireContext(),
-                        Manifest.permission.RECORD_AUDIO
-                    ) != PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(
-                        requireContext(),
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE
-                    ) != PackageManager.PERMISSION_GRANTED
-                ) {
-                    val permissions = arrayOf(
-                        Manifest.permission.RECORD_AUDIO,
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                        Manifest.permission.READ_EXTERNAL_STORAGE
-                    )
-                    requestPermissions(permissions, 0)
+                if (needsPermission()) {
+                    requestAudioPermission(1001)
                 } else {
                     startRecording()
                 }
@@ -238,6 +238,9 @@ class ChatFragment : Fragment(R.layout.chat_fragment) {
                 false
             }
 
+
+
+
             imageButtonSendMessage.setOnClickListener {
                 val message = editTextMessage.text.toString()
                 if (message.isNotEmpty()) {
@@ -245,6 +248,28 @@ class ChatFragment : Fragment(R.layout.chat_fragment) {
                     sendMessage(message)
                 }
             }
+        }
+
+        binding.imageButtonPushToTalk.setOnTouchListener { _, event ->
+            when (event.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    if (needsPermission()) {
+                        requestAudioPermission(1000)
+                    } else {
+//                        startRecording()
+                        startRecordingPTT()
+                    }
+                    return@setOnTouchListener true
+                }
+
+                MotionEvent.ACTION_UP -> {
+                    stopRecordingPTT()
+//                    stopRecording()
+                    return@setOnTouchListener true
+                }
+
+            }
+            false
         }
 
     }
@@ -261,6 +286,14 @@ class ChatFragment : Fragment(R.layout.chat_fragment) {
         viewModel.sendMessage(message, args.chat.id)
     }
 
+    private fun startRecordingPTT() {
+        viewModel.startPushToTalk()
+    }
+
+    private fun stopRecordingPTT() {
+        viewModel.stopPushToTalk()
+    }
+
     private fun openChatDetails() {
         if (args.chat.user !== null) {
             findNavController().navigate(
@@ -274,6 +307,41 @@ class ChatFragment : Fragment(R.layout.chat_fragment) {
             )
         }
 
+    }
+
+
+    private fun needsPermission(): Boolean {
+        if (ContextCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.RECORD_AUDIO
+            ) != PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            return true
+        }
+        return false
+    }
+
+    private fun requestAudioPermission(code: Int) {
+        val permissions = arrayOf(
+            Manifest.permission.RECORD_AUDIO,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.READ_EXTERNAL_STORAGE
+        )
+        requestPermissions(permissions, code)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == 1000) {
+            startRecordingPTT()
+        }
+
+        if (resultCode == 1001) {
+            startRecording()
+        }
     }
 }
 

@@ -36,6 +36,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         viewModel.observeUserStatus()
         viewModel.isSignIn.observe(this) { isSignIn ->
+            println("LOGADO?????????????? $isSignIn")
             if (isSignIn) {
                 if (viewModel.isLocationEnabled()) {
                     if (requestLocationPermission(this)) {

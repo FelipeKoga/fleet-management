@@ -27,7 +27,7 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 
-class AudioRepositoryImpl @Inject constructor(val service: Service, private val context: Context) :
+class AudioRepositoryImpl @Inject constructor(val service: Service) :
     AudioRepository {
 
     override fun uploadUrl(key: String): Observable<UploadResponse> {

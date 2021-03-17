@@ -111,7 +111,7 @@ class LocationService : Service() {
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         fusedLocationClient?.lastLocation?.addOnSuccessListener { location ->
             println("Location: $location")
-            if (location !== null) {
+            if (location != null) {
                 repository.sendLocation(location.latitude, location.longitude)
             }
         }
