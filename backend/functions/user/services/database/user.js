@@ -55,8 +55,6 @@ async function updateUser(
         role,
         status,
         avatar,
-        avatarKey,
-        avatarExpiration,
         locationEnabled,
         pushToTalkEnabled,
         notificationEnabled,
@@ -70,17 +68,15 @@ async function updateUser(
             sortKey: `CONFIG#${companyId}`,
         },
         UpdateExpression:
-            'set customName = :customName, phone = :phone, email = :email, #role = :role, #status = :status, #name = :name, #avatar = :avatar, #avatarKey = :avatarKey, #avatarExpiration = :avatarExpiration,#locationEnabled = :locationEnabled, #pushToTalkEnabled = :pushToTalkEnabled, #notificationEnabled = :notificationEnabled',
+            'set customName = :customName, phone = :phone, email = :email, #role = :role, #status = :status, #name = :name, #avatar = :avatar,#locationEnabled = :locationEnabled, #pushToTalkEnabled = :pushToTalkEnabled, #notificationEnabled = :notificationEnabled',
         ExpressionAttributeNames: {
             '#status': 'status',
             '#role': 'role',
             '#name': 'name',
             '#avatar': 'avatar',
-            '#avatarExpiration': 'avatarExpiration',
             '#locationEnabled': 'locationEnabled',
             '#pushToTalkEnabled': 'pushToTalkEnabled',
             '#notificationEnabled': 'notificationEnabled',
-            '#avatarKey': 'avatarKey',
         },
         ExpressionAttributeValues: {
             ':customName': customName,
@@ -90,11 +86,28 @@ async function updateUser(
             ':status': status,
             ':name': name,
             ':avatar': avatar,
-            ':avatarExpiration': avatarExpiration,
             ':locationEnabled': locationEnabled,
             ':pushToTalkEnabled': pushToTalkEnabled,
             ':notificationEnabled': notificationEnabled,
-            ':avatarKey': avatarKey,
+        },
+    });
+}
+
+async function updateUserAvatar(user, avatar, expiration) {
+    return update({
+        Key: {
+            partitionKey: `USER#${user.username}`,
+            sortKey: `CONFIG#${user.companyId}`,
+        },
+        UpdateExpression:
+            'set #avatar = :avatar, #avatarExpiration = :avatarExpiration',
+        ExpressionAttributeNames: {
+            '#avatar': 'avatar',
+            '#avatarExpiration': 'avatarExpiration',
+        },
+        ExpressionAttributeValues: {
+            ':avatar': avatar,
+            ':avatarExpiration': expiration,
         },
     });
 }
@@ -122,4 +135,5 @@ module.exports = {
     createUser,
     updateUser,
     disableUser,
+    updateUserAvatar,
 };

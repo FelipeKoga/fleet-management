@@ -1,4 +1,4 @@
-const { setMinutes, isBefore } = require('date-fns');
+const { setSeconds } = require('date-fns');
 const { nanoid } = require('nanoid');
 const Database = require('../services/database');
 const Lambda = require('../services/lambda');
@@ -22,12 +22,12 @@ async function getChat(chatId, username, member) {
     chat.user = member ? await getUser(member) : null;
 
     if (chat.user && chat.user.avatar) {
-        if (isBefore(chat.user.avatarExpiration, Date.now())) {
+        if (Date.now() >= chat.user.avatarExpiration) {
             chat.user.avatar = S3.getObject(chat.user.avatarKey);
             await Database.user.updateUserAvatar(
                 chat.user,
                 chat.user.avatar,
-                +setMinutes(Date.now(), 604800),
+                +setSeconds(Date.now(), 86400),
             );
         }
     }
@@ -232,7 +232,6 @@ async function addMessage({
 
 async function getMessages(chatId) {
     const messages = await Database.message.fetchMessages(chatId);
-    console.log(messages);
     return messages.map(message => {
         const item = { ...message };
         if (item.hasAudio && item.message) {

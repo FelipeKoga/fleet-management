@@ -1,4 +1,4 @@
-const { isBefore } = require('date-fns');
+const { setSeconds } = require('date-fns');
 const { Database, Lambda } = require('../services');
 const { getObject } = require('../services/s3');
 
@@ -19,10 +19,13 @@ async function addConnection(connectionId, username) {
         await Database.updateStatus(username, user.companyId, 'ONLINE');
         user.status = 'ONLINE';
         if (user.avatar) {
-            const params = new URLSearchParams(user.avatar);
-            const expires = params.get('Expires');
-            if (isBefore(expires, Date.now())) {
+            if (Date.now() >= user.avatarExpiration) {
                 user.avatar = getObject(user.avatarKey);
+                await Database.updateUserAvatar(
+                    user,
+                    user.avatar,
+                    +setSeconds(Date.now(), 86400),
+                );
             }
         }
         user.location = await Database.getLastLocation(username);
@@ -35,10 +38,13 @@ async function deleteConnection(connectionId) {
     await Database.deleteConnectionId(username, connectionId);
     const user = await Database.getUser(username);
     if (user.avatar) {
-        const params = new URLSearchParams(user.avatar);
-        const expires = params.get('Expires');
-        if (isBefore(expires, Date.now())) {
+        if (Date.now() >= user.avatarExpiration) {
             user.avatar = getObject(user.avatarKey);
+            await Database.updateUserAvatar(
+                user,
+                user.avatar,
+                +setSeconds(Date.now(), 86400),
+            );
         }
     }
 

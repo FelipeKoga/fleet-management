@@ -123,6 +123,25 @@ async function getLastLocation(username) {
     });
 }
 
+async function updateUserAvatar(user, avatar, expiration) {
+    return update({
+        Key: {
+            partitionKey: `USER#${user.username}`,
+            sortKey: `CONFIG#${user.companyId}`,
+        },
+        UpdateExpression:
+            'set #avatar = :avatar, #avatarExpiration = :avatarExpiration',
+        ExpressionAttributeNames: {
+            '#avatar': 'avatar',
+            '#avatarExpiration': 'avatarExpiration',
+        },
+        ExpressionAttributeValues: {
+            ':avatar': avatar,
+            ':avatarExpiration': expiration,
+        },
+    });
+}
+
 module.exports = {
     fetchCompanyConnectionIDs,
     getUser,
@@ -132,4 +151,5 @@ module.exports = {
     updateStatus,
     getUserConnectionId,
     getLastLocation,
+    updateUserAvatar,
 };

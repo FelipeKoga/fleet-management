@@ -262,3 +262,4 @@ ptt:
         APP: ${self:app}
         STAGE: ${self:custom.stage}
         TABLE: ${self:custom.table}
+        WS_URL: ${self:custom.webSocketUrl}

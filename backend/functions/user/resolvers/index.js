@@ -1,6 +1,7 @@
 const randomColor = require('randomcolor');
-const { isBefore, setMinutes, isAfter } = require('date-fns');
-const { Cognito, Database, Lambda, S3, Email } = require('../services');
+const { setSeconds } = require('date-fns');
+const { Cognito, Database, Lambda, S3 } = require('../services');
+const { updateUserAvatar } = require('../services/database/user');
 
 const generateRandomString = length => {
     const characters =
@@ -29,11 +30,14 @@ async function postMessage(user, action) {
 
 async function get(username, companyId) {
     const user = await Database.user.getUser(username, companyId);
-    console.log(user);
     if (user.avatarKey) {
-        console.log(isAfter(user.avatarExpiration, Date.now()));
-        if (isBefore(user.avatarExpiration, Date.now())) {
+        if (Date.now() >= user.avatarExpiration) {
             user.avatar = S3.getObject(user.avatarKey);
+            await Database.user.updateUserAvatar(
+                user,
+                user.avatar,
+                +setSeconds(Date.now(), 86400),
+            );
         }
     }
     user.location = await Database.location.getLastLocation(username);
@@ -69,7 +73,7 @@ async function create(data, companyId) {
     await Database.user.createUser(newUser, companyId);
     const user = await get(newUser.email, companyId);
     const message = `Prezado(a) ${user.name}, seu usuário foi criado. Para logar, use as seguintes credenciais: <br><br><b>Usuário:</b> ${user.username}<br><b>Senha:</b> ${password}`;
-    await Email.sendEmail(user.email, 'Seu usuário foi criado!', message);
+    // await Email.sendEmail(user.email, 'Seu usuário foi criado!', message);
     await postMessage(user, 'USER_CREATED');
     return user;
 }
@@ -83,7 +87,8 @@ async function update(data, username, companyId) {
             ? payload.avatar
             : payload.avatarKey;
         payload.avatar = S3.getObject(payload.avatarKey);
-        payload.avatarExpiration = +setMinutes(Date.now(), 604800);
+        payload.avatarExpiration = +setSeconds(Date.now(), 604800);
+        await updateUserAvatar(user, payload.avatar, payload.avatarExpiration);
     }
 
     console.log(payload);
@@ -99,8 +104,8 @@ async function disable(username, companyId) {
     await Database.user.disableUser(username, companyId);
     await postMessage(user, 'USER_DISABLED');
     const message = `Prezado(a) ${user.name}, seu usuário foi desabilitado por um administrador.`;
-    await Email.sendEmail(user.email, 'Seu usuário foi desabilitado.', message);
-    return true;
+    // await Email.sendEmail(user.email, 'Seu usuário foi desabilitado.', message);
+    return { ...user, status: 'DISABLED' };
 }
 
 async function addLocation({ companyId, username, latitude, longitude }) {

@@ -1,18 +1,12 @@
-const { sendMessage } = require('./invoke');
+const ApiGatewayManagementApi = require('aws-sdk/clients/apigatewaymanagementapi');
 const { fetchConnectionIds } = require('./database');
 
+const apigwManagementApi = new ApiGatewayManagementApi({
+    apiVersion: '2018-11-29',
+    endpoint: 'https://87davwn2wl.execute-api.us-east-1.amazonaws.com/dev',
+});
+
 const merge = array => array.reduce((a, b) => a.concat(b), []);
-
-async function getConnectionIds(receivers) {
-    const promises = [];
-    receivers.forEach(receiver => {
-        promises.push(fetchConnectionIds(receiver));
-    });
-
-    const connectionIdsArrays = await Promise.all(promises);
-
-    return merge(connectionIdsArrays);
-}
 
 exports.handler = async event => {
     const payload = JSON.parse(event.body);
@@ -22,23 +16,13 @@ exports.handler = async event => {
         chatId,
         username,
         receiver,
-        receivers,
         inputData,
-        outputData,
         length,
     } = payload.body;
 
     console.log(payload.body);
 
-    let connectionIds = [];
-    if (receiver) {
-        connectionIds = merge(await fetchConnectionIds(receiver));
-    } else {
-        connectionIds = await getConnectionIds(receivers);
-    }
-
-    console.log(connectionIds);
-    console.log(type);
+    const connectionIds = merge(await fetchConnectionIds(receiver));
 
     let body;
     let action;
@@ -61,12 +45,26 @@ exports.handler = async event => {
             chatId,
             username,
             inputData,
-            outputData,
             length,
         };
     }
 
-    await sendMessage(body, connectionIds, action);
+    const requests = [];
+    connectionIds.forEach(connectionId => {
+        requests.push(
+            apigwManagementApi
+                .postToConnection({
+                    ConnectionId: connectionId,
+                    Data: JSON.stringify({
+                        action,
+                        body,
+                    }),
+                })
+                .promise(),
+        );
+    });
+
+    await Promise.all(requests);
 
     return {
         statusCode: 200,
