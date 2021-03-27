@@ -125,7 +125,7 @@ export class ChatComponent implements OnInit {
     const message = new Message({
       chatId: this.chat.id,
       message: text,
-      username: this.authService.getUser().username,
+      username: this.user.username,
       status: MessageStatus.PENDING,
       hasAudio: false,
     });

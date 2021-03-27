@@ -19,8 +19,8 @@ const initialState: StreamState = {
   playing: false,
   readableCurrentTime: "",
   readableDuration: "",
-  duration: undefined,
-  currentTime: undefined,
+  duration: 0,
+  currentTime: 0,
   canplay: false,
   error: false,
   messageId: "",
@@ -41,11 +41,13 @@ export class AudioService extends StateService<StreamState> {
   public loadAudio(url: string, duration: number) {
     this.audio.src = url;
     this.audio.load();
-
+    console.log(duration);
     this.audio.addEventListener("canplay", (e) => {
+      console.log("AUDIO:", this.audio.duration);
+      console.log("AUDIO2:", duration);
       this.setState({
         ...this.state,
-        duration: duration,
+        duration: Math.round(duration / 1000),
         readableDuration: this.formatTime(duration),
       });
     });
@@ -53,7 +55,6 @@ export class AudioService extends StateService<StreamState> {
     this.audio.addEventListener("loadedmetadata", (e) => {
       this.setState({
         ...this.state,
-        duration: duration,
         readableDuration: this.formatTime(duration),
       });
     });
@@ -63,7 +64,6 @@ export class AudioService extends StateService<StreamState> {
       () => {
         this.setState({
           ...this.state,
-          duration: duration,
           readableDuration: this.formatTime(duration),
         });
       },
@@ -73,7 +73,7 @@ export class AudioService extends StateService<StreamState> {
     this.audio.addEventListener("timeupdate", (e) => {
       this.setState({
         ...this.state,
-        currentTime: this.audio.currentTime,
+        currentTime: Math.round(this.audio.currentTime),
         readableCurrentTime: this.formatTime(this.state.currentTime),
       });
     });

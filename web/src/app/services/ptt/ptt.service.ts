@@ -51,7 +51,7 @@ export class PttService {
     this.context = new AudioContext({
       sampleRate: 8000,
     });
-    this.processor = this.context.createScriptProcessor(0, 1, 1);
+    this.processor = this.context.createScriptProcessor(1024, 1, 1);
 
     this.recording$.next(true);
     this.webSocketService.sendMessage({
@@ -76,7 +76,7 @@ export class PttService {
           chatId,
           username: this.user.username,
           inputData: e.inputBuffer.getChannelData(0).toString(),
-          length: e.inputBuffer.length,
+          length: 1024,
           members,
           receiver: receiver.username,
         },
@@ -96,38 +96,35 @@ export class PttService {
 
   public stop() {
     console.log("STOP!");
-    if (this.recording$.value) {
-      this.recording$.next(false);
-      // this.mediaRecorder.stop();
-      this.processor.removeEventListener(
-        "audioprocess",
-        this.audioProcessingListener,
-        true
-      );
-      this.processor.disconnect(this.context.destination);
-      this.source.disconnect();
-      this.webSocketService.sendMessage({
-        action: Actions.PUSH_TO_TALK,
-        body: {
-          type: Actions.STOP_PUSH_TO_TALK,
-          chatId: this.chatId,
-          username: this.user.username,
-          members: this.members,
-          receiver: this.receiver.username,
-        },
-      });
-    }
+    this.recording$.next(false);
+    // this.mediaRecorder.stop();
+    this.processor.removeEventListener(
+      "audioprocess",
+      this.audioProcessingListener,
+      true
+    );
+    this.processor.disconnect(this.context.destination);
+    this.source.disconnect();
+    this.webSocketService.sendMessage({
+      action: Actions.PUSH_TO_TALK,
+      body: {
+        type: Actions.STOP_PUSH_TO_TALK,
+        chatId: this.chatId,
+        username: this.user.username,
+        members: this.members,
+        receiver: this.receiver.username,
+      },
+    });
   }
 
   public playAudio(audioBufferString: string, length: number) {
     const parsedAudioBuffer = audioBufferString
       .split(",")
       .map((value: string) => +value);
-
-    const buf = this.context.createBuffer(1, length, 8000);
+    const buf = this.context.createBuffer(1, 1024, 8000);
+    const player = this.context.createBufferSource();
     console.log(parsedAudioBuffer);
     buf.copyToChannel(new Float32Array(parsedAudioBuffer), 0);
-    const player = this.context.createBufferSource();
     player.buffer = buf;
     player.connect(this.context.destination);
     console.log("START!");
@@ -190,5 +187,13 @@ export class PttService {
 
   public stopReceivingPushToTalk() {
     this.receiving$.next(false);
+  }
+
+  downsample(arr) {
+    var out = new Int16Array(arr.length);
+    for (var i = 0; i < arr.length; i++) {
+      out[i] = arr[i] * 0xffff;
+    }
+    return out.buffer;
   }
 }

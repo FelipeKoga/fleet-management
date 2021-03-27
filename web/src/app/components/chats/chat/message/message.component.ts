@@ -50,8 +50,6 @@ export class MessageComponent implements OnInit {
     }
   }
 
-  public playAudioStream() {}
-
   public pause() {
     this.audioService.pause();
   }

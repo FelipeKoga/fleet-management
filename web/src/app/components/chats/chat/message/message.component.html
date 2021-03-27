@@ -38,8 +38,8 @@
           </button>
           <mat-slider
             min="0"
+            step="0.02"
             [max]="state?.duration"
-            step="1"
             [value]="state?.currentTime"
             (input)="onSliderChangeEnd($event)"
             [disabled]="state?.error"
@@ -125,8 +125,8 @@
             </button>
             <mat-slider
               min="0"
+              step="0.02"
               [max]="state?.duration"
-              step="1"
               [value]="state?.currentTime"
               (input)="onSliderChangeEnd($event)"
               [disabled]="state?.error"

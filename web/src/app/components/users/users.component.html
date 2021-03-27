@@ -59,22 +59,22 @@
           <mat-icon>edit</mat-icon>
         </button>
         <button
-          *ngIf="element.status === 'DISABLED'"
-          [disabled]="user.role !== 'ADMIN'"
-          (click)="openEnable(element)"
-          mat-icon-button
-          style="color: green"
-          matTooltip="Habilitar"
-        >
-          <mat-icon>check</mat-icon>
-        </button>
-        <button
           *ngIf="element.status !== 'DISABLED'"
           [disabled]="user.role !== 'ADMIN'"
           (click)="openDisable(element)"
           mat-icon-button
+          style="color: green"
+          matTooltip="Habilitado"
+        >
+          <mat-icon>check</mat-icon>
+        </button>
+        <button
+          *ngIf="element.status === 'DISABLED'"
+          [disabled]="user.role !== 'ADMIN'"
+          (click)="openEnable(element)"
+          mat-icon-button
           color="warn"
-          matTooltip="Desabilitar"
+          matTooltip="Desabilitado"
         >
           <mat-icon>block</mat-icon>
         </button>

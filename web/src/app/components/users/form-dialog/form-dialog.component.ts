@@ -70,12 +70,20 @@ export class FormDialogComponent implements OnInit {
     this.isLoading = true;
 
     if (this.data.type === FormType.INSERT) {
-      this.usersService.add({ ...user, username: user.email }, () => {
-        this.isLoading = false;
+      this.usersService.add(
+        { ...user, username: user.email },
+        () => {
+          this.isLoading = false;
 
-        this.showSuccess("Usuário criado com sucesso!");
-        this.dialogRef.close();
-      });
+          this.showSuccess("Usuário criado com sucesso!");
+          this.dialogRef.close();
+        },
+        () => {
+          this.isLoading = false;
+          this.showError("Ocorreu um erro interno");
+          this.dialogRef.close();
+        }
+      );
     } else {
       this.usersService.update(user, () => {
         this.isLoading = false;
@@ -88,6 +96,8 @@ export class FormDialogComponent implements OnInit {
 
   public changeUserStatus() {
     this.isLoading = true;
+    console.log(this.data.type);
+    console.log(FormType.ENABLE);
     if (this.data.type === FormType.ENABLE) {
       this.usersService.update(
         { ...this.user, status: UserStatus.OFFLINE },
@@ -112,6 +122,15 @@ export class FormDialogComponent implements OnInit {
     this.snackBar.open(message, null, {
       duration: 2000,
       panelClass: ["snackbar-success"],
+      horizontalPosition: "right",
+      verticalPosition: "bottom",
+    });
+  }
+
+  private showError(message: string) {
+    this.snackBar.open(message, null, {
+      duration: 2000,
+      panelClass: ["snackbar-error"],
       horizontalPosition: "right",
       verticalPosition: "bottom",
     });
