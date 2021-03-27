@@ -10,4 +10,6 @@ interface PushToTalkRepository {
     fun stop(chatId: String, receiver: String?, receivers: List<String>?)
     fun send(chatId: String, receiver: String?, receivers: List<String>?, inputData: String, length: Int)
     fun receive(): Observable<WebSocketMessage<PushToTalkResponse, PushToTalkActions>>
+    fun setReceivingPTT(value: Boolean)
+    fun receivingPTT(): Observable<Boolean>
 }

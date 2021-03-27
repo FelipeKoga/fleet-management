@@ -132,6 +132,8 @@ class Client {
 
     fun getToken(): String = tokenString
 
+    fun isSignIn(): Boolean = AWSMobileClient.getInstance().isSignedIn
+
     companion object {
         private lateinit var instance: Client
         fun getInstance(): Client {

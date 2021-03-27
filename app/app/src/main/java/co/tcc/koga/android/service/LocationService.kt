@@ -11,6 +11,7 @@ import android.os.PowerManager
 import androidx.core.app.ActivityCompat
 import co.tcc.koga.android.App
 import co.tcc.koga.android.R
+import co.tcc.koga.android.data.network.aws.Client
 import co.tcc.koga.android.data.repository.ClientRepository
 import co.tcc.koga.android.data.repository.UserRepository
 import co.tcc.koga.android.ui.MainActivity
@@ -22,11 +23,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-
-enum class Actions {
-    START,
-    STOP
-}
 
 class LocationService : Service() {
     private var wakeLock: PowerManager.WakeLock? = null
@@ -64,7 +60,7 @@ class LocationService : Service() {
     private fun startService() {
         if (isServiceStarted) return
         isServiceStarted = true
-        setServiceState(this, ServiceState.STARTED)
+        setLocationServiceState(this, ServiceState.STARTED)
         wakeLock =
             (getSystemService(Context.POWER_SERVICE) as PowerManager).run {
                 newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Location::lock").apply {
@@ -93,10 +89,11 @@ class LocationService : Service() {
         } catch (e: Exception) {
         }
         isServiceStarted = false
-        setServiceState(this, ServiceState.STOPPED)
+        setLocationServiceState(this, ServiceState.STOPPED)
     }
 
     private fun sendLocation() {
+        if (!Client.getInstance().isSignIn() && Client.getInstance().currentUser.locationEnabled) return
         if (ActivityCompat.checkSelfPermission(
                 this,
                 Manifest.permission.ACCESS_FINE_LOCATION

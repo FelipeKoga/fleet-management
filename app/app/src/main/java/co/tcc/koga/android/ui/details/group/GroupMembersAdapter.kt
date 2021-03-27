@@ -43,7 +43,7 @@ class GroupMembersAdapter(private val chat: ChatEntity, private val currentUsern
                     imageViewRemove.show()
                 }
 
-                if (member.username == currentUsername) {
+                if ( chat.admin == member.username) {
                     textViewAdmin.show()
                 }
 

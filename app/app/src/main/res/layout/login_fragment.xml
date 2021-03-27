@@ -60,15 +60,16 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="0dp"
-                            android:text="@string/hello"
-                            android:textColor="?textColor"
+                            android:textStyle="bold"
+                            android:text="Bem vindo!"
+                            android:textColor="?colorPrimary"
                             android:textSize="32sp" />
 
                         <TextView
                             android:id="@+id/text_field_login_info"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
+                            android:layout_marginTop="12dp"
                             android:text="@string/loginInfo"
                             android:textColor="?textColor"
                             android:textSize="16sp" />
@@ -81,6 +82,7 @@
                             android:layout_marginTop="8dp"
                             android:hint="@string/user"
                             app:errorEnabled="true"
+                            app:endIconTint="?colorPrimary"
                             app:endIconDrawable="@drawable/ic_round_email"
                             app:endIconMode="custom">
 
@@ -103,6 +105,7 @@
                             android:layout_marginTop="8dp"
                             app:boxStrokeErrorColor="?colorError"
                             app:errorEnabled="true"
+                            app:endIconTint="?colorPrimary"
                             app:endIconMode="password_toggle">
 
                             <com.google.android.material.textfield.TextInputEditText

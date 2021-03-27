@@ -15,6 +15,9 @@ import com.amazonaws.services.cognitoidentityprovider.model.NotAuthorizedExcepti
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class ClientRepositoryImpl @Inject constructor(
@@ -124,7 +127,6 @@ class ClientRepositoryImpl @Inject constructor(
 
 
     override suspend fun signOut() {
-        Thread { appDatabase.clearAllTables() }.start()
         Client.getInstance().signOut()
     }
 

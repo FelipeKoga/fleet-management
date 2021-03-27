@@ -15,17 +15,26 @@ enum class ServiceState {
     STOPPED,
 }
 
-private const val name = "SPYSERVICE_KEY"
-private const val key = "SPYSERVICE_STATE"
+enum class Actions {
+    START,
+    STOP
+}
 
-fun setServiceState(context: Context, state: ServiceState) {
-    val sharedPrefs = getPreferences(context)
+private fun setServiceState(name: String, key: String, context: Context, state: ServiceState) {
+    val sharedPrefs = getPreferences(name, context)
     sharedPrefs.edit().let {
         it.putString(key, state.name)
         it.apply()
     }
 }
 
+fun setPTTSerivceState(context: Context, state: ServiceState) {
+    setServiceState("PTT_SERVICE", "PTT_KEY", context, state)
+}
+
+fun setLocationServiceState(context: Context, state: ServiceState) {
+    setServiceState("LOCATION_SERVICE", "LOCATION_KEY", context, state)
+}
 //fun getServiceState(context: Context): ServiceState {
 //    val sharedPrefs = getPreferences(context)
 //    val value = sharedPrefs.getString(key, ServiceState.STOPPED.name)
@@ -33,15 +42,6 @@ fun setServiceState(context: Context, state: ServiceState) {
 //}
 
 fun requestLocationPermission(context: Context): Boolean {
-    println("OPA")
-    println(ActivityCompat.checkSelfPermission(
-        context,
-        Manifest.permission.ACCESS_FINE_LOCATION
-    ) == PackageManager.PERMISSION_GRANTED)
-    println(ActivityCompat.checkSelfPermission(
-        context,
-        Manifest.permission.ACCESS_COARSE_LOCATION
-    ) == PackageManager.PERMISSION_GRANTED)
     if (ActivityCompat.checkSelfPermission(
             context,
             Manifest.permission.ACCESS_FINE_LOCATION
@@ -58,17 +58,14 @@ fun requestLocationPermission(context: Context): Boolean {
             override fun onLocationResult(locationResult: LocationResult) {
             }
         }
-
         LocationServices.getFusedLocationProviderClient(context)
             .requestLocationUpdates(mLocationRequest, mLocationCallback, null)
-
         return true
-
     }
 
     return false
 }
 
-private fun getPreferences(context: Context): SharedPreferences {
+private fun getPreferences(name: String, context: Context): SharedPreferences {
     return context.getSharedPreferences(name, 0)
 }

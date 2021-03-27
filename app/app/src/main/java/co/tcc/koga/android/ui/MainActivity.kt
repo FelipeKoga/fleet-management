@@ -7,12 +7,14 @@ import android.os.Build
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import co.tcc.koga.android.App
 import co.tcc.koga.android.R
 import co.tcc.koga.android.service.Actions
 import co.tcc.koga.android.service.LocationService
+import co.tcc.koga.android.service.PushToTalkService
 import co.tcc.koga.android.service.requestLocationPermission
 
 import co.tcc.koga.android.ui.di.MainComponent
@@ -26,6 +28,8 @@ class MainActivity : AppCompatActivity() {
     lateinit var viewModelFactory: ViewModelProvider.Factory
     private val viewModel by viewModels<MainViewModel> { viewModelFactory }
 
+    private var alreadyStarted: Boolean = false
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         mainComponent = (applicationContext as App).appComponent.mainComponent().create()
@@ -34,12 +38,24 @@ class MainActivity : AppCompatActivity() {
         setTheme(R.style.SplashScreenTheme)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        requestPermissions(
+            arrayOf(
+                Manifest.permission.ACCESS_BACKGROUND_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION,
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.RECORD_AUDIO,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+            ), 1000
+        )
+
         viewModel.observeUserStatus()
         viewModel.isSignIn.observe(this) { isSignIn ->
             println("LOGADO?????????????? $isSignIn")
             if (isSignIn) {
+                startPushToTalkService()
                 if (viewModel.isLocationEnabled()) {
                     if (requestLocationPermission(this)) {
+                        println("TESTEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE")
                         startLocationService()
                     }
                 }
@@ -56,17 +72,10 @@ class MainActivity : AppCompatActivity() {
         when (requestCode) {
             1000 -> {
                 if (grantResults.isNotEmpty()
-                    && grantResults[0] == PackageManager.PERMISSION_GRANTED
+                    && grantResults[0] == PackageManager.PERMISSION_GRANTED && viewModel.isSignIn() && viewModel.isLocationEnabled()
                 ) {
-                    if (ContextCompat.checkSelfPermission(
-                            this,
-                            Manifest.permission.ACCESS_FINE_LOCATION
-                        )
-                        == PackageManager.PERMISSION_GRANTED
-                    ) {
-
-                        startLocationService()
-                    }
+                    println("TESTEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE222222")
+//                    startLocationService()
                 }
                 return
             }
@@ -74,6 +83,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun startLocationService() {
+        println("START LOCATION SERVICE")
         Intent(this, LocationService::class.java).also {
             it.action = Actions.START.name
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -84,5 +94,23 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun startPushToTalkService() {
+        println("START PTT SERVICE")
+        if (alreadyStarted) return
+        alreadyStarted = true
+        Intent(this, PushToTalkService::class.java).also {
+            it.action = Actions.START.name
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                startForegroundService(it)
+                return
+            }
+            startService(it)
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+
+    }
 
 }

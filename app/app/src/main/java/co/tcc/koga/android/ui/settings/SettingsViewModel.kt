@@ -28,11 +28,6 @@ class SettingsViewModel @Inject constructor(
     var notification: Boolean = currentUser.notificationEnabled
     var pushToTalk: Boolean = currentUser.pushToTalkEnabled
 
-    val isLoadingLocation: LiveData<Boolean> get() = _isLoadingLocation
-    val isLoadingNotification: LiveData<Boolean> get() = _isLoadingNotification
-    val isLoadingPushToTalk: LiveData<Boolean> get() = _isLoadingPushToTalk
-
-
     fun signOut() = viewModelScope.launch {
         try {
             repository.signOut()

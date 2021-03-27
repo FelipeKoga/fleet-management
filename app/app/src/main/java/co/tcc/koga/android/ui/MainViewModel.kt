@@ -47,5 +47,6 @@ class MainViewModel @Inject constructor(
         return false
     }
 
+    fun isSignIn(): Boolean = currentUser !== null
 
 }

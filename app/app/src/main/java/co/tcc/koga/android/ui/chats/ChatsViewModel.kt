@@ -32,10 +32,12 @@ class ChatsViewModel @Inject constructor(
     private val _chats = MutableLiveData<List<ChatEntity>>(mutableListOf())
     private val _isLoading = MutableLiveData(false)
     private val _error = MutableLiveData(false)
+    private val _isReceivingPTT = MutableLiveData(false)
 
     val chats: LiveData<List<ChatEntity>> get() = _chats
     val isLoading: LiveData<Boolean> get() = _isLoading
     val error: LiveData<Boolean> get() = _error
+    val isReceivingPTT: LiveData<Boolean> get() = _isReceivingPTT
 
     override fun onCleared() {
         super.onCleared()
@@ -43,36 +45,40 @@ class ChatsViewModel @Inject constructor(
     }
 
     fun observePushToTalk() = viewModelScope.launch {
-        var hasStarted = false
+        pushToTalkRepository.receivingPTT().subscribe { isReceiving ->
 
-        val aa = AudioAttributes.Builder()
-            .setUsage(AudioAttributes.USAGE_MEDIA)
-            .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-            .build()
-        val format = AudioFormat.Builder()
-            .setSampleRate(8000)
-            .setEncoding(AudioFormat.ENCODING_PCM_FLOAT)
-            .setChannelMask(AudioFormat.CHANNEL_OUT_MONO)
-            .build()
-
-        val audioTrack = AudioTrack(aa, format, 1024, AudioTrack.MODE_STREAM, 0)
-
-        pushToTalkRepository.receive().subscribe {
-            println(it.action)
-            println(it.body)
-            if (it.action == PushToTalkActions.RECEIVED_PUSH_TO_TALK) {
-                if (it.body.inputData != null) {
-                    val doubleArray = it.body.inputData.split(',').map { floatString -> floatString.toFloat() }
-                    val float = doubleArray.toFloatArray()
-                    audioTrack.write(float, 0, 1024, AudioTrack.WRITE_BLOCKING)
-                }
-                if (!hasStarted) {
-                    audioTrack.play()
-                    hasStarted = true
-                }
-            }
-
+            _isReceivingPTT.postValue(isReceiving)
         }
+
+//        var hasStarted = false
+//
+//        val aa = AudioAttributes.Builder()
+//            .setUsage(AudioAttributes.USAGE_MEDIA)
+//            .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+//            .build()
+//        val format = AudioFormat.Builder()
+//            .setSampleRate(8000)
+//            .setEncoding(AudioFormat.ENCODING_PCM_FLOAT)
+//            .setChannelMask(AudioFormat.CHANNEL_OUT_MONO)
+//            .build()
+//
+//        val audioTrack = AudioTrack(aa, format, 1024, AudioTrack.MODE_STREAM, 0)
+//
+//        pushToTalkRepository.receive().subscribe {
+//            println(it.action)
+//            if (it.action == PushToTalkActions.RECEIVED_PUSH_TO_TALK) {
+//                if (it.body.inputData != null) {
+//                    val doubleArray = it.body.inputData.split(',').map { floatString -> floatString.toFloat() }
+//                    val float = doubleArray.toFloatArray()
+//                    audioTrack.write(float, 0, 1024, AudioTrack.WRITE_BLOCKING)
+//                }
+//                if (!hasStarted) {
+//                    audioTrack.play()
+//                    hasStarted = true
+//                }
+//            }
+//
+//        }
     }
 
     fun getAllChats() = viewModelScope.launch {
@@ -97,6 +103,7 @@ class ChatsViewModel @Inject constructor(
 
     fun observeChatUpdates() {
         compositeDisposable.add(repository.observeChatUpdates().subscribe { update ->
+            println(update)
             if (update.action === ChatActions.CHAT_UPDATED) {
                 val foundChat = _chats.value?.find { chat -> chat.id == update.body.id }
                 if (foundChat !== null) {
@@ -105,6 +112,8 @@ class ChatsViewModel @Inject constructor(
                         updateChat.messages = foundChat.messages
                     }
                     updateChat(update.body)
+                } else {
+                    insertChat(update.body)
                 }
             }
 

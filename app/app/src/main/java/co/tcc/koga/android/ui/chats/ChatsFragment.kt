@@ -75,6 +75,15 @@ class ChatsFragment : Fragment(R.layout.chats_fragment) {
             }
         }
 
+        viewModel.isReceivingPTT.observe(viewLifecycleOwner) { isReceiving ->
+            if (isReceiving) {
+                binding.linearLayoutReceivingPtt.show()
+            } else {
+                binding.linearLayoutReceivingPtt.hide()
+            }
+
+        }
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

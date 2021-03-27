@@ -5,12 +5,14 @@ import co.tcc.koga.android.data.network.payload.PushToTalkPayload
 import co.tcc.koga.android.data.network.payload.PushToTalkResponse
 import co.tcc.koga.android.data.network.socket.*
 import co.tcc.koga.android.data.repository.PushToTalkRepository
-import com.amazonaws.mobile.auth.core.internal.util.ThreadUtils
 import io.reactivex.Observable
+import io.reactivex.subjects.PublishSubject
 import javax.inject.Inject
 
 class PushToTalkRepositoryImpl @Inject constructor(private val webSocketService: WebSocketService) :
     PushToTalkRepository {
+
+    private val isReceiving = PublishSubject.create<Boolean>()
 
 
     override fun start(chatId: String, receiver: String?, receivers: List<String>?) {
@@ -69,6 +71,14 @@ class PushToTalkRepositoryImpl @Inject constructor(private val webSocketService:
 
         println("SEND PUSH TO TALK REPOSITORY: $payload")
         webSocketService.send(payload)
+    }
+
+    override fun setReceivingPTT(value: Boolean) {
+        isReceiving.onNext(value)
+    }
+
+    override fun receivingPTT(): Observable<Boolean> {
+        return isReceiving.hide()
     }
 
     override fun receive(): Observable<WebSocketMessage<PushToTalkResponse, PushToTalkActions>> {

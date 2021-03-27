@@ -41,6 +41,7 @@ class SplashScreenFragment : Fragment(R.layout.splash_screen_fragment) {
         viewModel.uiState.asLiveData().observe(viewLifecycleOwner) { state ->
             when (state) {
                 SplashScreenUiState.LoggedIn -> {
+                    requestLocationPermission(requireContext())
                     findNavController().navigate(
                         R.id.action_splashScreenFragment_to_chatsFragment,
                     )

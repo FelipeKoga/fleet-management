@@ -1,5 +1,6 @@
 package co.tcc.koga.android.ui.chats.chat.viewholder
 
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -16,8 +17,10 @@ class RecipientViewHolder(private val binding: RowMessageReceivedBinding) :
         binding.run {
             if (!members.isNullOrEmpty()) {
                 val user = members.find { item.username == it.username }
+                println(user)
+                println(user?.customName ?: user?.name)
                 textViewUserName.show()
-                textViewUserName.text = user?.customName ?: user?.name
+                textViewUserName.text = if (!user?.customName.isNullOrEmpty()) user?.customName else user?.name
             }
 
             textViewMessageReceived.text = item.message

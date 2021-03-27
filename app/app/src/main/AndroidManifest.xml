@@ -38,6 +38,10 @@
             android:exported="false"
             android:name=".service.LocationService"
             android:enabled="true" />
+        <service
+            android:exported="false"
+            android:name=".service.PushToTalkService"
+            android:enabled="true" />
         <activity
             android:name=".ui.MainActivity"
             android:label="@string/app_name"
