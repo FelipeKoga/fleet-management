@@ -40,17 +40,22 @@ export class UsersService extends StateService<UsersState> {
       });
   }
 
-  public add(user: User, completed?: () => void) {
+  public add(user: User, completed?: () => void, error?: () => void) {
     this.setState({ isLoading: true });
     this.http
       .post<User>(`${API}/company/${this.companyId}/users`, user)
-      .subscribe((response) => {
-        this.setState({
-          users: [...this.state.users, response],
-          isLoading: false,
-        });
-        completed();
-      });
+      .subscribe(
+        (response) => {
+          this.setState({
+            users: [...this.state.users, response],
+            isLoading: false,
+          });
+          completed();
+        },
+        () => {
+          error();
+        }
+      );
   }
 
   public update(user: User, completed?: (user: User) => void) {
@@ -92,7 +97,6 @@ export class UsersService extends StateService<UsersState> {
       ...this.state,
       users: this.state.users.map((item) => {
         if (item.username === newUser.username) {
-          console.log("show!");
           return newUser;
         }
         return item;
