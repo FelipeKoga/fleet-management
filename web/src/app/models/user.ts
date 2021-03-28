@@ -9,7 +9,7 @@ export enum UserStatus {
 export enum UserRole {
   ADMIN = "ADMIN",
   OPERATOR = "OPERATOR",
-  EMPLOYEEE = "EMPLOYEE",
+  EMPLOYEE = "EMPLOYEE",
 }
 
 export class User {
@@ -31,7 +31,7 @@ export class User {
     email = "",
     phone = "",
     customName = "",
-    role = UserRole.EMPLOYEEE,
+    role = UserRole.EMPLOYEE,
     status = UserStatus.OFFLINE,
     companyId = "",
     username = email,

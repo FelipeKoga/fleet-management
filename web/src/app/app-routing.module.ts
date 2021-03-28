@@ -22,7 +22,7 @@ const routes: Routes = [
     path: "map",
     component: MapComponent,
     data: {
-      roles: [UserRole.ADMIN, UserRole.EMPLOYEEE, UserRole.OPERATOR],
+      roles: [UserRole.ADMIN, UserRole.OPERATOR],
     },
     canActivate: [AuthGuard],
   },
@@ -30,7 +30,7 @@ const routes: Routes = [
     path: "profile",
     component: ProfileComponent,
     data: {
-      roles: [UserRole.ADMIN, UserRole.EMPLOYEEE, UserRole.OPERATOR],
+      roles: [UserRole.ADMIN, UserRole.EMPLOYEE, UserRole.OPERATOR],
     },
     canActivate: [AuthGuard],
   },
@@ -38,7 +38,7 @@ const routes: Routes = [
     path: "chats",
     component: ChatsComponent,
     data: {
-      roles: [UserRole.ADMIN, UserRole.EMPLOYEEE, UserRole.OPERATOR],
+      roles: [UserRole.ADMIN, UserRole.EMPLOYEE, UserRole.OPERATOR],
     },
     canActivate: [AuthGuard],
   },
@@ -46,7 +46,7 @@ const routes: Routes = [
     path: "chats/:username",
     component: ChatsComponent,
     data: {
-      roles: [UserRole.ADMIN, UserRole.EMPLOYEEE, UserRole.OPERATOR],
+      roles: [UserRole.ADMIN, UserRole.EMPLOYEE, UserRole.OPERATOR],
     },
     canActivate: [AuthGuard],
   },
@@ -63,7 +63,7 @@ const routes: Routes = [
     path: "**",
     component: NotFoundComponent,
     data: {
-      roles: [UserRole.ADMIN, UserRole.EMPLOYEEE, UserRole.OPERATOR],
+      roles: [UserRole.ADMIN, UserRole.EMPLOYEE, UserRole.OPERATOR],
     },
     canActivate: [AuthGuard],
   },

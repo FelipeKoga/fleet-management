@@ -1,6 +1,7 @@
 import { Component, OnInit } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { Router } from "@angular/router";
+import { UserRole } from "src/app/models/user";
 import {
   AuthService,
   AuthServiceStore,
@@ -36,7 +37,11 @@ export class LoginComponent implements OnInit {
       const { errorCode, isLoggedIn } = authStore;
 
       if (isLoggedIn) {
-        this.router.navigate(["/map"]);
+        if (authStore.user.role === UserRole.EMPLOYEE) {
+          this.router.navigate(["/chats"]);
+        } else {
+          this.router.navigate(["/map"]);
+        }
       }
 
       if (errorCode) {

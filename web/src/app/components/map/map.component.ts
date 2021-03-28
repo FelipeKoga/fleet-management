@@ -54,7 +54,7 @@ export class MapComponent implements OnInit {
         .filter(
           (user) =>
             user.username !== this.currentUser.username &&
-            user.role === UserRole.EMPLOYEEE &&
+            user.role === UserRole.EMPLOYEE &&
             user.status !== UserStatus.DISABLED
         )
         .sort((a) => {
