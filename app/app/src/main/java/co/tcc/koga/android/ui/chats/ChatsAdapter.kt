@@ -43,6 +43,9 @@ class ChatsAdapter : ListAdapter<ChatEntity, ChatsAdapter.ChatsViewHolder>(DIFF_
                     textViewLastMessageHour.text = getMessageHour(chat.messages.last())
                 }
 
+                imageViewUserStatusOffline.hide()
+                imageViewUserStatusOnline.hide()
+
                 if (chat.user !== null) {
                     val user = chat.user as UserEntity
                     if (user.status == "ONLINE") {
