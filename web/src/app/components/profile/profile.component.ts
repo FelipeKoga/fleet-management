@@ -152,6 +152,7 @@ export class ProfileComponent implements OnInit {
 
   public signOut() {
     this.authService.signOut();
+    window.location.reload();
   }
 
   public getUserAvatar(user: User) {
