@@ -21,7 +21,6 @@ export class PttService {
   private members: string[];
   private receiver: User;
   private mediaRecorder;
-  private variable: AudioWorkletNode;
 
   private audioProcessingListener: (
     this: ScriptProcessorNode,
@@ -59,7 +58,7 @@ export class PttService {
       body: {
         type: Actions.START_PUSH_TO_TALK,
         chatId,
-        username: this.user.username,
+        user: this.user,
         members,
         receiver: this.receiver.username,
       },
@@ -74,7 +73,7 @@ export class PttService {
         action: Actions.PUSH_TO_TALK,
         body: {
           chatId,
-          username: this.user.username,
+          user: this.user,
           inputData: e.inputBuffer.getChannelData(0).toString(),
           length: 1024,
           members,
@@ -110,7 +109,7 @@ export class PttService {
       body: {
         type: Actions.STOP_PUSH_TO_TALK,
         chatId: this.chatId,
-        username: this.user.username,
+        user: this.user,
         members: this.members,
         receiver: this.receiver.username,
       },

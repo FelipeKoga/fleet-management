@@ -50,7 +50,7 @@ export class AppComponent implements OnInit {
             console.log("START RECEIVED PTT");
             this.pttService.startReceivingPushToTalk(message.body.chatId);
             this.snackbar.openFromComponent(PttSnackbarComponent, {
-              data: new User({ name: "Koga" }),
+              data: new User({ name: message.body.user.name }),
               horizontalPosition: "right",
               verticalPosition: "top",
               panelClass: ["snackbar-primary"],
