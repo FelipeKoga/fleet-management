@@ -11,14 +11,7 @@ const merge = array => array.reduce((a, b) => a.concat(b), []);
 exports.handler = async event => {
     const payload = JSON.parse(event.body);
 
-    const {
-        type,
-        chatId,
-        username,
-        receiver,
-        inputData,
-        length,
-    } = payload.body;
+    const { type, chatId, user, receiver, inputData, length } = payload.body;
 
     console.log(payload.body);
 
@@ -30,20 +23,20 @@ exports.handler = async event => {
         action = 'STARTED_PUSH_TO_TALK';
         body = {
             chatId,
-            username,
+            user,
         };
     } else if (type === 'STOP_PUSH_TO_TALK') {
         action = 'STOPPED_PUSH_TO_TALK';
         body = {
             chatId,
-            username,
+            user,
         };
     } else {
         action = 'RECEIVED_PUSH_TO_TALK';
 
         body = {
             chatId,
-            username,
+            user,
             inputData,
             length,
         };
