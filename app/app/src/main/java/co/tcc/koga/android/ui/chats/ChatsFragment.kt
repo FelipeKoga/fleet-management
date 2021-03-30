@@ -75,13 +75,16 @@ class ChatsFragment : Fragment(R.layout.chats_fragment) {
             }
         }
 
-        viewModel.isReceivingPTT.observe(viewLifecycleOwner) { isReceiving ->
-            if (isReceiving) {
-                binding.linearLayoutReceivingPtt.show()
-            } else {
-                binding.linearLayoutReceivingPtt.hide()
+        viewModel.isReceivingPTT.observe(viewLifecycleOwner) { it ->
+            binding.run {
+                if (it.isReceiving) {
+                    linearLayoutReceivingPtt.show()
+                    textViewPtt.text = "${it.user?.name} está falando..."
+                } else {
+                    linearLayoutReceivingPtt.hide()
+                    textViewPtt.text = ""
+                }
             }
-
         }
 
     }
@@ -152,6 +155,8 @@ class ChatsFragment : Fragment(R.layout.chats_fragment) {
 
     private fun loadUserAvatar() {
         val avatar = viewModel.getAvatar()
+        println("AVATAR =======================")
+        println(avatar)
         Avatar.load(
             requireContext(),
             binding.imageViewUserPhoto,

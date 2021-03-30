@@ -8,7 +8,7 @@ sealed class Constants {
         private const val AvatarBaseURL = "https://ui-avatars.com/api/?rounded=true"
 
         fun getAvatarURL(name: String, color: String, size: Int = 42): String {
-            return "${AvatarBaseURL}&name=${name}&background=${color}&size=$size"
+            return "${AvatarBaseURL}&name=${name}&background=${color}&size=$size&color=fff"
         }
     }
 

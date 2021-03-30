@@ -7,6 +7,7 @@ import android.media.AudioManager
 import android.media.AudioTrack
 import androidx.lifecycle.*
 import co.tcc.koga.android.data.database.entity.ChatEntity
+import co.tcc.koga.android.data.network.payload.RecevingPTT
 import co.tcc.koga.android.data.network.socket.ChatActions
 import co.tcc.koga.android.data.network.socket.MessageActions
 import co.tcc.koga.android.data.network.socket.PushToTalkActions
@@ -32,12 +33,12 @@ class ChatsViewModel @Inject constructor(
     private val _chats = MutableLiveData<List<ChatEntity>>(mutableListOf())
     private val _isLoading = MutableLiveData(false)
     private val _error = MutableLiveData(false)
-    private val _isReceivingPTT = MutableLiveData(false)
+    private val _isReceivingPTT = MutableLiveData(RecevingPTT(false, null))
 
     val chats: LiveData<List<ChatEntity>> get() = _chats
     val isLoading: LiveData<Boolean> get() = _isLoading
     val error: LiveData<Boolean> get() = _error
-    val isReceivingPTT: LiveData<Boolean> get() = _isReceivingPTT
+    val isReceivingPTT: LiveData<RecevingPTT> get() = _isReceivingPTT
 
     override fun onCleared() {
         super.onCleared()
@@ -46,39 +47,8 @@ class ChatsViewModel @Inject constructor(
 
     fun observePushToTalk() = viewModelScope.launch {
         pushToTalkRepository.receivingPTT().subscribe { isReceiving ->
-
             _isReceivingPTT.postValue(isReceiving)
         }
-
-//        var hasStarted = false
-//
-//        val aa = AudioAttributes.Builder()
-//            .setUsage(AudioAttributes.USAGE_MEDIA)
-//            .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-//            .build()
-//        val format = AudioFormat.Builder()
-//            .setSampleRate(8000)
-//            .setEncoding(AudioFormat.ENCODING_PCM_FLOAT)
-//            .setChannelMask(AudioFormat.CHANNEL_OUT_MONO)
-//            .build()
-//
-//        val audioTrack = AudioTrack(aa, format, 1024, AudioTrack.MODE_STREAM, 0)
-//
-//        pushToTalkRepository.receive().subscribe {
-//            println(it.action)
-//            if (it.action == PushToTalkActions.RECEIVED_PUSH_TO_TALK) {
-//                if (it.body.inputData != null) {
-//                    val doubleArray = it.body.inputData.split(',').map { floatString -> floatString.toFloat() }
-//                    val float = doubleArray.toFloatArray()
-//                    audioTrack.write(float, 0, 1024, AudioTrack.WRITE_BLOCKING)
-//                }
-//                if (!hasStarted) {
-//                    audioTrack.play()
-//                    hasStarted = true
-//                }
-//            }
-//
-//        }
     }
 
     fun getAllChats() = viewModelScope.launch {
@@ -98,7 +68,10 @@ class ChatsViewModel @Inject constructor(
 
     fun getAvatar(): String {
         val user = clientRepository.user()
-        return user.avatar ?: Constants.getAvatarURL(user.name, user.color)
+        return if (user.avatar.isNullOrEmpty()) Constants.getAvatarURL(
+            user.name,
+            user.color
+        ) else user.avatar as String
     }
 
     fun observeChatUpdates() {

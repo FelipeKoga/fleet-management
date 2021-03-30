@@ -67,7 +67,10 @@ class ChatsAdapter : ListAdapter<ChatEntity, ChatsAdapter.ChatsViewHolder>(DIFF_
                     }
 
                     onLoadAvatar?.invoke(
-                        user.avatar ?: Constants.getAvatarURL(user.name, user.color),
+                        if (user.avatar.isNullOrEmpty()) Constants.getAvatarURL(
+                            user.name,
+                            user.color
+                        ) else user.avatar as String,
                         false,
                         imageViewAvatar
                     )

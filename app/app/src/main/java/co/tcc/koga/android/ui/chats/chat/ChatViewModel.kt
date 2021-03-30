@@ -235,6 +235,7 @@ class ChatViewModel @Inject constructor(
             while (isRecording) {
                 val data = FloatArray(1024)
                 pushToTalkRecorder.read(data, 0, data.size, AudioRecord.READ_BLOCKING)
+                println(data.joinToString())
                 pushToTalkRepository.send(chatId, receiver, receivers, data.joinToString(), 1024)
             }
         }.start()

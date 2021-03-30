@@ -16,6 +16,7 @@ import androidx.core.app.ActivityCompat
 import co.tcc.koga.android.App
 import co.tcc.koga.android.R
 import co.tcc.koga.android.data.network.aws.Client
+import co.tcc.koga.android.data.network.payload.RecevingPTT
 import co.tcc.koga.android.data.network.socket.PushToTalkActions
 import co.tcc.koga.android.data.repository.ClientRepository
 import co.tcc.koga.android.data.repository.PushToTalkRepository
@@ -33,7 +34,6 @@ import javax.inject.Inject
 
 
 class PushToTalkService : Service() {
-    private var wakeLock: PowerManager.WakeLock? = null
     private var isServiceStarted = false
     private val compositeDisposable: CompositeDisposable = CompositeDisposable()
 
@@ -75,13 +75,6 @@ class PushToTalkService : Service() {
 
     private fun startService() {
         setPTTSerivceState(this, ServiceState.STARTED)
-//        wakeLock =
-//            (getSystemService(Context.POWER_SERVICE) as PowerManager).run {
-//                newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "PTT::lock").apply {
-//                    acquire(10 * 60 * 1000L)
-//                }
-//            }
-
         observePushToTalk()
     }
 
@@ -91,10 +84,10 @@ class PushToTalkService : Service() {
         println("OBSERVE PUSH TO TALK!!!!!!")
         compositeDisposable.add(repository.receive().subscribe {
             if (it.action == PushToTalkActions.STARTED_PUSH_TO_TALK) {
-                repository.setReceivingPTT(true)
+                repository.setReceivingPTT(RecevingPTT(true, it.body.user))
             }
             if (it.action == PushToTalkActions.STOPPED_PUSH_TO_TALK) {
-                repository.setReceivingPTT(false)
+                repository.setReceivingPTT(RecevingPTT(false, null))
             }
 
             if (it.action == PushToTalkActions.RECEIVED_PUSH_TO_TALK) {
@@ -117,11 +110,6 @@ class PushToTalkService : Service() {
     private fun stopService() {
         try {
             compositeDisposable.dispose()
-            wakeLock?.let {
-                if (it.isHeld) {
-                    it.release()
-                }
-            }
             stopForeground(true)
             stopSelf()
         } catch (e: Exception) {

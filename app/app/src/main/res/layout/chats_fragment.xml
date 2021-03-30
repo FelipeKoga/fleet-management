@@ -158,11 +158,11 @@
                 />
 
             <TextView
-                android:id="@+id/ptt"
+                android:id="@+id/text_view_ptt"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"
-                android:text="Felipe Koga está falando..."
+                android:text=""
                 android:textColor="?backgroundColor"
                 android:textSize="18sp"
                 android:textStyle="bold" />

@@ -1,8 +1,10 @@
 package co.tcc.koga.android.data.repository.impl
 
+import co.tcc.koga.android.data.database.entity.UserEntity
 import co.tcc.koga.android.data.network.aws.Client
 import co.tcc.koga.android.data.network.payload.PushToTalkPayload
 import co.tcc.koga.android.data.network.payload.PushToTalkResponse
+import co.tcc.koga.android.data.network.payload.RecevingPTT
 import co.tcc.koga.android.data.network.socket.*
 import co.tcc.koga.android.data.repository.PushToTalkRepository
 import io.reactivex.Observable
@@ -12,17 +14,17 @@ import javax.inject.Inject
 class PushToTalkRepositoryImpl @Inject constructor(private val webSocketService: WebSocketService) :
     PushToTalkRepository {
 
-    private val isReceiving = PublishSubject.create<Boolean>()
+    private val isReceiving = PublishSubject.create<RecevingPTT>()
 
 
     override fun start(chatId: String, receiver: String?, receivers: List<String>?) {
-        val username = Client.getInstance().username()
+        val user = Client.getInstance().currentUser
         val payload = WebSocketPayload(
             WebSocketActions.PUSH_TO_TALK,
             PushToTalkPayload(
                 PushToTalkActions.START_PUSH_TO_TALK,
                 chatId,
-                username,
+                user,
                 receiver,
                 receivers, null, null
             )
@@ -33,13 +35,13 @@ class PushToTalkRepositoryImpl @Inject constructor(private val webSocketService:
     }
 
     override fun stop(chatId: String, receiver: String?, receivers: List<String>?) {
-        val username = Client.getInstance().username()
+        val user = Client.getInstance().currentUser
         val payload = WebSocketPayload(
             WebSocketActions.PUSH_TO_TALK,
             PushToTalkPayload(
                 PushToTalkActions.STOP_PUSH_TO_TALK,
                 chatId,
-                username,
+                user,
                 receiver,
                 receivers, null, null
             )
@@ -56,13 +58,13 @@ class PushToTalkRepositoryImpl @Inject constructor(private val webSocketService:
         inputData: String,
         length: Int
     ) {
-        val username = Client.getInstance().username()
+        val user = Client.getInstance().currentUser
         val payload = WebSocketPayload(
             WebSocketActions.PUSH_TO_TALK,
             PushToTalkPayload(
                 PushToTalkActions.SEND_PUSH_TO_TALK,
                 chatId,
-                username,
+                user,
                 receiver,
                 receivers, inputData, length
 
@@ -73,11 +75,11 @@ class PushToTalkRepositoryImpl @Inject constructor(private val webSocketService:
         webSocketService.send(payload)
     }
 
-    override fun setReceivingPTT(value: Boolean) {
+    override fun setReceivingPTT(value: RecevingPTT) {
         isReceiving.onNext(value)
     }
 
-    override fun receivingPTT(): Observable<Boolean> {
+    override fun receivingPTT(): Observable<RecevingPTT> {
         return isReceiving.hide()
     }
 

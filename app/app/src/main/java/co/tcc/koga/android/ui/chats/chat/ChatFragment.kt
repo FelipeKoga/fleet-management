@@ -185,7 +185,7 @@ class ChatFragment : Fragment(R.layout.chat_fragment) {
     private fun loadChatAvatar(imageView: ImageView) {
         val url: String? = if (args.chat.user !== null) {
             val user = args.chat.user as UserEntity
-            user.avatar ?: Constants.getAvatarURL(user.name, user.color)
+            if (user.avatar.isNullOrEmpty())  Constants.getAvatarURL(user.name, user.color) else user.avatar as String
         } else {
             args.chat.avatar
         }
