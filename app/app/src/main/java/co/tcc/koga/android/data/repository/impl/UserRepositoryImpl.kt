@@ -40,15 +40,15 @@ class UserRepositoryImpl @Inject constructor(
     }
 
     override fun sendLocation(latitude: Double, longitude: Double) {
-        println("SEND LOCATION")
+        val currentUser = Client.getInstance().currentUser
         webSocketService.send(
             WebSocketPayload(
                 WebSocketActions.SEND_LOCATION,
                 LocationPayload(
                     latitude,
                     longitude,
-                    Client.getInstance().currentUser.username,
-                    Client.getInstance().currentUser.companyId
+                    currentUser.username,
+                    currentUser.companyId
                 )
             )
         )
