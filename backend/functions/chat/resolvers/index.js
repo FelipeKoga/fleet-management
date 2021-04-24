@@ -22,7 +22,7 @@ async function getChat(chatId, username, member) {
     chat.user = member ? await getUser(member) : null;
 
     if (chat.user && chat.user.avatar) {
-        if (Date.now() >= chat.user.avatarExpiration) {
+        if (Date.now() <= chat.user.avatarExpiration) {
             chat.user.avatar = S3.getObject(chat.user.avatarKey);
             await Database.user.updateUserAvatar(
                 chat.user,
@@ -176,7 +176,6 @@ async function addMessage({
         const chat = await createChat(username, recipient);
         id = chat.id;
     }
-
     const messageResponse = await Database.message.addMessage({
         chatId: id,
         username,
@@ -188,14 +187,11 @@ async function addMessage({
         duration,
     });
 
-    if (hasAudio) {
+    if (hasAudio)
         messageResponse.message = S3.getObject(messageResponse.message);
-    }
     const chatConfig = await Database.chat.getChat(id);
-
     const users = await Database.chat.fetchChatUsers(id);
     const chatUsers = users.filter(u => u !== username);
-
     const currentUserChat = chatConfig.private
         ? await getChat(
               id,
@@ -224,7 +220,6 @@ async function addMessage({
                 'CHAT_UPDATED',
             );
         }),
-
         sendWebSocketMessage(username, messageResponse, 'MESSAGE_SENT'),
         sendWebSocketMessage(username, currentUserChat, 'CHAT_UPDATED'),
     );
@@ -254,8 +249,6 @@ async function viewedMessages({ chatId, username }) {
                   .filter(member => member !== username),
           )
         : await getChat(chatId, username);
-
-    console.log(chat);
 
     await sendWebSocketMessage(username, chat, 'CHAT_UPDATED');
 }
