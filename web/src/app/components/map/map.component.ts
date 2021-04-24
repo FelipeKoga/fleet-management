@@ -34,12 +34,67 @@ export class MapComponent implements OnInit {
     private authService: AuthService,
     private webSocketService: WebsocketService,
     private snackBar: MatSnackBar
-  ) {}
+  ) {
+    this.currentUser = this.authService.getUser();
+    this.messageFormControl = new FormControl("");
+    this.selectedUser = new User({});
+  }
 
   ngOnInit() {
-    this.messageFormControl = new FormControl("");
+    this.getCurrentLocation();
+    this.usersService.fetch();
+    this.usersService.usersState$.subscribe((state) => {
+      this.users = state.users
+        .filter((user) => this.isEmployee(user))
+        .sort(this.orderByOnline);
+      this.buildMarkers();
+    });
 
-    this.selectedUser = new User({});
+    this.webSocketService.messages.subscribe((response) => {
+      if (this.hasUserStatusChanged(response.action)) {
+        this.usersService.replaceUser(response.body);
+      }
+    });
+  }
+
+  private buildMarkers() {
+    this.markers = [];
+    this.users.forEach((user) => {
+      if (user.location) {
+        this.markers.push({
+          latitude: +user.location.latitude,
+          longitude: +user.location.longitude,
+          icon: {
+            url: user.avatar ? user.avatar : this.getUserAvatar(user),
+          },
+          user,
+        });
+      }
+    });
+  }
+
+  private hasUserStatusChanged(action: Actions) {
+    return (
+      action === Actions.USER_CONNECTED ||
+      action === Actions.USER_DISCONNECTED ||
+      action === Actions.USER_NEW_LOCATION
+    );
+  }
+
+  private isEmployee(user: User): boolean {
+    return (
+      user.username !== this.currentUser.username &&
+      user.role === UserRole.EMPLOYEE &&
+      user.status !== UserStatus.DISABLED
+    );
+  }
+
+  private orderByOnline(aUser: User): number {
+    if (aUser.status === UserStatus.ONLINE) return -1;
+    return 1;
+  }
+
+  public getCurrentLocation() {
     navigator.geolocation.getCurrentPosition((resp) => {
       this.currentUserLocation = {
         latitude: resp.coords.latitude,
@@ -47,50 +102,6 @@ export class MapComponent implements OnInit {
       };
       this.currentFocus = this.currentUserLocation;
     });
-
-    this.currentUser = this.authService.getUser();
-    this.usersService.usersState$.subscribe((state) => {
-      this.users = state.users
-        .filter(
-          (user) =>
-            user.username !== this.currentUser.username &&
-            user.role === UserRole.EMPLOYEE &&
-            user.status !== UserStatus.DISABLED
-        )
-        .sort((a) => {
-          if (a.status === UserStatus.ONLINE) return -1;
-          return 1;
-        });
-      this.getActiveUsers();
-      if (this.users.length) {
-        this.markers = [];
-        this.users.forEach((user) => {
-          if (user.location) {
-            this.markers.push({
-              latitude: +user.location.latitude,
-              longitude: +user.location.longitude,
-              icon: {
-                url: user.avatar ? user.avatar : this.getUserAvatar(user),
-              },
-              user,
-            });
-          }
-        });
-      }
-    });
-
-    this.webSocketService.messages.subscribe((response) => {
-      console.log(response);
-      if (
-        response.action === Actions.USER_CONNECTED ||
-        response.action === Actions.USER_DISCONNECTED ||
-        response.action === Actions.USER_NEW_LOCATION
-      ) {
-        this.usersService.replaceUser(response.body);
-      }
-    });
-
-    this.usersService.fetch();
   }
 
   public userClicked(user: User) {
@@ -101,19 +112,15 @@ export class MapComponent implements OnInit {
     };
   }
 
-  public selectMarker(_, marker, infoWindow) {
+  public selectMarker(_, marker) {
     this.messageFormControl.reset();
-
     this.selectedUser = marker.user;
-
     const that = this;
     const location = { lat: marker.latitude, lng: marker.longitude };
     const geocoder = new google.maps.Geocoder();
     geocoder.geocode({ location }, function (results) {
       if (results[0]) {
         that.selectedUser.location.address = results[0].formatted_address;
-      } else {
-        console.log("No results found");
       }
     });
   }
@@ -149,7 +156,7 @@ export class MapComponent implements OnInit {
   }
 
   public getActiveUsers() {
-    this.activeUsers = this.users.filter((user) => {
+    return this.users.filter((user) => {
       return user.status === UserStatus.ONLINE && user.locationUpdate !== 0;
     });
   }

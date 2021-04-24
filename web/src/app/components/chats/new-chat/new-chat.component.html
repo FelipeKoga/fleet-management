@@ -10,7 +10,7 @@
     <div *ngIf="newChatType === 'PRIVATE'">
       <h2>Novo chat</h2>
       <div style="margin-bottom: 12px">
-        Selecione o usuário para iniciar um chat
+        Selecione o funcionário para iniciar um chat
       </div>
     </div>
     <ng-container *ngIf="isLoading; else usersTemplate">
@@ -23,13 +23,22 @@
     <ng-template #usersTemplate>
       <div *ngIf="newChatType === 'PRIVATE'">
         <div
-          style="padding-top: 12px"
-          (click)="newPrivateChat(user)"
+          color="primary"
           *ngFor="let user of users"
-          class="user-item"
+          (click)="newPrivateChat(user)"
+          style="width: 100%"
         >
-          <div style="font-weight: 500">{{ user.name }}</div>
-          <div>{{ user.email }}</div>
+          <div style="display: flex; margin-bottom: 8px; margin-top: 8px">
+            <img
+              class="user-avatar"
+              [src]="user.avatar || getUserAvatar(user)"
+            />
+            <div style="margin-left: 12px">
+              <div style="font-weight: 500">{{ user.name }}</div>
+              <div>{{ user.email }}</div>
+            </div>
+          </div>
+
           <mat-divider></mat-divider>
         </div>
       </div>
