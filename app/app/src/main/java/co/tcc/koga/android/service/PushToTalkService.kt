@@ -80,8 +80,6 @@ class PushToTalkService : Service() {
 
     private fun observePushToTalk() {
         var hasStarted = false
-
-        println("OBSERVE PUSH TO TALK!!!!!!")
         compositeDisposable.add(repository.receive().subscribe {
             if (it.action == PushToTalkActions.STARTED_PUSH_TO_TALK) {
                 repository.setReceivingPTT(RecevingPTT(true, it.body.user))

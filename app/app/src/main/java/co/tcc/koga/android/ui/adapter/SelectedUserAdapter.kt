@@ -37,7 +37,10 @@ class SelectedUserAdapter :
                 textViewSelectedUser.text = user.name
                 imageViewRemoveSelected.setOnClickListener { onUserClicked?.invoke(user) }
                 onLoadAvatar?.invoke(
-                    user.avatar ?: Constants.getAvatarURL(user.name, user.color),
+                    if (user.avatar.isNullOrEmpty()) Constants.getAvatarURL(
+                        user.name,
+                        user.color
+                    ) else user.avatar,
                     imageViewSelectedUserAvatar
                 )
             }

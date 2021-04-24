@@ -27,7 +27,10 @@ class UserAdapter : ListAdapter<UserEntity, UserAdapter.UserViewHolder>(DIFF_CAL
                 textViewName.text = user.name
                 textViewEmail.text = user.email
                 onLoadAvatar?.invoke(
-                    user.avatar ?: Constants.getAvatarURL(user.name, user.color),
+                    if (user.avatar.isNullOrEmpty()) Constants.getAvatarURL(
+                        user.name,
+                        user.color
+                    ) else user.avatar,
                     imageViewAvatar
                 )
                 linearLayoutUserContainer.setOnClickListener {

@@ -77,7 +77,6 @@ class ChatViewModel @Inject constructor(
 
     fun observeMessageUpdates() = viewModelScope.launch {
         repository.observeMessageUpdated().subscribe { update ->
-            println("OBSEEEEERVE: ${update.body}")
             if (update.action === MessageActions.NEW_MESSAGE) {
                 insertMessage(update.body)
             }

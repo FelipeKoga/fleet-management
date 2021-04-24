@@ -16,8 +16,6 @@ class PTTStream {
         hasStopped = false
         initRecorder()
         recorder.startRecording()
-        println("START RECORDING")
-
         while (!hasStopped) {
             val data = FloatArray(metadata.bufferSize)
             recorder.read(data, 0, data.size, AudioRecord.READ_BLOCKING)
