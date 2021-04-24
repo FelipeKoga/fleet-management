@@ -1,6 +1,7 @@
 package co.tcc.koga.android.service
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.*
 import android.content.Context
 import android.content.Intent
@@ -25,13 +26,11 @@ import javax.inject.Inject
 
 
 class LocationService : Service() {
-    private var wakeLock: PowerManager.WakeLock? = null
     private var isServiceStarted = false
     private var fusedLocationClient: FusedLocationProviderClient? = null
 
     @Inject
     lateinit var repository: UserRepository
-
     @Inject
     lateinit var clientRepository: ClientRepository
 
@@ -61,12 +60,6 @@ class LocationService : Service() {
         if (isServiceStarted) return
         isServiceStarted = true
         setLocationServiceState(this, ServiceState.STARTED)
-        wakeLock =
-            (getSystemService(Context.POWER_SERVICE) as PowerManager).run {
-                newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Location::lock").apply {
-                    acquire(10 * 60 * 1000L)
-                }
-            }
         GlobalScope.launch {
             while (isServiceStarted) {
                 launch(Dispatchers.IO) {
@@ -78,42 +71,36 @@ class LocationService : Service() {
     }
 
     private fun stopService() {
-        try {
-            wakeLock?.let {
-                if (it.isHeld) {
-                    it.release()
-                }
-            }
-            stopForeground(true)
-            stopSelf()
-        } catch (e: Exception) {
-        }
+        stopForeground(true)
+        stopSelf()
         isServiceStarted = false
         setLocationServiceState(this, ServiceState.STOPPED)
     }
 
+    @SuppressLint("MissingPermission")
     private fun sendLocation() {
-        if (!Client.getInstance().isSignIn() && Client.getInstance().currentUser.locationEnabled) return
-        if (ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            return
-        }
+        if (!hasPermission() || !isLocationEnabled()) return
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         fusedLocationClient?.lastLocation?.addOnSuccessListener { location ->
-            println("Location: $location")
             if (location != null) {
                 repository.sendLocation(location.latitude, location.longitude)
             }
         }
+    }
 
+    private fun isLocationEnabled(): Boolean {
+        return !Client.getInstance().isSignIn() && Client.getInstance().currentUser.locationEnabled
+    }
 
+    private fun hasPermission(): Boolean {
+        return ActivityCompat.checkSelfPermission(
+            this,
+            Manifest.permission.ACCESS_FINE_LOCATION
+        ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+            this,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+        ) != PackageManager.PERMISSION_GRANTED
     }
 
     private fun createNotification(): Notification {
