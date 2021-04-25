@@ -15,15 +15,18 @@ import co.tcc.koga.android.data.network.socket.PushToTalkActions
 import co.tcc.koga.android.data.repository.PushToTalkRepository
 import co.tcc.koga.android.ui.MainActivity
 import io.reactivex.disposables.CompositeDisposable
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 
 class PushToTalkService : Service() {
     private var isServiceStarted = false
-    private val compositeDisposable: CompositeDisposable = CompositeDisposable()
 
     @Inject
-    lateinit var repository: PushToTalkRepository
+    lateinit var pushToTalkRepository: PushToTalkRepository
 
     private val audioAttributes = AudioAttributes.Builder()
         .setUsage(AudioAttributes.USAGE_MEDIA)
@@ -66,34 +69,31 @@ class PushToTalkService : Service() {
 
     private fun observePushToTalk() {
         var hasStarted = false
-        compositeDisposable.add(repository.receive().subscribe { response ->
-            if (response.action == PushToTalkActions.STARTED_PUSH_TO_TALK) {
-                repository.setReceivingPTT(RecevingPTT(true, response.body.user))
-            }
-            if (response.action == PushToTalkActions.STOPPED_PUSH_TO_TALK) {
-                repository.setReceivingPTT(RecevingPTT(false, null))
-            }
+        CoroutineScope(Dispatchers.IO).launch {
+            pushToTalkRepository.receive().subscribe { response ->
+                if (response.action == PushToTalkActions.STARTED_PUSH_TO_TALK) {
+                    pushToTalkRepository.setReceivingPTT(RecevingPTT(true, response.body.user))
+                }
+                if (response.action == PushToTalkActions.STOPPED_PUSH_TO_TALK) {
+                    pushToTalkRepository.setReceivingPTT(RecevingPTT(false, null))
+                }
 
-            if (response.action == PushToTalkActions.RECEIVED_PUSH_TO_TALK) {
-                if (response.body.inputData != null) {
+                if (response.action == PushToTalkActions.RECEIVED_PUSH_TO_TALK && response.body.inputData != null) {
                     val doubleArray = response.body.inputData.split(',')
                         .map { floatString -> floatString.toFloat() }
                     val floatArray = doubleArray.toFloatArray()
                     audioTrack.write(floatArray, 0, 1024, AudioTrack.WRITE_BLOCKING)
-                }
-                if (!hasStarted) {
-                    audioTrack.play()
-                    hasStarted = true
+                    if (!hasStarted) {
+                        audioTrack.play()
+                        hasStarted = true
+                    }
                 }
             }
-        })
-
-
+        }
     }
 
     private fun stopService() {
         try {
-            compositeDisposable.dispose()
             stopForeground(true)
             stopSelf()
         } catch (e: Exception) {

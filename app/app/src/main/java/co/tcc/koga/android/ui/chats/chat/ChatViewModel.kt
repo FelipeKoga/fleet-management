@@ -213,16 +213,18 @@ class ChatViewModel @Inject constructor(
         )
     }
 
+	private fun getReceivers(): List<String>? {
+        val chat = chat.value!!
+        return if (chat.members != null) chat.members?.map { member -> member.username } else listOf(
+                chat.user?.username as String
+            )
+	}
+
     private val stream = PTTStream()
 
     fun startPushToTalk() {
-        val chat = chat.value!!
-        val receivers: List<String>? =
-            if (chat.members != null) chat.members?.map { member -> member.username } else listOf(
-                chat.user?.username as String
-            )
-
-        pushToTalkRepository.start(chat.id, receivers)
+        val receivers = getReceivers()
+        pushToTalkRepository.start(chatId, receivers)
         stream.start { response ->
             pushToTalkRepository.send(response.joinToString())
         }
