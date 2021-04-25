@@ -4,11 +4,6 @@ import { nanoid } from "nanoid";
 import { BehaviorSubject } from "rxjs";
 import { User } from "src/app/models/user";
 import { Actions, WebsocketService } from "../websocket/websocket.service";
-declare var MediaRecorder: any;
-
-const mime = ["audio/wav", "audio/mpeg", "audio/webm", "audio/ogg"].filter(
-  MediaRecorder.isTypeSupported
-)[0];
 @Injectable({
   providedIn: "root",
 })
@@ -18,9 +13,7 @@ export class PttService {
   private source: MediaStreamAudioSourceNode;
   private chatId: string;
   private user: User;
-  private members: string[];
-  private receiver: User;
-  private mediaRecorder;
+  private receivers: string[];
 
   private audioProcessingListener: (
     this: ScriptProcessorNode,
@@ -35,53 +28,20 @@ export class PttService {
     private http: HttpClient
   ) {}
 
-  public async start(
-    chatId: string,
-    user: User,
-    receiver: User,
-    members: string[],
-    onStop: (blob: Blob) => void
-  ) {
-    console.log("START PUSH TO TALK...");
+  private setupVariables = ({ user, chatId, receivers }) => {
     this.user = user;
     this.chatId = chatId;
-    this.members = members;
-    this.receiver = receiver;
+    this.receivers = receivers;
+  };
+
+  private setupStreaming = async () => {
     this.context = new AudioContext({
       sampleRate: 8000,
     });
     this.processor = this.context.createScriptProcessor(1024, 1, 1);
-
-    this.recording$.next(true);
-    this.webSocketService.sendMessage({
-      action: Actions.PUSH_TO_TALK,
-      body: {
-        type: Actions.START_PUSH_TO_TALK,
-        chatId,
-        user: this.user,
-        members,
-        receiver: this.receiver.username,
-      },
-    });
-
     const stream = await navigator.mediaDevices.getUserMedia({
       audio: true,
     });
-    this.audioProcessingListener = (e) => {
-      console.log("AUDIO PROCESSING", e);
-      this.webSocketService.sendMessage({
-        action: Actions.PUSH_TO_TALK,
-        body: {
-          chatId,
-          user: this.user,
-          inputData: e.inputBuffer.getChannelData(0).toString(),
-          length: 1024,
-          members,
-          receiver: receiver.username,
-        },
-      });
-    };
-
     this.source = this.context.createMediaStreamSource(stream);
     this.source.connect(this.processor);
     this.processor.addEventListener(
@@ -89,14 +49,41 @@ export class PttService {
       this.audioProcessingListener
     );
     this.processor.connect(this.context.destination);
+  };
 
-    // this.startMediaRecorder(stream, onStop);
+  private audioStreamListener = (payload) => {
+    this.audioProcessingListener = (e) => {
+      this.webSocketService.sendMessage({
+        action: Actions.PUSH_TO_TALK,
+        body: {
+          ...payload,
+          inputData: e.inputBuffer.getChannelData(0).toString(),
+        },
+      });
+    };
+  };
+
+  public async start(chatId: string, user: User, receivers: string[]) {
+    this.recording$.next(true);
+    this.setupVariables({ user, chatId, receivers });
+    this.setupStreaming();
+    const payload = {
+      user: this.user,
+      receivers,
+      chatId,
+    };
+    this.webSocketService.sendMessage({
+      action: Actions.PUSH_TO_TALK,
+      body: {
+        ...payload,
+        type: Actions.START_PUSH_TO_TALK,
+      },
+    });
+
+    this.audioStreamListener(payload);
   }
 
-  public stop() {
-    console.log("STOP!");
-    this.recording$.next(false);
-    // this.mediaRecorder.stop();
+  private disconnectStreaming = () => {
     this.processor.removeEventListener(
       "audioprocess",
       this.audioProcessingListener,
@@ -104,34 +91,35 @@ export class PttService {
     );
     this.processor.disconnect(this.context.destination);
     this.source.disconnect();
+  };
+
+  public stop() {
+    this.recording$.next(false);
+    this.disconnectStreaming();
     this.webSocketService.sendMessage({
       action: Actions.PUSH_TO_TALK,
       body: {
         type: Actions.STOP_PUSH_TO_TALK,
         chatId: this.chatId,
         user: this.user,
-        members: this.members,
-        receiver: this.receiver.username,
+        receivers: this.receivers,
       },
     });
   }
 
-  public playAudio(audioBufferString: string, length: number) {
+  public playAudio(audioBufferString: string) {
     const parsedAudioBuffer = audioBufferString
       .split(",")
       .map((value: string) => +value);
     const buf = this.context.createBuffer(1, 1024, 8000);
     const player = this.context.createBufferSource();
-    console.log(parsedAudioBuffer);
     buf.copyToChannel(new Float32Array(parsedAudioBuffer), 0);
     player.buffer = buf;
     player.connect(this.context.destination);
-    console.log("START!");
     player.start(0);
   }
 
   public busy(chatId: string) {
-    console.log(this.chatId !== chatId && this.receiving$.value);
     return this.chatId && this.chatId !== chatId && this.receiving$.value;
   }
 
@@ -156,25 +144,6 @@ export class PttService {
       });
   }
 
-  private startMediaRecorder(
-    stream: MediaStream,
-    onStop: (blob: Blob) => void
-  ) {
-    this.mediaRecorder = new MediaRecorder(stream, {
-      mimeType: mime,
-    });
-    this.mediaRecorder.start();
-    const audioChunks = [];
-    this.mediaRecorder.addEventListener("dataavailable", (event) => {
-      audioChunks.push(event.data);
-    });
-
-    this.mediaRecorder.addEventListener("stop", async () => {
-      const audioBlob = new Blob(audioChunks);
-      onStop(audioBlob);
-    });
-  }
-
   public startReceivingPushToTalk(chatId: string) {
     if (this.busy(chatId)) return;
     this.context = new AudioContext({
@@ -186,13 +155,5 @@ export class PttService {
 
   public stopReceivingPushToTalk() {
     this.receiving$.next(false);
-  }
-
-  downsample(arr) {
-    var out = new Int16Array(arr.length);
-    for (var i = 0; i < arr.length; i++) {
-      out[i] = arr[i] * 0xffff;
-    }
-    return out.buffer;
   }
 }

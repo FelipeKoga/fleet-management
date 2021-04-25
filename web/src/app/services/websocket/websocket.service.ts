@@ -54,15 +54,12 @@ export class WebsocketService {
             this.messages$.next(data);
           }
         },
-        (error) => {
-          console.log("SUBSCRIBE ERROR", error);
-          console.log(error);
+        () => {
           this.socket$.complete();
           this.connect();
         }
       ),
         () => {
-          console.log("ON COMPLETE");
           this.socket$.complete();
           this.connect();
         };
@@ -70,6 +67,7 @@ export class WebsocketService {
   }
 
   public sendMessage(message: WebSocketPayload) {
+    console.log(message);
     if (this.socket$.closed) {
       this.connect();
     }

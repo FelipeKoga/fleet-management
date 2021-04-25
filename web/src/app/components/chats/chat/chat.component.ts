@@ -24,7 +24,6 @@ import { convertDate } from "src/app/utils/date";
 import { MapBottomSheetComponent } from "../../map/map-bottom-sheet/map-bottom-sheet.component";
 declare var MediaRecorder: any;
 
-const mime = ["audio/ogg"].filter(MediaRecorder.isTypeSupported)[0];
 @Component({
   selector: "app-chat",
 
@@ -84,6 +83,7 @@ export class ChatComponent implements OnInit {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
+    console.log(changes);
     this.viewedMessages();
     this.showChatDetails = false;
     if (this.chat.messages && this.chat.messages.length <= 1) {
@@ -141,6 +141,7 @@ export class ChatComponent implements OnInit {
   public translateStatus(status: UserStatus) {
     if (status === UserStatus.ONLINE) return "Online";
     if (status === UserStatus.OFFLINE) return "Offline";
+    if (status === UserStatus.DISABLED) return "Desabilitado";
   }
 
   public onShowChatDetails() {
@@ -170,7 +171,7 @@ export class ChatComponent implements OnInit {
           duration = Date.now() - duration;
 
           this.uploadAudio(
-            audioBlob.slice(0, audioBlob.size, "audio/ogg"),
+            audioBlob.slice(0, audioBlob.size, "audio/wav"),
             duration
           );
         });
@@ -182,11 +183,14 @@ export class ChatComponent implements OnInit {
     this.mediaRecorder.stop();
   }
 
-  private uploadAudio(blob: Blob, duration: number) {
-    const key = `company/${this.user.companyId}/chat/${this.chat.id}/${
+  private getS3Key = () => {
+    return `company/${this.user.companyId}/chat/${this.chat.id}/${
       this.user.username
-    }/audios/${nanoid()}.oga`;
+    }/audios/${nanoid()}.wav`;
+  };
 
+  private uploadAudio(blob: Blob, duration: number) {
+    const key = this.getS3Key();
     const message = new Message({
       chatId: this.chat.id,
       username: this.user.username,
@@ -234,25 +238,11 @@ export class ChatComponent implements OnInit {
   }
 
   public startRecordingPTT() {
-    console.log("opa!@");
     this.recordingPTT = true;
-    const currentTime = Date.now();
-
-    const members = this.chat.members
+    const receivers = this.chat.members
       ? this.chat.members.map((member) => member.username)
-      : null;
-    const receiver = this.chat.user ? this.chat.user : null;
-    console.log(this.chat.id, this.user, receiver, members);
-    this.pttService.start(
-      this.chat.id,
-      this.user,
-      receiver,
-      members,
-      (blob) => {
-        console.log(blob);
-        this.uploadAudio(blob, Date.now() - currentTime);
-      }
-    );
+      : [this.chat.user.username];
+    this.pttService.start(this.chat.id, this.user, receivers);
   }
 
   public stopRecordingPTT() {
