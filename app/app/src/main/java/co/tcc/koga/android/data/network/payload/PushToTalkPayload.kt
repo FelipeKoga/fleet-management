@@ -9,8 +9,6 @@ data class PushToTalkPayload(
     val type: PushToTalkActions? = null,
     val chatId: String,
     val user: UserEntity,
-    val receiver: String? = null,
     val receivers: List<String>? = null,
     val inputData: String? = null,
-    val length: Int? = null
 ): Serializable

@@ -7,5 +7,4 @@ data class PushToTalkResponse(
     val chatId: String,
     val user: UserEntity,
     val inputData: String?,
-    val length: Int?
-): Serializable
+) : Serializable

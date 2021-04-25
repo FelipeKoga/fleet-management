@@ -15,6 +15,7 @@ import com.amazonaws.services.s3.AmazonS3Client
 import com.amazonaws.services.s3.model.CannedAccessControlList
 import io.reactivex.Observable
 import okhttp3.MediaType
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
 import okhttp3.RequestBody
 import okhttp3.ResponseBody
@@ -53,7 +54,7 @@ class AudioRepositoryImpl @Inject constructor(val service: Service) :
 
         val service = retrofit.create(Service::class.java)
 
-        val avatarBody = RequestBody.create(MediaType.parse("audio/wav"), file)
+        val avatarBody = RequestBody.create("audio/wav".toMediaTypeOrNull(), file)
         return service.uploadFile(url, avatarBody)
     }
 }

@@ -70,6 +70,7 @@ class ChatFragment : Fragment(R.layout.chat_fragment) {
             observeMessageUpdates()
             observeChatUpdates(args.chat)
             observeUserUpdates()
+            observeRecordingPTT()
 
             messages.observe(viewLifecycleOwner) { messages ->
                 adapter.submitList(messages)
@@ -97,7 +98,7 @@ class ChatFragment : Fragment(R.layout.chat_fragment) {
             isRecordingPushToTalk.observe(viewLifecycleOwner) { isRecording ->
                 binding.imageButtonPushToTalk.run {
                     if (isRecording) {
-                        setImageResource(R.drawable.ic_big_mic_grey)
+                        setImageResource(R.drawable.ic_big_mic_green)
                         setBackgroundResource(R.drawable.shape_rounded_mic_green)
                     } else {
                         setImageResource(R.drawable.ic_big_mic_blue)

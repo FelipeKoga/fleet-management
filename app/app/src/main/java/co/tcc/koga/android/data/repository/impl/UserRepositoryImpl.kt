@@ -14,6 +14,7 @@ import co.tcc.koga.android.data.repository.UserRepository
 import co.tcc.koga.android.utils.Constants
 import io.reactivex.Observable
 import okhttp3.*
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
@@ -89,7 +90,7 @@ class UserRepositoryImpl @Inject constructor(
 
         val service = retrofit.create(Service::class.java)
 
-        val avatarBody = RequestBody.create(MediaType.parse("image/jpeg"), file)
+        val avatarBody = RequestBody.create("image/jpeg".toMediaTypeOrNull(), file)
         return service.uploadFile(url, avatarBody)
     }
 

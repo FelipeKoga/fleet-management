@@ -16,7 +16,7 @@ import co.tcc.koga.android.data.network.socket.ChatActions
 import co.tcc.koga.android.data.network.socket.MessageActions
 import co.tcc.koga.android.data.network.socket.UserActions
 import co.tcc.koga.android.data.repository.*
-import co.tcc.koga.android.ui.chats.chat.utils.PushToTalkMetadata
+import co.tcc.koga.android.ui.chats.chat.utils.PTTStream
 import kotlinx.coroutines.*
 import java.io.*
 import java.util.*
@@ -28,7 +28,8 @@ class ChatViewModel @Inject constructor(
     private val chatsRepository: ChatsRepository,
     private val clientRepository: ClientRepository,
     private val audioRepository: AudioRepository,
-    private val context: Context, private val pushToTalkRepository: PushToTalkRepository,
+    private val context: Context,
+    private val pushToTalkRepository: PushToTalkRepository,
 
     ) : ViewModel() {
     private val _chat = MutableLiveData<ChatEntity>()
@@ -43,15 +44,10 @@ class ChatViewModel @Inject constructor(
     val error: LiveData<Boolean> get() = _error
     val isRecordingPushToTalk: LiveData<Boolean> get() = _isRecordingPushToTalk
 
-    @Volatile
-    var isRecording: Boolean = false
-
     val username = clientRepository.user().username
     private var file: File? = null
     private var recorder: MediaRecorder? = null
-    private lateinit var pushToTalkRecorder: AudioRecord
     private var startRecorder: Long = System.currentTimeMillis()
-    private var stopRecorder: Long = System.currentTimeMillis()
     lateinit var chatId: String
 
 
@@ -72,6 +68,12 @@ class ChatViewModel @Inject constructor(
         withContext(Dispatchers.IO) {
             chatsRepository.openChat(chatId)
             repository.insertMessage(message)
+        }
+    }
+
+    fun observeRecordingPTT() = viewModelScope.launch {
+        pushToTalkRepository.isRecording().subscribe {
+            _isRecordingPushToTalk.postValue(it)
         }
     }
 
@@ -195,8 +197,6 @@ class ChatViewModel @Inject constructor(
         viewModelScope.launch {
             val chat = _chat.value
             audioMessageEntity.message = getURL
-            println("sendAudio: ${audioMessageEntity}")
-
             repository.sendMessage(audioMessageEntity)
             if (chat != null) {
                 chatsRepository.updateChat(chat)
@@ -213,55 +213,24 @@ class ChatViewModel @Inject constructor(
         )
     }
 
-    var receiver = chat.value?.user?.username
-    var receivers =
-        if (chat.value?.members != null) chat.value?.members?.map { it.username } else null
-
+    private val stream = PTTStream()
 
     fun startPushToTalk() {
-        _isRecordingPushToTalk.postValue(true)
+        val chat = chat.value!!
+        val receivers: List<String>? =
+            if (chat.members != null) chat.members?.map { member -> member.username } else listOf(
+                chat.user?.username as String
+            )
 
-        receiver = chat.value?.user?.username
-        receivers =
-            if (chat.value?.members != null) chat.value?.members?.map { it.username } else null
-
-        initRecorder()
-
-        isRecording = true
-        pushToTalkRecorder.startRecording()
-        pushToTalkRepository.start(chatId, receiver, receivers)
-        Thread {
-            while (isRecording) {
-                val data = FloatArray(1024)
-                pushToTalkRecorder.read(data, 0, data.size, AudioRecord.READ_BLOCKING)
-                println(data.joinToString())
-                pushToTalkRepository.send(chatId, receiver, receivers, data.joinToString(), 1024)
-            }
-        }.start()
-
+        pushToTalkRepository.start(chat.id, receivers)
+        stream.start { response ->
+            pushToTalkRepository.send(response.joinToString())
+        }
     }
-
 
     fun stopPushToTalk() {
-//        println("STOP PUSH TO TALK!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-        isRecording = false
-        pushToTalkRecorder.stop()
-        pushToTalkRepository.stop(chatId, receiver, receivers)
+        stream.stop()
+        pushToTalkRepository.stop()
         _isRecordingPushToTalk.postValue(false)
-    }
-
-    private val metadata = PTTMetadata()
-
-    private fun initRecorder() {
-        val min = AudioRecord.getMinBufferSize(
-            metadata.sampleRate,
-            metadata.channel,
-            metadata.encoding
-        )
-        metadata.bufferSize = min
-        pushToTalkRecorder = AudioRecord(
-            MediaRecorder.AudioSource.MIC, metadata.sampleRate,
-            metadata.channel, metadata.encoding, min
-        )
     }
 }

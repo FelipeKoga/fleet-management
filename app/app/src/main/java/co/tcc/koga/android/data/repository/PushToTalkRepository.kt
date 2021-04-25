@@ -7,10 +7,11 @@ import co.tcc.koga.android.data.network.socket.WebSocketMessage
 import io.reactivex.Observable
 
 interface PushToTalkRepository {
-    fun start(chatId: String, receiver: String?, receivers: List<String>?)
-    fun stop(chatId: String, receiver: String?, receivers: List<String>?)
-    fun send(chatId: String, receiver: String?, receivers: List<String>?, inputData: String, length: Int)
+    fun start(chatId: String, receivers: List<String>?)
+    fun stop()
+    fun send(inputData: String)
     fun receive(): Observable<WebSocketMessage<PushToTalkResponse, PushToTalkActions>>
     fun setReceivingPTT(value: RecevingPTT)
     fun receivingPTT(): Observable<RecevingPTT>
+    fun isRecording(): Observable<Boolean>
 }

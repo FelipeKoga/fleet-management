@@ -1,6 +1,5 @@
 package co.tcc.koga.android.data.repository.impl
 
-import co.tcc.koga.android.data.database.entity.UserEntity
 import co.tcc.koga.android.data.network.aws.Client
 import co.tcc.koga.android.data.network.payload.PushToTalkPayload
 import co.tcc.koga.android.data.network.payload.PushToTalkResponse
@@ -15,63 +14,56 @@ class PushToTalkRepositoryImpl @Inject constructor(private val webSocketService:
     PushToTalkRepository {
 
     private val isReceiving = PublishSubject.create<RecevingPTT>()
+    private val isRecording = PublishSubject.create<Boolean>()
 
+    private var receivers: List<String>? = null
+    private var chatId: String? = null
+    private val currentUser = Client.getInstance().currentUser
 
-    override fun start(chatId: String, receiver: String?, receivers: List<String>?) {
-        val user = Client.getInstance().currentUser
+    override fun start(chatId: String, receivers: List<String>?) {
+        isRecording.onNext(true)
+        this.receivers = receivers
+        this.chatId = chatId
         val payload = WebSocketPayload(
             WebSocketActions.PUSH_TO_TALK,
             PushToTalkPayload(
                 PushToTalkActions.START_PUSH_TO_TALK,
                 chatId,
-                user,
-                receiver,
-                receivers, null, null
+                currentUser,
+                receivers,
+                null
             )
         )
-
-        println("START PUSH TO TALK REPOSITORY: $payload")
         webSocketService.send(payload)
     }
 
-    override fun stop(chatId: String, receiver: String?, receivers: List<String>?) {
-        val user = Client.getInstance().currentUser
+    override fun stop() {
+        isRecording.onNext(false)
         val payload = WebSocketPayload(
             WebSocketActions.PUSH_TO_TALK,
             PushToTalkPayload(
                 PushToTalkActions.STOP_PUSH_TO_TALK,
-                chatId,
-                user,
-                receiver,
-                receivers, null, null
+                chatId as String,
+                currentUser,
+                receivers, null
             )
         )
-        println("STOP PUSH TO TALK REPOSITORY: $payload")
-
-            webSocketService.send(payload)
+        webSocketService.send(payload)
     }
 
     override fun send(
-        chatId: String,
-        receiver: String?,
-        receivers: List<String>?,
         inputData: String,
-        length: Int
     ) {
-        val user = Client.getInstance().currentUser
         val payload = WebSocketPayload(
             WebSocketActions.PUSH_TO_TALK,
             PushToTalkPayload(
                 PushToTalkActions.SEND_PUSH_TO_TALK,
-                chatId,
-                user,
-                receiver,
-                receivers, inputData, length
+                chatId as String,
+                currentUser,
+                receivers, inputData
 
             )
         )
-
-        println("SEND PUSH TO TALK REPOSITORY: $payload")
         webSocketService.send(payload)
     }
 
@@ -85,6 +77,10 @@ class PushToTalkRepositoryImpl @Inject constructor(private val webSocketService:
 
     override fun receive(): Observable<WebSocketMessage<PushToTalkResponse, PushToTalkActions>> {
         return webSocketService.observePushToTalk()
+    }
+
+    override fun isRecording(): Observable<Boolean> {
+        return isRecording.hide()
     }
 
 }
