@@ -25,9 +25,7 @@ class MainViewModel @Inject constructor(
 
     fun observeUserStatus() = viewModelScope.launch {
         repository.observeCurrentUser().subscribe { user ->
-            println("OBSERVEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE")
             currentUser = user
-            println(user)
             if (user == null) {
                 _isSignIn.postValue(false)
                 lifecycleRegistry.onNext(Lifecycle.State.Stopped.WithReason(ShutdownReason.GRACEFUL))

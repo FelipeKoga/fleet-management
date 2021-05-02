@@ -220,18 +220,18 @@ class ChatViewModel @Inject constructor(
             )
 	}
 
-    private val stream = PTTStream()
+    private val pttStream = PTTStream()
 
     fun startPushToTalk() {
         val receivers = getReceivers()
         pushToTalkRepository.start(chatId, receivers)
-        stream.start { response ->
-            pushToTalkRepository.send(response.joinToString())
+        pttStream.start { audioAsString ->
+            pushToTalkRepository.send(audioAsString)
         }
     }
 
     fun stopPushToTalk() {
-        stream.stop()
+        pttStream.stop()
         pushToTalkRepository.stop()
         _isRecordingPushToTalk.postValue(false)
     }

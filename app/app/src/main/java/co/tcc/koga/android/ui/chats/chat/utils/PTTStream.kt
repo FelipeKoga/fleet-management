@@ -30,14 +30,14 @@ class PTTStream {
         )
     }
 
-    fun start(onReceive: (buffer: FloatArray) -> Unit) {
+    fun start(onReceive: (audioAsString: String) -> Unit) {
         isRecording = false
         recorder.startRecording()
         Thread {
             while (!isRecording) {
                 val data = FloatArray(Metadata.bufferSize)
                 recorder.read(data, 0, data.size, AudioRecord.READ_BLOCKING)
-                onReceive(data)
+                onReceive(data.joinToString())
             }
         }.start()
     }

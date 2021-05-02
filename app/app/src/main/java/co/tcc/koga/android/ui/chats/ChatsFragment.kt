@@ -155,8 +155,6 @@ class ChatsFragment : Fragment(R.layout.chats_fragment) {
 
     private fun loadUserAvatar() {
         val avatar = viewModel.getAvatar()
-        println("AVATAR =======================")
-        println(avatar)
         Avatar.load(
             requireContext(),
             binding.imageViewUserPhoto,

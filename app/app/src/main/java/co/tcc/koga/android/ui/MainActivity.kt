@@ -50,12 +50,10 @@ class MainActivity : AppCompatActivity() {
 
         viewModel.observeUserStatus()
         viewModel.isSignIn.observe(this) { isSignIn ->
-            println("LOGADO?????????????? $isSignIn")
             if (isSignIn) {
                 startPushToTalkService()
                 if (viewModel.isLocationEnabled()) {
                     if (requestLocationPermission(this)) {
-                        println("TESTEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE")
                         startLocationService()
                     }
                 }
@@ -83,7 +81,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun startLocationService() {
-        println("START LOCATION SERVICE")
         Intent(this, LocationService::class.java).also {
             it.action = Actions.START.name
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -95,7 +92,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun startPushToTalkService() {
-        println("START PTT SERVICE")
         if (alreadyStarted) return
         alreadyStarted = true
         Intent(this, PushToTalkService::class.java).also {
@@ -107,10 +103,4 @@ class MainActivity : AppCompatActivity() {
             startService(it)
         }
     }
-
-    override fun onStart() {
-        super.onStart()
-
-    }
-
 }

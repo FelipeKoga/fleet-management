@@ -79,10 +79,10 @@ class PushToTalkService : Service() {
                 }
 
                 if (response.action == PushToTalkActions.RECEIVED_PUSH_TO_TALK && response.body.inputData != null) {
-                    val doubleArray = response.body.inputData.split(',')
+                    val audioAsFloatList = response.body.inputData.split(',')
                         .map { floatString -> floatString.toFloat() }
-                    val floatArray = doubleArray.toFloatArray()
-                    audioTrack.write(floatArray, 0, 1024, AudioTrack.WRITE_BLOCKING)
+                    val audioAsFloatArray = audioAsFloatList.toFloatArray()
+                    audioTrack.write(audioAsFloatArray, 0, 1024, AudioTrack.WRITE_BLOCKING)
                     if (!hasStarted) {
                         audioTrack.play()
                         hasStarted = true

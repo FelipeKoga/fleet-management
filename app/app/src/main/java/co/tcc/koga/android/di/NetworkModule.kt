@@ -54,12 +54,12 @@ class NetworkModule {
         okHttpClient: OkHttpClient,
         lifecycleRegistry: LifecycleRegistry
     ): WebSocketService {
-        val username = Client.getInstance().username()
+        val token = Client.getInstance().getToken()
         lifecycleRegistry.onNext(Lifecycle.State.Started)
         val scarletInstance = Scarlet.Builder()
             .webSocketFactory(
                 okHttpClient.newWebSocketFactory(
-                    "${Constants.WebsocketURL}?username=${username}"
+                    "${Constants.WebsocketURL}?token=${token}"
                 )
             )
             .lifecycle(lifecycleRegistry)
