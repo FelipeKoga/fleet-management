@@ -50,9 +50,13 @@ export class MapComponent implements OnInit {
       this.buildMarkers();
     });
 
-    this.webSocketService.messages.subscribe((response) => {
-      if (this.hasUserStatusChanged(response.action)) {
-        this.usersService.replaceUser(response.body);
+    this.webSocketService.messages.subscribe(({ action, body }) => {
+      if (
+        action === Actions.USER_CONNECTED ||
+        action === Actions.USER_DISCONNECTED ||
+        action === Actions.USER_NEW_LOCATION
+      ) {
+        this.usersService.replaceUser(body);
       }
     });
   }
@@ -71,14 +75,6 @@ export class MapComponent implements OnInit {
         });
       }
     });
-  }
-
-  private hasUserStatusChanged(action: Actions) {
-    return (
-      action === Actions.USER_CONNECTED ||
-      action === Actions.USER_DISCONNECTED ||
-      action === Actions.USER_NEW_LOCATION
-    );
   }
 
   private isEmployee(user: User): boolean {
