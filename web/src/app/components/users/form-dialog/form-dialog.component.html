@@ -1,17 +1,17 @@
 <div class="container">
   <h2 mat-dialog-title>
-    <span *ngIf="data.type === 'INSERT'">Criação de usuário</span>
-    <span *ngIf="data.type === 'UPDATE'">Atualização de usuário</span>
+    <span *ngIf="data.type === 'INSERT'">Cadastro funcionário</span>
+    <span *ngIf="data.type === 'UPDATE'">Atualização de funcionário</span>
 
-    <span *ngIf="data.type === 'DISABLE'">Desabilitar usuário</span>
-    <span *ngIf="data.type === 'ENABLE'">Habilitar usuário</span>
+    <span *ngIf="data.type === 'DISABLE'">Desabilitar funcionário</span>
+    <span *ngIf="data.type === 'ENABLE'">Habilitar funcionário</span>
   </h2>
   <ng-container
     *ngIf="data.type !== 'INSERT' && data.type !== 'UPDATE'; else elseTemplate"
   >
     <p style="font-size: 16px; flex: 1">
       Você tem certeza que deseja
-      {{ data.type === "DISABLE" ? "desabilitar" : "habilitar" }} o usuário
+      {{ data.type === "DISABLE" ? "desabilitar" : "habilitar" }} o funcionário
       {{ data.user.name }}?
     </p>
     <mat-dialog-actions align="end">
