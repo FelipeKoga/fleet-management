@@ -1,4 +1,6 @@
 const { setSeconds } = require('date-fns');
+const jose = require('node-jose');
+const fetch = require('node-fetch');
 const { Database, Lambda } = require('../services');
 const { getObject } = require('../services/s3');
 
@@ -9,12 +11,45 @@ async function postMessage(user, action) {
     await Lambda.sendMessage(user, connectionIds, action);
 }
 
-async function addConnection(connectionId, username) {
+async function authenticate(token) {
+    if (!token) throw new Error('Unathorized');
+    const sections = token.split('.');
+    let header = jose.util.base64url.decode(sections[0]);
+    header = JSON.parse(header);
+    const { kid } = header;
+
+    const rawRes = await fetch(
+        'https://cognito-idp.us-east-1.amazonaws.com/us-east-1_qtIxjoqVD/.well-known/jwks.json',
+    );
+    const response = await rawRes.json();
+
+    if (rawRes.status !== 200) throw new Error('Internal server error');
+
+    const { keys } = response;
+    const foundKey = keys.find(key => key.kid === kid);
+
+    if (!foundKey) throw new Error('Unathorized');
+    const result = await jose.JWK.asKey(foundKey);
+    const keyVerify = jose.JWS.createVerify(result);
+    const verificationResult = await keyVerify.verify(token);
+
+    const claims = JSON.parse(verificationResult.payload);
+
+    if (claims.aud !== '4ssv3lk591ehbtcspheg30n6ot')
+        throw new Error('Wrong app client id.');
+
+    return claims['cognito:username'];
+}
+
+async function addConnection(connectionId, token) {
+    const username = await authenticate(token);
+    const user = await Database.getUser(username);
+
+    if (!user) throw new Error('Unauthorized.');
     await Database.insertConnectionId({
         username,
         connectionId,
     });
-    const user = await Database.getUser(username);
     if (user.status === 'OFFLINE') {
         await Database.updateStatus(username, user.companyId, 'ONLINE');
         user.status = 'ONLINE';

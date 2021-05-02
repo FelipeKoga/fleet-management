@@ -5,7 +5,7 @@ exports.handler = async ({ requestContext, queryStringParameters }) => {
 
     try {
         if (eventType === 'CONNECT') {
-            await addConnection(connectionId, queryStringParameters.username);
+            await addConnection(connectionId, queryStringParameters.token);
         } else if (eventType === 'DISCONNECT') {
             await deleteConnection(connectionId);
         }
