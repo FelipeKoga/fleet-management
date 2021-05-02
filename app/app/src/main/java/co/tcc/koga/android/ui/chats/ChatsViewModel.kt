@@ -76,7 +76,6 @@ class ChatsViewModel @Inject constructor(
 
     fun observeChatUpdates() {
         compositeDisposable.add(repository.observeChatUpdates().subscribe { update ->
-            println(update)
             if (update.action === ChatActions.CHAT_UPDATED) {
                 val foundChat = _chats.value?.find { chat -> chat.id == update.body.id }
                 if (foundChat !== null) {

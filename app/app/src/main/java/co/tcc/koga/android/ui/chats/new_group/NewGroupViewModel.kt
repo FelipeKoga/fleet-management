@@ -38,7 +38,6 @@ class NewGroupViewModel @Inject constructor(
             }
 
         } catch (e: Exception) {
-            println(e)
         }
     }
 
@@ -64,7 +63,6 @@ class NewGroupViewModel @Inject constructor(
             }
         }
 
-        println(users)
         _selectedUsers.postValue(users)
     }
 }

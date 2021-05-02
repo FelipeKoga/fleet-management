@@ -72,8 +72,7 @@ class MainActivity : AppCompatActivity() {
                 if (grantResults.isNotEmpty()
                     && grantResults[0] == PackageManager.PERMISSION_GRANTED && viewModel.isSignIn() && viewModel.isLocationEnabled()
                 ) {
-                    println("TESTEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE222222")
-//                    startLocationService()
+                    startLocationService()
                 }
                 return
             }

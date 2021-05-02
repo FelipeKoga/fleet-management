@@ -79,12 +79,10 @@ class LoginViewModel @Inject constructor(
         try {
             compositeDisposable.add(repository.getCurrentUser(true).subscribe {
                 runOnUiThread {
-                    println(it)
                     _authenticationStatus.value = Constants.AuthStatus.LOGGED_IN
                 }
             })
         } catch (e: Exception) {
-            println(e)
         }
     }
 

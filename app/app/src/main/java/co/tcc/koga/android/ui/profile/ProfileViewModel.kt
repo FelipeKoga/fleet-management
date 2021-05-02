@@ -115,7 +115,6 @@ class ProfileViewModel @Inject constructor(
                 override fun onSubscribe(d: Disposable) {}
                 override fun onNext(i: ResponseBody) {}
                 override fun onError(e: Throwable) {
-                    println(e)
                 }
 
             })

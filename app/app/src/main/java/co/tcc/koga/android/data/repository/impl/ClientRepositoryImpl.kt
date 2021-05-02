@@ -49,7 +49,6 @@ class ClientRepositoryImpl @Inject constructor(
     private fun getUserDatabase(): Observable<UserEntity> {
         return userDao.getCurrentUser(Client.getInstance().username())
             .subscribeOn(Schedulers.computation()).doOnNext { user ->
-                println(user)
                 Client.getInstance().subCurrentUser.onNext(user)
                 Client.getInstance().currentUser = user
             }

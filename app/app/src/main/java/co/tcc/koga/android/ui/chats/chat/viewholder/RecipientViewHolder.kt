@@ -17,8 +17,6 @@ class RecipientViewHolder(private val binding: RowMessageReceivedBinding) :
         binding.run {
             if (!members.isNullOrEmpty()) {
                 val user = members.find { item.username == it.username }
-                println(user)
-                println(user?.customName ?: user?.name)
                 textViewUserName.show()
                 textViewUserName.text = if (!user?.customName.isNullOrEmpty()) user?.customName else user?.name
             }

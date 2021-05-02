@@ -22,7 +22,6 @@ class AudioUtil {
 
         currentURL = url
         isPlaying = true
-        println(url)
         try {
             mediaPlayer = MediaPlayer().apply {
                 setAudioAttributes(
@@ -46,7 +45,6 @@ class AudioUtil {
                 }
             }
         } catch (e: Exception) {
-            println(e)
         }
 
     }

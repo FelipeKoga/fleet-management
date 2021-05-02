@@ -50,8 +50,6 @@ class ConfirmForgotPasswordViewModel @Inject constructor(
         }
 
         formErrors.postValue(errors)
-
-        println(formErrors.value)
         return errors.isEmpty()
     }
 
@@ -89,7 +87,6 @@ class ConfirmForgotPasswordViewModel @Inject constructor(
                 }
             })
         } catch (e: Exception) {
-            println(e)
         }
     }
 }

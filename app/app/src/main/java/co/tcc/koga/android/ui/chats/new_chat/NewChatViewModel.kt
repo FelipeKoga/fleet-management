@@ -55,7 +55,6 @@ class NewChatViewModel @Inject constructor(
             val newChat = chatsRepository.createChat(member_username)
             _chatCreated.postValue(newChat)
         } catch (e: Exception) {
-            println(e)
         }
     }
 }

@@ -109,7 +109,6 @@ class NewGroupFragment : Fragment() {
         }
 
         viewModel.chatCreated.observe(viewLifecycleOwner) {
-            println("Chat created")
             findNavController().popBackStack()
             findNavController().popBackStack()
             findNavController().navigate(

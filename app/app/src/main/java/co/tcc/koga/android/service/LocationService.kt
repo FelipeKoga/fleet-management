@@ -89,7 +89,6 @@ class LocationService : Service() {
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         fusedLocationClient?.lastLocation?.addOnSuccessListener { location ->
             if (location != null) {
-                println(location)
                 repository.sendLocation(location.latitude, location.longitude)
             }
         }

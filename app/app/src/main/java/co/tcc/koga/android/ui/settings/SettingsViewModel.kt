@@ -32,7 +32,6 @@ class SettingsViewModel @Inject constructor(
         try {
             repository.signOut()
         } catch (e: Exception) {
-            println(e)
         }
     }
 

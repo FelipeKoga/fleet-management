@@ -33,8 +33,6 @@ class Client {
                             UserState.SIGNED_IN -> {
                                 tokenString =
                                     AWSMobileClient.getInstance().tokens.idToken.tokenString
-                                println(tokenString)
-                                println("PASSEI")
                                 subject.onNext(Constants.AuthStatus.LOGGED_IN)
                                 onInitSuccess(true)
                             }
@@ -43,7 +41,6 @@ class Client {
                     }
 
                     override fun onError(e: Exception?) {
-                        println(e)
                         onInitError()
                     }
 
@@ -68,7 +65,6 @@ class Client {
                 }
 
                 override fun onError(e: Exception?) {
-                    println(e)
                     onSignInError(e)
                 }
 
