@@ -65,7 +65,7 @@ class LocationService : Service() {
                 launch(Dispatchers.IO) {
                     sendLocation()
                 }
-                delay(30000)
+                delay(clientRepository.user().locationUpdate?.times(1000)?.toLong() as Long)
             }
         }
     }
@@ -77,20 +77,26 @@ class LocationService : Service() {
         setLocationServiceState(this, ServiceState.STOPPED)
     }
 
-    @SuppressLint("MissingPermission")
     private fun sendLocation() {
-        if (!hasPermission() || !isLocationEnabled()) return
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED || !isLocationEnabled()) return
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         fusedLocationClient?.lastLocation?.addOnSuccessListener { location ->
             if (location != null) {
+                println(location)
                 repository.sendLocation(location.latitude, location.longitude)
             }
         }
     }
 
     private fun isLocationEnabled(): Boolean {
-        return !Client.getInstance().isSignIn() && Client.getInstance().currentUser.locationEnabled
+        return Client.getInstance().isSignIn() && Client.getInstance().currentUser.locationEnabled
     }
 
     private fun hasPermission(): Boolean {
