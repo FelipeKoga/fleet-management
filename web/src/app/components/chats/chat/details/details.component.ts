@@ -96,7 +96,6 @@ export class DetailsComponent implements OnInit {
           this.chatsService
             .removeMember(this.chat.id, this.user.username)
             .subscribe((response) => {
-              console.log(response);
             });
         },
       },
@@ -116,7 +115,6 @@ export class DetailsComponent implements OnInit {
               this.members = this.members.filter(
                 (m) => m.username !== member.username
               );
-              console.log(response);
             });
         },
       },
@@ -136,7 +134,6 @@ export class DetailsComponent implements OnInit {
         }
       )
       .subscribe(async (response: { getURL: string; putURL: string }) => {
-        console.log(response);
         const { putURL } = response;
         fetch(putURL, {
           method: "PUT",
@@ -169,9 +166,7 @@ export class DetailsComponent implements OnInit {
   }
 
   public onChangeAdministrador() {
-    console.log("change");
     const { admin } = this.administratorForm.value;
-    console.log(admin);
     this.updateGroup(this.chat.groupName, admin.username);
   }
 

@@ -52,7 +52,6 @@ export class NewChatComponent implements OnInit {
   public newPrivateChat(user: User) {
     this.isLoadingNewChat = true;
     this.chatsService.newPrivateChat(user.username, (chat) => {
-      console.log("NEW PRIVATE CHAT");
       this.isLoadingNewChat = false;
       this.onChatCreated.next(chat);
     });

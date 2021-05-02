@@ -81,7 +81,6 @@ export class ProfileComponent implements OnInit {
         }
       )
       .subscribe(async (response: { getURL: string; putURL: string }) => {
-        console.log(response);
         const { putURL } = response;
         fetch(putURL, {
           method: "PUT",
@@ -122,8 +121,6 @@ export class ProfileComponent implements OnInit {
       return;
     }
 
-    console.log("OPA");
-
     this.isLoadingPasswordForm = true;
     this.authService
       .userChangePassword(oldPassword, password)
@@ -133,10 +130,8 @@ export class ProfileComponent implements OnInit {
           duration: 2000,
           panelClass: ["snackbar-success"],
         });
-        console.log(response);
       })
       .catch((e) => {
-        console.log(e);
         this.isLoadingPasswordForm = false;
 
         this.snackBar.open(e.message, null, {

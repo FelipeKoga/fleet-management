@@ -130,7 +130,6 @@ export class ChatsService extends StateService<ChatsState> {
       });
     } else {
       chats.unshift(newChat);
-      console.log(chats);
       this.setState({
         chats: chats.sort(this.sort),
       });
@@ -188,9 +187,7 @@ export class ChatsService extends StateService<ChatsState> {
   }
 
   public addOrReplaceMessage(message: Message) {
-    console.log(message.chatId);
     const chat = this.findChat(message.chatId);
-    console.log(chat);
     if (chat.messages.find((msg) => msg.messageId === message.messageId)) {
       this.addOrReplaceChat({
         ...chat,

@@ -42,12 +42,10 @@ export class ForgotPasswordComponent implements OnInit {
   }
 
   public async sendVerificationCode() {
-    console.log("send");
     const { username } = this.usernameForm.value;
     this.errorMessage = "";
     await this.authService.sendVerificationCode(username);
     this.step = 1;
-    console.log("mandou");
     this.snackBar.open(
       "O código de verificação foi enviado para seu e-mail.",
       null,
@@ -81,7 +79,6 @@ export class ForgotPasswordComponent implements OnInit {
   }
 
   public back() {
-    console.log("back");
     this.router.navigate(["/login"]);
   }
 

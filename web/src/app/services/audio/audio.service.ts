@@ -41,10 +41,7 @@ export class AudioService extends StateService<StreamState> {
   public loadAudio(url: string, duration: number) {
     this.audio.src = url;
     this.audio.load();
-    console.log(duration);
     this.audio.addEventListener("canplay", (e) => {
-      console.log("AUDIO:", this.audio.duration);
-      console.log("AUDIO2:", duration);
       this.setState({
         ...this.state,
         duration: Math.round(duration / 1000),

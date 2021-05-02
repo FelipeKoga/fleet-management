@@ -37,7 +37,6 @@ export class MapBottomSheetComponent implements OnInit {
     });
 
     this.webSocketService.messages.subscribe((response) => {
-      console.log(response);
       if (response.action === Actions.USER_NEW_LOCATION) {
         this.user = response.body;
       }
@@ -62,13 +61,10 @@ export class MapBottomSheetComponent implements OnInit {
       lng: this.user.location.longitude,
     };
     const geocoder = new google.maps.Geocoder();
-    console.log("opa");
     geocoder.geocode({ location }, function (results) {
-      console.log(results);
       if (results[0]) {
         that.user.location.address = results[0].formatted_address;
       } else {
-        console.log("No results found");
       }
     });
   }

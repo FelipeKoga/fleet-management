@@ -37,7 +37,6 @@ export class AddMemberComponent implements OnInit {
     this.chatsService
       .addMember(this.data.chat.id, member.username)
       .subscribe((response) => {
-        console.log(response);
         if (response) {
           this.dialogRef.close(member);
         }

@@ -96,8 +96,6 @@ export class FormDialogComponent implements OnInit {
 
   public changeUserStatus() {
     this.isLoading = true;
-    console.log(this.data.type);
-    console.log(FormType.ENABLE);
     if (this.data.type === FormType.ENABLE) {
       this.usersService.update(
         { ...this.user, status: UserStatus.OFFLINE },

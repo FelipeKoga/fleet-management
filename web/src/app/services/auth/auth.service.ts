@@ -108,7 +108,6 @@ export class AuthService {
   }
 
   public async userChangePassword(oldPassword, password) {
-    console.log(this.subAuthStore.value.cognitoUser);
     return Auth.changePassword(
       this.subAuthStore.value.cognitoUser,
       oldPassword,

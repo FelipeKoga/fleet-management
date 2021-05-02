@@ -83,7 +83,6 @@ export class ChatComponent implements OnInit {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    console.log(changes);
     this.viewedMessages();
     this.showChatDetails = false;
     if (this.chat.messages && this.chat.messages.length <= 1) {

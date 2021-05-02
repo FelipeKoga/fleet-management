@@ -67,7 +67,6 @@ export class WebsocketService {
   }
 
   public sendMessage(message: WebSocketPayload) {
-    console.log(message);
     if (this.socket$.closed) {
       this.connect();
     }
@@ -75,9 +74,9 @@ export class WebsocketService {
   }
 
   private getNewWebSocket() {
-    const { username } = this.authService.getUser();
+    const token = this.authService.getAuthToken();
     return webSocket({
-      url: `${ServiceEndpointWebsocket}?username=${username}`,
+      url: `${ServiceEndpointWebsocket}?token=${token}`,
       deserializer: (msg) => {
         return msg.data ? JSON.parse(msg.data) : "";
       },

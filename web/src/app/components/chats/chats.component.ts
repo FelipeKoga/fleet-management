@@ -46,7 +46,6 @@ export class ChatsComponent implements OnInit {
         );
       }
 
-      console.log(state.chats);
       this.chats = state.chats;
       this.isLoadingChats = state.isLoading;
     });
@@ -69,9 +68,7 @@ export class ChatsComponent implements OnInit {
         response.action === Actions.CHAT_CREATED
       ) {
         const chat = this.chatsService.findChat(response.body.id);
-        console.log(response.action);
         if (!chat) {
-          console.log(response.body);
           this.chatsService.addOrReplaceChat(response.body);
         } else {
           this.chatsService.addOrReplaceChat({
@@ -109,7 +106,6 @@ export class ChatsComponent implements OnInit {
   }
 
   public handleChatCreated(chat: Chat) {
-    console.log("handle chat created", chat);
     this.chatsService.addOrReplaceChat(chat);
     this.selectedChat = chat;
     this.showNewChat = null;

@@ -98,7 +98,6 @@ export class AudioService {
   }
 
   seekTo(seconds) {
-    console.log(seconds);
     this.audioObj.currentTime = seconds;
   }
 
