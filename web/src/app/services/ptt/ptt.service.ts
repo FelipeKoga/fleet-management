@@ -34,7 +34,7 @@ export class PttService {
     this.receivers = receivers;
   };
 
-  private setupStreaming = async () => {
+  private setupStreaming = async (payload) => {
     this.context = new AudioContext({
       sampleRate: 8000,
     });
@@ -49,9 +49,6 @@ export class PttService {
       this.audioProcessingListener
     );
     this.processor.connect(this.context.destination);
-  };
-
-  private audioStreamListener = (payload) => {
     this.audioProcessingListener = (e) => {
       this.webSocketService.sendMessage({
         action: Actions.PUSH_TO_TALK,
@@ -66,7 +63,6 @@ export class PttService {
   public async start(chatId: string, user: User, receivers: string[]) {
     this.recording$.next(true);
     this.setupVariables({ user, chatId, receivers });
-    this.setupStreaming();
     const payload = {
       user: this.user,
       receivers,
@@ -79,8 +75,7 @@ export class PttService {
         type: Actions.START_PUSH_TO_TALK,
       },
     });
-
-    this.audioStreamListener(payload);
+    this.setupStreaming(payload);
   }
 
   private disconnectStreaming = () => {
@@ -107,13 +102,13 @@ export class PttService {
     });
   }
 
-  public playAudio(audioBufferString: string) {
-    const parsedAudioBuffer = audioBufferString
+  public playAudio(audioAsString: string) {
+    const audioAsFloatArray = audioAsString
       .split(",")
       .map((value: string) => +value);
     const buf = this.context.createBuffer(1, 1024, 8000);
     const player = this.context.createBufferSource();
-    buf.copyToChannel(new Float32Array(parsedAudioBuffer), 0);
+    buf.copyToChannel(new Float32Array(audioAsFloatArray), 0);
     player.buffer = buf;
     player.connect(this.context.destination);
     player.start(0);
