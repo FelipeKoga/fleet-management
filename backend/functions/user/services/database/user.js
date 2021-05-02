@@ -1,4 +1,4 @@
-const { getByPK, fetchBySK, insert, update } = require('./query');
+const { getByPK, fetchBySK, insert, update, remove } = require('./query');
 const { removeConnectionIds } = require('./connection');
 
 const ProjectionExpression =
@@ -129,6 +129,21 @@ async function disableUser(username, companyId) {
     });
 }
 
+async function addNotificationToken(username, token) {
+    return insert({
+        partitionKey: `USER#${username}`,
+        sortKey: `NOTIFICATION#${token}`,
+        token,
+    });
+}
+
+async function removeNotificationToken(username, token) {
+    return remove({
+        partitionKey: `USER#${username}`,
+        sortKey: `NOTIFICATION#${token}`,
+    });
+}
+
 module.exports = {
     getUser,
     fetchUsers,
@@ -136,4 +151,6 @@ module.exports = {
     updateUser,
     disableUser,
     updateUserAvatar,
+    addNotificationToken,
+    removeNotificationToken,
 };

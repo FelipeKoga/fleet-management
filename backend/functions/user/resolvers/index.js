@@ -31,7 +31,7 @@ async function postMessage(user, action) {
 async function get(username, companyId) {
     const user = await Database.user.getUser(username, companyId);
     if (user.avatarKey) {
-        if (Date.now() >= user.avatarExpiration) {
+        if (Date.now() <= user.avatarExpiration) {
             user.avatar = S3.getObject(user.avatarKey);
             await Database.user.updateUserAvatar(
                 user,
@@ -73,7 +73,7 @@ async function create(data, companyId) {
     await Database.user.createUser(newUser, companyId);
     const user = await get(newUser.email, companyId);
     const message = `Prezado(a) ${user.name}, seu usuário foi criado. Para logar, use as seguintes credenciais: <br><br><b>Usuário:</b> ${user.username}<br><b>Senha:</b> ${password}`;
-    // await Email.sendEmail(user.email, 'Seu usuário foi criado!', message);
+    await Email.sendEmail(user.email, 'Seu usuário foi criado!', message);
     await postMessage(user, 'USER_CREATED');
     return user;
 }
@@ -104,18 +104,28 @@ async function disable(username, companyId) {
     await Database.user.disableUser(username, companyId);
     await postMessage(user, 'USER_DISABLED');
     const message = `Prezado(a) ${user.name}, seu usuário foi desabilitado por um administrador.`;
-    // await Email.sendEmail(user.email, 'Seu usuário foi desabilitado.', message);
+    await Email.sendEmail(user.email, 'Seu usuário foi desabilitado.', message);
     return { ...user, status: 'DISABLED' };
 }
 
 async function addLocation({ companyId, username, latitude, longitude }) {
-    await Database.location.addLocation(username, {
+    await Database.location.add(username, {
         latitude,
         longitude,
         lastUpdate: Date.now(),
     });
     const user = await get(username, companyId);
     await postMessage(user, 'USER_NEW_LOCATION');
+    return true;
+}
+
+async function addNotificationToken({ username, token }) {
+    await Database.user.addNotificationToken(username, token);
+    return true;
+}
+
+async function removeNotificationToken({ username, token }) {
+    await Database.user.removeNotificationToken(username, token);
     return true;
 }
 
@@ -126,4 +136,6 @@ module.exports = {
     update,
     disable,
     addLocation,
+    addNotificationToken,
+    removeNotificationToken,
 };

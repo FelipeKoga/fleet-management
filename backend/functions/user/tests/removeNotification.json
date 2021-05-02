@@ -1,0 +1,12 @@
+{
+    "httpMethod": "DELETE",
+    "resource": "/company/{companyId}/users/{username}/notification",
+
+    "pathParameters": {
+        "companyId": "1",
+        "username": "kosloski.fkoga@gmail.com"
+    },
+    "body": {
+        "token": "DJASIDJIOASJIDOAJSIODJASODJIOASJODASJISAJDIAJ"
+    }
+}

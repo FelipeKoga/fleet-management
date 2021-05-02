@@ -1,6 +1,6 @@
 const { insert, getByPK } = require('./query');
 
-async function addLocation(username, { latitude, longitude, lastUpdate }) {
+async function add(username, { latitude, longitude, lastUpdate }) {
     await insert({
         partitionKey: `USER#${username}`,
         sortKey: `LOCATION#${lastUpdate}`,
@@ -24,6 +24,6 @@ async function getLastLocation(username) {
 }
 
 module.exports = {
-    addLocation,
+    add,
     getLastLocation,
 };
