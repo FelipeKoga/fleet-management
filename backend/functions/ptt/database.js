@@ -1,6 +1,6 @@
 const DynamoDB = require('aws-sdk/clients/dynamodb');
 
-const docClient = new DynamoDB.DocumentClient();
+const dynamoDB = new DynamoDB.DocumentClient();
 const BaseParams = {
     TableName: process.env.TABLE,
     KeyConditionExpression: 'partitionKey = :pk and begins_with(sortKey, :sk)',
@@ -21,7 +21,7 @@ const formatResponse = (items, mapKey = true) => {
 };
 
 const fetchByPK = async (params, mapKey) => {
-    const { Items } = await docClient
+    const { Items } = await dynamoDB
         .query({
             ...BaseParams,
             ...params,
@@ -45,18 +45,20 @@ async function fetchChatUsers(chatId) {
 }
 
 async function fetchConnectionIds(username) {
-    const connectionIds = await fetchByPK(
-        {
+    const { Items } = await dynamoDB
+        .query({
+            TableName: process.env.TABLE,
+            KeyConditionExpression:
+                'partitionKey = :pk and begins_with(sortKey, :sk)',
             ExpressionAttributeValues: {
                 ':pk': `USER#${username}`,
                 ':sk': 'CONNECTION#',
             },
             ProjectionExpression: 'connectionId',
-        },
-        false,
-    );
+        })
+        .promise();
 
-    return connectionIds.map(res => res.connectionId);
+    return Items.map(res => res.connectionId);
 }
 
 module.exports = {

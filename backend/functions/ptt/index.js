@@ -31,7 +31,9 @@ exports.handler = async event => {
         connectionIdsPromises.push(fetchConnectionIds(receiver));
     });
 
-    const connectionIds = merge(await Promise.all(connectionIdsPromises));
+    const connectionIds = [
+        ...new Set(merge(await Promise.all(connectionIdsPromises))),
+    ];
 
     const action = getAction(type);
 
