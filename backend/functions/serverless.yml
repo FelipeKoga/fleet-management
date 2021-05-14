@@ -103,12 +103,6 @@ chat:
         APP: ${self:app}
         STAGE: ${self:custom.stage}
         TABLE: ${self:custom.table}
-company:
-    handler: functions/company/index.handler
-    package:
-        include:
-            - functions/company/*
-            - functions/company/*/**
 user:
     name: ${self:app}-user-${self:custom.stage}
     handler: functions/user/index.handler
@@ -162,6 +156,24 @@ user:
         - http:
               path: company/{companyId}/users/{username}/disable
               method: PUT
+              cors: true
+              authorizer:
+                  type: COGNITO_USER_POOLS
+                  authorizerId:
+                      Ref: ApiGatewayAuthorizer
+
+        - http:
+              path: company/{companyId}/users/{username}/notification
+              method: POST
+              cors: true
+              authorizer:
+                  type: COGNITO_USER_POOLS
+                  authorizerId:
+                      Ref: ApiGatewayAuthorizer
+
+        - http:
+              path: company/{companyId}/users/{username}/notification/{token}
+              method: DELETE
               cors: true
               authorizer:
                   type: COGNITO_USER_POOLS
