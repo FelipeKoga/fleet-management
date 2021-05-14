@@ -46,8 +46,23 @@ async function fetchConnectionIds(username) {
     return connectionIds.map(res => res.connectionId);
 }
 
+async function fetchNotificationTokens(username) {
+    const tokens = await fetchByPK(
+        {
+            ExpressionAttributeValues: {
+                ':pk': `USER#${username}`,
+                ':sk': 'NOTIFICATION#',
+            },
+        },
+        false,
+    );
+
+    return tokens.map(res => res.token);
+}
+
 module.exports = {
     getUser,
     fetchConnectionIds,
     updateUserAvatar,
+    fetchNotificationTokens,
 };

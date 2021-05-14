@@ -1,8 +1,11 @@
 const { setSeconds } = require('date-fns');
 const { nanoid } = require('nanoid');
+const NotificationService = require('../services/sns');
 const Database = require('../services/database');
 const Lambda = require('../services/lambda');
 const S3 = require('../services/s3');
+
+const notificationService = new NotificationService();
 
 async function getUser(username) {
     return Database.user.getUser(username);
@@ -202,6 +205,16 @@ async function addMessage({
           )
         : await getChat(id, username);
 
+    const notificationTokens = await Promise.all(
+        chatUsers.map(async member => {
+            const tokens = await Database.user.fetchNotificationTokens(member);
+            return {
+                member,
+                tokens,
+            };
+        }),
+    );
+
     await Promise.all(
         chatUsers.map(async memberUsername => {
             await Database.message.newMessages(id, memberUsername);
@@ -219,7 +232,34 @@ async function addMessage({
                 memberChat,
                 'CHAT_UPDATED',
             );
+
+            return memberChat;
         }),
+        sendWebSocketMessage(username, messageResponse, 'MESSAGE_SENT'),
+        sendWebSocketMessage(username, currentUserChat, 'CHAT_UPDATED'),
+    );
+
+    const user = await Database.user.getUser(username);
+
+    const notificationPromises = [];
+    chatUsers.forEach(memberUser => {
+        const notificationToken = notificationTokens.find(
+            nToken => nToken.member === memberUser,
+        );
+        if (notificationToken) {
+            notificationToken.tokens.forEach(token => {
+                notificationPromises.push(
+                    notificationService.send(token, {
+                        title: user.name,
+                        body: hasAudio ? 'Áudio' : message,
+                        chatId,
+                    }),
+                );
+            });
+        }
+    });
+    await Promise.all(
+        notificationPromises,
         sendWebSocketMessage(username, messageResponse, 'MESSAGE_SENT'),
         sendWebSocketMessage(username, currentUserChat, 'CHAT_UPDATED'),
     );
