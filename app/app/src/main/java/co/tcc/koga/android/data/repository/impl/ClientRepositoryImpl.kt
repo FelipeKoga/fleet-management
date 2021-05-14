@@ -5,6 +5,7 @@ import co.tcc.koga.android.data.database.AppDatabase
 import co.tcc.koga.android.data.database.dao.UserDAO
 import co.tcc.koga.android.data.database.entity.UserEntity
 import co.tcc.koga.android.data.network.aws.Client
+import co.tcc.koga.android.data.network.payload.NotificationPayload
 import co.tcc.koga.android.data.network.retrofit.Service
 import co.tcc.koga.android.data.network.socket.WebSocketService
 import co.tcc.koga.android.data.repository.ClientRepository
@@ -131,6 +132,20 @@ class ClientRepositoryImpl @Inject constructor(
 
     override fun user(): UserEntity {
         return Client.getInstance().currentUser
+    }
+
+    override suspend fun addNotificationToken(token: String) {
+        val currentUser = Client.getInstance().currentUser
+        try {
+            service.addNotificationToken(currentUser.companyId, currentUser.username, NotificationPayload(token))
+        } catch (e: Exception) {
+            println(e)
+        }
+    }
+
+    override suspend fun removeNotificationToken(token: String) {
+        val currentUser = Client.getInstance().currentUser
+        service.removeNotificationToken(currentUser.companyId, currentUser.username, token)
     }
 
 }

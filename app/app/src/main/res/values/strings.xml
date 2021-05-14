@@ -35,4 +35,5 @@
         <item>Bloqueado</item>
     </string-array>
 
+    <string name="notification_id">co.tcc.android</string>
 </resources>

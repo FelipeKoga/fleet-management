@@ -1,6 +1,8 @@
 package co.tcc.koga.android.ui
 
 import android.Manifest
+import android.app.NotificationManager
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
@@ -10,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.findNavController
 import co.tcc.koga.android.App
 import co.tcc.koga.android.R
 import co.tcc.koga.android.service.Actions
@@ -18,6 +21,9 @@ import co.tcc.koga.android.service.PushToTalkService
 import co.tcc.koga.android.service.requestLocationPermission
 
 import co.tcc.koga.android.ui.di.MainComponent
+import com.google.firebase.installations.FirebaseInstallations
+import com.google.firebase.messaging.FirebaseMessaging
+
 import javax.inject.Inject
 
 
@@ -37,7 +43,15 @@ class MainActivity : AppCompatActivity() {
 
         setTheme(R.style.SplashScreenTheme)
         super.onCreate(savedInstanceState)
+
         setContentView(R.layout.activity_main)
+
+        if (intent.extras?.get("notificationId") != null) {
+            val notificationManager: NotificationManager =
+                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.cancel(intent.getIntExtra("notificationId", 0))
+        }
+
         requestPermissions(
             arrayOf(
                 Manifest.permission.ACCESS_BACKGROUND_LOCATION,
@@ -48,10 +62,18 @@ class MainActivity : AppCompatActivity() {
             ), 1000
         )
 
+        FirebaseMessaging.getInstance().isAutoInitEnabled = true
         viewModel.observeUserStatus()
         viewModel.isSignIn.observe(this) { isSignIn ->
             if (isSignIn) {
                 startPushToTalkService()
+                FirebaseInstallations.getInstance().id.addOnCompleteListener {
+                    println(it.result)
+                }
+                FirebaseMessaging.getInstance().token.addOnCompleteListener {
+                    println("opa: ${it.result}")
+                    viewModel.addNotificationToken(it.result)
+                }
                 if (viewModel.isLocationEnabled()) {
                     if (requestLocationPermission(this)) {
                         startLocationService()

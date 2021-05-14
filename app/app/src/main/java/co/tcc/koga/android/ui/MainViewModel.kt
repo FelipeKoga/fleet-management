@@ -8,7 +8,9 @@ import androidx.lifecycle.viewModelScope
 import co.tcc.koga.android.data.database.entity.UserEntity
 import co.tcc.koga.android.data.repository.ClientRepository
 import co.tcc.koga.android.data.repository.PushToTalkRepository
+import co.tcc.koga.android.data.repository.UserRepository
 import co.tcc.koga.android.utils.Constants
+import com.google.firebase.installations.FirebaseInstallations
 import com.tinder.scarlet.Lifecycle
 import com.tinder.scarlet.ShutdownReason
 import kotlinx.coroutines.launch
@@ -37,6 +39,9 @@ class MainViewModel @Inject constructor(
     }
 
 
+    fun addNotificationToken(token: String) = viewModelScope.launch {
+        repository.addNotificationToken(token)
+    }
 
     fun isLocationEnabled(): Boolean {
         if (currentUser != null ) {

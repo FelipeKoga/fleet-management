@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:amazon="http://schemas.amazon.com/apk/res/android"
     package="co.tcc.koga.android">
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
@@ -11,6 +12,7 @@
     <uses-permission android:name="android.permission.MICROPHONE" />
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
 
     <uses-permission android:name="android.permission.INTERNET" />
@@ -25,10 +27,14 @@
     <uses-feature android:name="android.hardware.audio.pro" />
     <uses-feature android:name="android.hardware.microphone" />
 
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+
 
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
+        android:hardwareAccelerated="true"
+        android:usesCleartextTraffic="true"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:name=".App"
@@ -42,6 +48,8 @@
             android:exported="false"
             android:name=".service.PushToTalkService"
             android:enabled="true" />
+
+
         <activity
             android:name=".ui.MainActivity"
             android:label="@string/app_name"
@@ -53,6 +61,33 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <service
+            android:enabled="true"
+            android:stopWithTask="false"
+            android:name=".service.NotificationService"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
+        <amazon:enable-feature
+            android:name="com.amazon.device.messaging"
+            android:required="true" />
+
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/ic_baseline_message" />
+        <meta-data
+            android:name="firebase_analytics_collection_enabled"
+            android:value="false" />
+        <meta-data
+            android:name="firebase_messaging_auto_init_enabled"
+            android:value="true" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="@string/notification_id" />
     </application>
 
 </manifest>

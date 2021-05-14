@@ -25,11 +25,8 @@ class MessageRepositoryImpl @Inject constructor(
         return service.getMessages(user.companyId, user.username, chatId)
             .subscribeOn(Schedulers.newThread())
             .doOnNext { messages ->
-                if (messages.isEmpty()) {
-                    messageDAO.deleteAll(chatId)
-                } else {
-                    messageDAO.insertAll(messages)
-                }
+//                messageDAO.deleteAll(chatId)
+                messageDAO.insertAll(messages)
             }.subscribeOn(Schedulers.newThread()).map { messages ->
                 MessagesResponse(messages, true)
             }

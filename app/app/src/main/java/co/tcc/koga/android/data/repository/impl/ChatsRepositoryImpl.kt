@@ -42,6 +42,7 @@ class ChatsRepositoryImpl @Inject constructor(
         val user = Client.getInstance().currentUser
         return service.getChats(user.companyId, user.username).subscribeOn(Schedulers.newThread())
             .doOnNext { chats ->
+                chatDao.deleteAll()
                 chatDao.insertAll(chats)
             }.subscribeOn(Schedulers.newThread()).map { chats ->
                 ChatsResponse(chats, false)

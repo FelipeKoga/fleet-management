@@ -97,4 +97,6 @@ class UserRepositoryImpl @Inject constructor(
     override fun observeCurrentUser(): Observable<UserEntity> {
         return Client.getInstance().subCurrentUser
     }
+
+
 }

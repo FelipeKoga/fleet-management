@@ -24,4 +24,5 @@ interface UserRepository {
     suspend fun updateLocalUser(userEntity: UserEntity)
 
     fun observeCurrentUser(): Observable<UserEntity>
+
 }

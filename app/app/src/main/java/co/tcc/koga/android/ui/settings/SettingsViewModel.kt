@@ -1,7 +1,6 @@
 package co.tcc.koga.android.ui.settings
 
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -16,7 +15,8 @@ import javax.inject.Inject
 
 class SettingsViewModel @Inject constructor(
     val repository: ClientRepository,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val clientRepository: ClientRepository
 ) : ViewModel() {
     private val _isLoadingLocation = MutableLiveData(false)
     private val _isLoadingNotification = MutableLiveData(false)
@@ -28,13 +28,13 @@ class SettingsViewModel @Inject constructor(
     var notification: Boolean = currentUser.notificationEnabled
     var pushToTalk: Boolean = currentUser.pushToTalkEnabled
 
-    fun signOut() = viewModelScope.launch {
+    fun signOut(notificationToken: String) = viewModelScope.launch {
+        clientRepository.removeNotificationToken(notificationToken)
         try {
             repository.signOut()
         } catch (e: Exception) {
         }
     }
-
 
     private fun updateUser(newUser: UserEntity, _isLoading: MutableLiveData<Boolean>) =
         viewModelScope.launch {

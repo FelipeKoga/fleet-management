@@ -35,11 +35,6 @@ fun setPTTSerivceState(context: Context, state: ServiceState) {
 fun setLocationServiceState(context: Context, state: ServiceState) {
     setServiceState("LOCATION_SERVICE", "LOCATION_KEY", context, state)
 }
-//fun getServiceState(context: Context): ServiceState {
-//    val sharedPrefs = getPreferences(context)
-//    val value = sharedPrefs.getString(key, ServiceState.STOPPED.name)
-//    return ServiceState.valueOf(value as String)
-//}
 
 fun requestLocationPermission(context: Context): Boolean {
     if (ActivityCompat.checkSelfPermission(

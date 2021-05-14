@@ -108,6 +108,7 @@ dependencies {
     implementation "com.tinder.scarlet:websocket-okhttp:0.1.11"
 
     implementation platform('com.google.firebase:firebase-bom:26.6.0')
+    implementation 'com.google.firebase:firebase-messaging:22.0.0'
 
     implementation 'com.google.android.gms:play-services-maps:17.0.0'
     implementation 'com.google.android.gms:play-services-location:18.0.0'

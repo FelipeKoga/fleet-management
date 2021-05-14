@@ -1,6 +1,5 @@
 package co.tcc.koga.android.ui.settings
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Build
@@ -19,6 +18,8 @@ import co.tcc.koga.android.service.Actions
 import co.tcc.koga.android.service.LocationService
 import co.tcc.koga.android.ui.MainActivity
 import co.tcc.koga.android.utils.Constants
+import com.google.firebase.installations.FirebaseInstallations
+import com.google.firebase.messaging.FirebaseMessaging
 
 import javax.inject.Inject
 
@@ -49,7 +50,7 @@ class SettingsFragment : Fragment(R.layout.settings_fragment) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.apply {
-            linearLayoutLocationUpdate .visibility =
+            linearLayoutLocationUpdate.visibility =
                 if (viewModel.currentUser.role == Constants.UserRole.EMPLOYEE.name) View.VISIBLE else View.GONE
             switchLocation.isChecked = viewModel.location
             switchPushToTalk.isChecked = viewModel.pushToTalk
@@ -62,11 +63,14 @@ class SettingsFragment : Fragment(R.layout.settings_fragment) {
 
             linearLayoutLogout.setOnClickListener {
                 stopLocationService()
-                viewModel.signOut()
-                findNavController().popBackStack(R.id.loginFragment, true)
-                findNavController().navigate(
-                    R.id.loginFragment
-                )
+                FirebaseMessaging.getInstance().token.addOnCompleteListener {
+                    viewModel.signOut(it.result)
+                    findNavController().popBackStack(R.id.loginFragment, true)
+                    findNavController().navigate(
+                        R.id.loginFragment
+                    )
+                }
+
             }
 
 

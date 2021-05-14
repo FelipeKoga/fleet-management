@@ -42,5 +42,6 @@ interface ClientRepository {
     fun observeCurrentUser(): Observable<UserEntity>
 
     suspend fun signOut()
-
+    suspend fun addNotificationToken(token: String)
+    suspend fun removeNotificationToken(token: String)
 }

@@ -3,10 +3,7 @@ package co.tcc.koga.android.data.network.retrofit
 import co.tcc.koga.android.data.database.entity.ChatEntity
 import co.tcc.koga.android.data.database.entity.MessageEntity
 import co.tcc.koga.android.data.database.entity.UserEntity
-import co.tcc.koga.android.data.network.payload.NewChatPayload
-import co.tcc.koga.android.data.network.payload.NewGroupPayload
-import co.tcc.koga.android.data.network.payload.UploadResponse
-import co.tcc.koga.android.data.network.payload.UploadUrlPayload
+import co.tcc.koga.android.data.network.payload.*
 import io.reactivex.Observable
 import okhttp3.RequestBody
 import okhttp3.ResponseBody
@@ -58,6 +55,19 @@ interface Service {
         @Body body: UserEntity
     ): Observable<UserEntity>
 
+    @POST("company/{companyId}/users/{username}/notification")
+    suspend fun addNotificationToken(
+        @Path("companyId") companyId: String,
+        @Path("username") username: String,
+        @Body body: NotificationPayload
+    ): Boolean
+
+    @DELETE("company/{companyId}/users/{username}/notification/{token}")
+    suspend fun removeNotificationToken(
+        @Path("companyId") companyId: String,
+        @Path("username") username: String,
+        @Path("token") token: String
+    ): Boolean
 
     @POST("files")
     fun uploadUrl(
