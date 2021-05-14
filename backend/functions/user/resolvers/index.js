@@ -1,7 +1,10 @@
 const randomColor = require('randomcolor');
 const { setSeconds } = require('date-fns');
-const { Cognito, Database, Lambda, S3 } = require('../services');
+const { Cognito, Database, Lambda, S3, Email } = require('../services');
 const { updateUserAvatar } = require('../services/database/user');
+const NotificationService = require('../services/sns');
+
+const notificationService = new NotificationService();
 
 const generateRandomString = length => {
     const characters =
@@ -90,9 +93,6 @@ async function update(data, username, companyId) {
         payload.avatarExpiration = +setSeconds(Date.now(), 604800);
         await updateUserAvatar(user, payload.avatar, payload.avatarExpiration);
     }
-
-    console.log(payload);
-
     await Database.user.updateUser(payload, username, companyId);
     await postMessage(payload, 'USER_UPDATED');
     return { ...user, ...payload };
@@ -120,11 +120,13 @@ async function addLocation({ companyId, username, latitude, longitude }) {
 }
 
 async function addNotificationToken({ username, token }) {
-    await Database.user.addNotificationToken(username, token);
+    const arn = await notificationService.createEndpoint(token);
+    await Database.user.addNotificationToken(username, arn);
     return true;
 }
 
 async function removeNotificationToken({ username, token }) {
+    await notificationService.removeEndpoint(token);
     await Database.user.removeNotificationToken(username, token);
     return true;
 }

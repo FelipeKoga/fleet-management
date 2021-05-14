@@ -28,6 +28,13 @@ async function main({
                         parsedBody,
                     );
                 }
+
+                if (resource.includes('/notification')) {
+                    return Resolvers.addNotificationToken({
+                        username,
+                        token: parsedBody.token,
+                    });
+                }
                 return Resolvers.create(parsedBody, companyId);
             case 'PUT':
                 if (resource.includes('/disable')) {
@@ -36,6 +43,15 @@ async function main({
 
                 return Resolvers.update(parsedBody, username, companyId);
 
+            case 'DELETE':
+                if (resource.includes('notification')) {
+                    const { token } = pathParameters;
+                    return Resolvers.removeNotificationToken({
+                        username,
+                        token,
+                    });
+                }
+                break;
             default:
                 throw new Error('Method not allowed');
         }
@@ -68,7 +84,6 @@ exports.handler = async event => {
         return response;
     } catch (error) {
         console.log(error);
-        console.log(error.name);
         return {
             statusCode: 500,
             errorType: error.name,

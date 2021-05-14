@@ -53,7 +53,6 @@ async function updateUser(
         phone,
         email,
         role,
-        status,
         avatar,
         locationEnabled,
         pushToTalkEnabled,
@@ -68,9 +67,8 @@ async function updateUser(
             sortKey: `CONFIG#${companyId}`,
         },
         UpdateExpression:
-            'set customName = :customName, phone = :phone, email = :email, #role = :role, #status = :status, #name = :name, #avatar = :avatar,#locationEnabled = :locationEnabled, #pushToTalkEnabled = :pushToTalkEnabled, #notificationEnabled = :notificationEnabled',
+            'set customName = :customName, phone = :phone, email = :email, #role = :role, #name = :name, #avatar = :avatar,#locationEnabled = :locationEnabled, #pushToTalkEnabled = :pushToTalkEnabled, #notificationEnabled = :notificationEnabled',
         ExpressionAttributeNames: {
-            '#status': 'status',
             '#role': 'role',
             '#name': 'name',
             '#avatar': 'avatar',
@@ -83,7 +81,6 @@ async function updateUser(
             ':phone': phone,
             ':email': email,
             ':role': role,
-            ':status': status,
             ':name': name,
             ':avatar': avatar,
             ':locationEnabled': locationEnabled,

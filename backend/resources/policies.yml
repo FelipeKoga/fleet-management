@@ -108,3 +108,19 @@ Resources:
                           - arn:aws:execute-api:*:*:*/@connections/*
             Roles:
                 - !Ref TccRole
+    SNSPolicy:
+        Type: AWS::IAM::Policy
+        Properties:
+            PolicyName: ${self:app}-sns-policy-${self:custom.stage}
+            PolicyDocument:
+                Version: '2012-10-17'
+                Statement:
+                    - Effect: Allow
+                      Action:
+                          - SNS:CreatePlatformEndpoint
+                          - SNS:DeletePlatformApplication
+                          - SNS:Publish
+                      Resource:
+                          - arn:aws:sns:us-east-1:603366505042:app/GCM/tcc-project
+            Roles:
+                - !Ref TccRole
