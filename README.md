@@ -1,7 +1,7 @@
 # Fleet Management System
 
 ## Overview
-Advanced fleet management system powered by Android, Angular, and AWS, designed as a final paper project for the Systems Analysis and Development course. This system offers real-time mapping and integrated communication tools, providing a comprehensive solution for dynamic fleet monitoring.
+Fleet management system powered by Android, Angular, and AWS, designed as a final project for the Systems Analysis and Development course.
 
 ## Features
 - **Complete Chat Functionality**: chat system with options for both private and group conversations, supporting text and audio messages for efficient communication.
@@ -10,17 +10,16 @@ Advanced fleet management system powered by Android, Angular, and AWS, designed 
 - **User Management**: Manage organizational users with the ability to create new accounts.
 
 ## Academic Context
-This project was developed as part of a thesis for the Systems Analysis and Development course. The dissertation associated with this project can be found here: [Dissertation Link](https://repositorio.utfpr.edu.br/jspui/bitstream/1/26456/1/sistemageolocalizacaoservicostransporte.pdf).
+The dissertation associated with this project can be found here: [Dissertation Link](https://repositorio.utfpr.edu.br/jspui/bitstream/1/26456/1/sistemageolocalizacaoservicostransporte.pdf).
 
 ## Project Status
-Note: This project was developed for academic purposes and is not currently maintained.
+Note: This project was developed for academic purposes and is not **currently maintained**. However, there are plans to resume this project in the future, utilizing the latest technologies.
 
 ## Technologies
 - **Android App**: 
   - Room Database
   - Retrofit
   - Scarlet
-  - Maps SDK
   - RxJava
   - Dagger 2
   - Firebase Messaging
