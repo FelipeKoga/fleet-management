@@ -50,7 +50,7 @@ import { AgmOverlays } from "agm-overlays";
     AppRoutingModule,
     HttpClientModule,
     AgmCoreModule.forRoot({
-      apiKey: "***REMOVED***",
+      apiKey: "",
     }),
     AgmOverlays,
 
