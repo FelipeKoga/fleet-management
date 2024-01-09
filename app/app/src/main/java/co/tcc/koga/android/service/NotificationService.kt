@@ -43,8 +43,6 @@ class NotificationService : FirebaseMessagingService() {
     }
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
-        println("RECEIVE NOTIFICATION!!!===========================")
-        println(remoteMessage)
         val notificationId = ThreadLocalRandom.current().nextInt()
         val intent = Intent(this, MainActivity::class.java).apply {
             flags =

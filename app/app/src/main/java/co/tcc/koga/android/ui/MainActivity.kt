@@ -67,13 +67,11 @@ class MainActivity : AppCompatActivity() {
         viewModel.isSignIn.observe(this) { isSignIn ->
             if (isSignIn) {
                 startPushToTalkService()
-                FirebaseInstallations.getInstance().id.addOnCompleteListener {
-                    println(it.result)
-                }
+
                 FirebaseMessaging.getInstance().token.addOnCompleteListener {
-                    println("opa: ${it.result}")
                     viewModel.addNotificationToken(it.result)
                 }
+
                 if (viewModel.isLocationEnabled()) {
                     if (requestLocationPermission(this)) {
                         startLocationService()
