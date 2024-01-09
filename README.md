@@ -1,7 +1,7 @@
 # Fleet Management System
 
 ## Overview
-Fleet management system powered by Android, Angular, and AWS, designed as a final project for the Systems Analysis and Development course.
+Fleet management system built with Android, Angular, and AWS.
 
 ## Features
 - **Complete Chat Functionality**: chat system with options for both private and group conversations, supporting text and audio messages for efficient communication.
