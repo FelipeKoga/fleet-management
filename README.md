@@ -4,9 +4,9 @@
 Advanced fleet management system powered by Android, Angular, and AWS, designed as a final paper project for the Systems Analysis and Development course. This system offers real-time mapping and integrated communication tools, providing a comprehensive solution for dynamic fleet monitoring.
 
 ## Features
-- **Complete Chat Functionality**: create private or group chats with text and audio messaging capabilities.
+- **Complete Chat Functionality**: chat system with options for both private and group conversations, supporting text and audio messages for efficient communication.
 - **Audio Streaming**: Simulate walkie-talkie communication for direct audio streaming, allowing for hands-free interaction with the app.
-- **Real-Time Monitoring**: Monitor fleet managers in real-time using the Maps SDK, providing a live view of fleet movements and locations.
+- **Real-Time Monitoring**: Track and monitor drivers in real-time using the Maps SDK, offering a live view of vehicle movements and locations.
 - **User Management**: Manage organizational users with the ability to create new accounts.
 
 ## Academic Context
