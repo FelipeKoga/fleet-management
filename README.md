@@ -35,3 +35,4 @@ Note: This project was developed for academic purposes and is not **currently ma
   - API Gateway
   - DynamoDB - Single Table Design
   - S3
+  - SNS
