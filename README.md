@@ -16,7 +16,8 @@ The dissertation associated with this project can be found here: [Dissertation L
 Note: This project was developed for academic purposes and is not **currently maintained**. However, there are plans to resume this project in the future, utilizing the latest technologies.
 
 ## Technologies
-- **Android App**: 
+- **Android App**:
+  - Kotlin
   - Room Database
   - Retrofit
   - Scarlet
