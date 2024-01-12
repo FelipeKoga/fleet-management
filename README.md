@@ -26,10 +26,12 @@ Note: This project was developed for academic purposes and is not **currently ma
   - Firebase Messaging
   - Navigation Components
   - MVVM
+  - Amplify
 - **Web Interface**: 
   - Angular
   - Rxjs
   - Maps SDK
+  - Amplify
 - **Backend**:
   - AWS Lambda with NodeJS
   - Cognito
